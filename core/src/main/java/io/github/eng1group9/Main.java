@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -35,6 +36,8 @@ public class Main extends ApplicationAdapter {
     // Config
     private float playerSpeed = 100;
 
+    private long elapsedTime = 0;
+    private long lastFrameTime = System.currentTimeMillis();
 
     @Override
     public void create() {
@@ -62,6 +65,10 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void render() {
+        long frameTime = System.currentTimeMillis() - lastFrameTime;
+        lastFrameTime = System.currentTimeMillis();
+        elapsedTime += frameTime;
+
         input();
         logic();
         draw();
@@ -110,6 +117,10 @@ public class Main extends ApplicationAdapter {
 
     }
 
+    public String getClock() {
+        return Integer.toString(500 - (int)(elapsedTime / 1000));
+    }
+
     public void draw() {
         // Draw frame here
         ScreenUtils.clear(Color.BLACK);
@@ -121,6 +132,11 @@ public class Main extends ApplicationAdapter {
 
         batch.begin();
         player.draw(batch);
+
+        // Overlay text - must be before batch.end.
+        BitmapFont font = new BitmapFont();
+        font.draw(batch, getClock(), 10, 640 - 10);
+
         batch.end();
     }
 
@@ -134,5 +150,5 @@ public class Main extends ApplicationAdapter {
         viewport.update(width, height);
     }
 
-    
+
 }

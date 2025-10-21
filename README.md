@@ -1,5 +1,24 @@
 # mazegame
 
+
+## Build
+Run gradlew build and the jar will be in lwjgl3/build/libs
+
+## Run
+Run gradlew run
+
+
+
+
+
+
+
+
+
+
+
+# LibGDX initial README:
+
 A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
 
 This project was generated with a template including simple application launchers and an `ApplicationAdapter` extension that draws libGDX logo.
