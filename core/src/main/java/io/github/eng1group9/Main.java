@@ -12,7 +12,11 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.TiledMapTile.BlendMode;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -102,19 +106,57 @@ public class Main extends ApplicationAdapter {
         }
     }
 
+    // Returns true if the player can move there
+    private boolean checkCollision(float x, float y) {
+        TiledMapTileLayer collisionLayer = (TiledMapTileLayer) testMap.getLayers().get(0);
+
+        int startX = (int) (x / 32);
+        int startY = (int) (y / 32);
+        int endX = (int) ((x + 32) / 32);
+        int endY = (int) ((y + 32) / 32);
+
+        for (int checkY = startY; checkY <= endY; checkY++) {
+            for (int checkX = startX; checkX <= endX; checkX++) {
+                Cell cell = collisionLayer.getCell(checkX, checkY);
+
+                if (cell == null) {
+                    return false;
+                }
+
+                int tileId = cell.getTile().getId();
+
+                if (tileId == 32 || tileId == 33 || tileId == 34) {
+                    return false;
+                }
+            }
+        }
+
+
+        return true;
+    }
+
     private void playerInputs() {
+        float nextIntendedX = player.getX();
+        float nextIntendedY = player.getY();
+
+
         float delta = Gdx.graphics.getDeltaTime();
         if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            player.translateY(delta * playerSpeed);
+            nextIntendedY +=  delta * playerSpeed;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            player.translateX(delta * -playerSpeed);
+            nextIntendedX += delta * -playerSpeed;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            player.translateY(delta * -playerSpeed);
+            nextIntendedY += delta * -playerSpeed;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            player.translateX(delta * playerSpeed);
+            nextIntendedX +=  delta * playerSpeed;
+        }
+
+        if (checkCollision(nextIntendedX, nextIntendedY)) {
+            player.setX(nextIntendedX);
+            player.setY(nextIntendedY);
         }
     }
 
