@@ -22,6 +22,7 @@ public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
 
     private boolean isFullscreen = false;
+    private boolean isPaused = false;
 
     private TiledMap testMap;
     private OrthogonalTiledMapRenderer mapRenderer;
@@ -65,9 +66,11 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void render() {
+        // Move this somewhere else?
         long frameTime = System.currentTimeMillis() - lastFrameTime;
         lastFrameTime = System.currentTimeMillis();
-        elapsedTime += frameTime;
+
+        if (!isPaused) elapsedTime += frameTime;
 
         input();
         logic();
@@ -76,7 +79,7 @@ public class Main extends ApplicationAdapter {
 
     public void input() {
         // Process user inputs here
-        playerInputs();
+        if (!isPaused) playerInputs();
         miscInputs();
     }
 
@@ -84,15 +87,18 @@ public class Main extends ApplicationAdapter {
         if (Gdx.input.isKeyJustPressed(Input.Keys.F11)) {
             if (isFullscreen) {
                 Gdx.graphics.setWindowedMode(960, 640);
-                isFullscreen = false;
             }
             else {
                 Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
-                isFullscreen = true;
             }
+
+            isFullscreen = !isFullscreen;
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             Gdx.app.exit();
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+            isPaused = !isPaused;
         }
     }
 
