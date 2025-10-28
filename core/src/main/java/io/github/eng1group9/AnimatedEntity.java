@@ -19,6 +19,8 @@ import com.badlogic.gdx.math.Vector2;
  * @param frameNumbers An array of integers which state how many frames are in each animation, values should match the number of sprites on each row of the spriteSheet.
  * @param tileWidth How wide each tile in the SpriteSheet is in pixels.
  * @param tileHeight How high each tile in the SpriteSheet is in pixels.
+ * 
+ * @author Mat.
  */
 public class AnimatedEntity extends Entity{
 

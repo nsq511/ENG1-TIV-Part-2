@@ -3,6 +3,10 @@ package io.github.eng1group9;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
+/**
+ * Handles everything connect to the player.
+ * @author Mat.
+ */
 public class Player extends AnimatedEntity {
 
     private float speed;

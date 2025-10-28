@@ -66,15 +66,24 @@ public class Entity {
         hitbox.setY(y);
     }
 
+    /**
+    * @return the entity's x co-ordinate.
+    */
     public void translate(float x, float y) {
         sprite.translate(x, y);
         hitbox.setPosition(sprite.getX(), sprite.getY());
     }
 
+    /**
+    * @return the entity's x co-ordinate.
+    */
     public float getX() {
         return sprite.getX();
     }
 
+    /**
+    * @return the entity's y co-ordinate.
+    */
     public float getY() {
         return sprite.getY();
     }
@@ -83,6 +92,9 @@ public class Entity {
         sprite.draw(batch);
     }
 
+    /**
+    * @return the Rectangle used as the entity's hitbox.
+    */
     private Rectangle getHitbox() {
         return hitbox;
     }
