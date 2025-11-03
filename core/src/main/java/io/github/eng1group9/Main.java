@@ -52,6 +52,9 @@ public class Main extends ApplicationAdapter {
 
     private Player player;
     final Vector2 PLAYERSTARTPOS = new Vector2(18, 516);
+
+    private Dean dean;
+    final Vector2 DEANSTARTPOS = new Vector2(16, 532);
  
 
     @Override
@@ -59,8 +62,9 @@ public class Main extends ApplicationAdapter {
         missingTexture = new Texture("missingTexture.png");
         batch = new SpriteBatch();
         setupWorld();
-        player = new Player(PLAYERSTARTPOS);
         setupWorldCollision();
+        player = new Player(PLAYERSTARTPOS);
+        dean = new Dean(DEANSTARTPOS);
     }
 
     public void setupWorld() {
@@ -157,6 +161,7 @@ public class Main extends ApplicationAdapter {
 
         batch.begin();
         player.draw(batch);
+        dean.draw(batch);
         
         if (showCollision) { // show collisions for debugging
             for (Rectangle rectangle : worldCollision) {

@@ -34,6 +34,7 @@ public class AnimatedEntity extends Entity{
     private float frameInterval = 0.25f;
     private int currentAnimation = 0;
     private float animationPlayTime = 0f;
+    private boolean frozen = false;
 
     public AnimatedEntity(Texture spriteSheetTexture, int[] frameNumbers, int tileWidth, int tileHeight) {
         super(new Vector2(0,0), tileWidth, tileHeight);
@@ -65,6 +66,20 @@ public class AnimatedEntity extends Entity{
 
     public void pauseAnimation() {
         paused = true;
+    }
+
+    public void freeze() {
+        frozen = true;
+        pauseAnimation();
+    }
+
+    public void unfreeze() {
+        frozen = false;
+        playAnimation();
+    }
+
+    public boolean isFrozen() {
+        return frozen;
     }
 
     public TextureRegion getCurrentFrame() {

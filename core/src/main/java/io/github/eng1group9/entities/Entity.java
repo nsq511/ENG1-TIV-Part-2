@@ -104,7 +104,7 @@ public class Entity {
     /**
     * @return the Rectangle used as the entity's hitbox.
     */
-    Rectangle getHitbox() {
+    public Rectangle getHitbox() {
         return hitbox;
     }
 
@@ -112,10 +112,6 @@ public class Entity {
     * Toggle wether other entities can detect collision with this entity.
     */
     public void toggleCollision() {
-<<<<<<< HEAD:core/src/main/java/io/github/eng1group9/Entity.java
-=======
-
->>>>>>> 2bd06a4877e17fbb19fec4d1c9d7f5f5451165b4:core/src/main/java/io/github/eng1group9/entities/Entity.java
         canCollide = !canCollide;
     }
 
@@ -171,8 +167,4 @@ public class Entity {
     public void setScale(float newScale) {
         scale = newScale;
     }
-<<<<<<< HEAD:core/src/main/java/io/github/eng1group9/Entity.java
-=======
-
->>>>>>> 2bd06a4877e17fbb19fec4d1c9d7f5f5451165b4:core/src/main/java/io/github/eng1group9/entities/Entity.java
 }
