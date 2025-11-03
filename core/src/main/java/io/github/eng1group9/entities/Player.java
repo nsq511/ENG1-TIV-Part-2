@@ -1,4 +1,4 @@
-package io.github.eng1group9;
+package io.github.eng1group9.entities;
 
 import java.util.List;
 
@@ -16,14 +16,20 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class Player extends AnimatedEntity {
 
+<<<<<<< HEAD:core/src/main/java/io/github/eng1group9/Player.java
     private float speed = 100;
     private boolean playerFrozen = false;
     
+=======
+    private float speed;
+
+>>>>>>> 2bd06a4877e17fbb19fec4d1c9d7f5f5451165b4:core/src/main/java/io/github/eng1group9/entities/Player.java
     public Player(Vector2 startPos) {
         super(new Texture("Characters/playerAnimations.png"), new int[] {4, 4,4,4} , 32, 32);
         setPosition(startPos);
         setScale(2);
     }
+<<<<<<< HEAD:core/src/main/java/io/github/eng1group9/Player.java
     
 
     public void handleInputs(List<Rectangle> worldCollision) {
@@ -106,5 +112,7 @@ public class Player extends AnimatedEntity {
         }
         return true;
     }
+=======
+>>>>>>> 2bd06a4877e17fbb19fec4d1c9d7f5f5451165b4:core/src/main/java/io/github/eng1group9/entities/Player.java
 
 }

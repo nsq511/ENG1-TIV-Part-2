@@ -30,6 +30,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
+import io.github.eng1group9.entities.*;
+
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
@@ -135,7 +137,7 @@ public class Main extends ApplicationAdapter {
     public void logic() {
         // Process game logic here
         float delta = Gdx.graphics.getDeltaTime();
-        if (!isPaused) elapsedTime += delta;
+        if (!isPaused) elapsedTime += (delta * 1000);
     }
 
     public String getClock() {
