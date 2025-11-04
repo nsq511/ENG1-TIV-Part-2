@@ -100,6 +100,7 @@ public class Main extends ApplicationAdapter {
     @Override
     public void render() {
         checkForKey();
+        checkForNearChestRoomDoorWithKey();
         input();
         logic();
         draw();
@@ -111,6 +112,17 @@ public class Main extends ApplicationAdapter {
 
         if (((playerX - 17) * (playerX - 17)) + ((playerY - 223) * (playerY - 223)) < 50) {
             player.setHasChestRoomKey(true);
+        }
+    }
+
+    private void checkForNearChestRoomDoorWithKey() {
+        float playerX = player.getX();
+        float playerY = player.getY();
+
+        if (((playerX - 238) * (playerX - 238)) + ((playerY - 416) * (playerY - 416)) < 50) {
+            if (player.hasChestRoomKey()) {
+
+            }
         }
     }
 
