@@ -88,7 +88,7 @@ public class Main extends ApplicationAdapter {
         // Process user inputs here
         miscInputs();
 
-        if (player.hasKey()) {
+        if (player.hasExitKey()) {
             player.handleInputs(worldCollision);
         } else {
             player.handleInputs(Stream.concat(worldCollision.stream(), exitDoorCollision.stream()).toList());
@@ -120,12 +120,12 @@ public class Main extends ApplicationAdapter {
     private void tryInteract() {
         if (!chest.opened) {
             if (chest.distanceTo(player) < 50) {
-                player.setHasKey(true);
+                player.setHasExitKey(true);
                 chest.open();
             }
         }
 
-        System.out.println(player.hasKey());
+        System.out.println(player.hasExitKey());
     }
 
     private void toggleFullscreen() {
@@ -199,7 +199,7 @@ public class Main extends ApplicationAdapter {
 
 
 
-        
+
         batch.end();
         // Overlay text - must be before batch.end.
 
@@ -217,7 +217,7 @@ public class Main extends ApplicationAdapter {
             UI.draw(missingTexture, player.getHitbox().x + 16, player.getHitbox().y+ 16, player.getHitbox().width, player.getHitbox().height);
             UI.draw(missingTexture, dean.getHitbox().x + 16, dean.getHitbox().y+ 16, dean.getHitbox().width, dean.getHitbox().height);
             chest.draw(batch);
-            
+
         }
         UI.end();
 

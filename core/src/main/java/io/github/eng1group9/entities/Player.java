@@ -2,8 +2,6 @@ package io.github.eng1group9.entities;
 
 import java.util.List;
 
-import javax.management.InvalidAttributeValueException;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
@@ -17,7 +15,8 @@ import com.badlogic.gdx.math.Vector2;
 public class Player extends AnimatedEntity {
 
     private float speed = 100;
-    private boolean hasKey = false;
+    private boolean hasExitKey = false;
+    private boolean hasChestRoomKey = false;
 
     public Player(Vector2 startPos) {
         super(new Texture("Characters/playerAnimations.png"), new int[] {4, 4,4,4} , 32, 32);
@@ -93,11 +92,18 @@ public class Player extends AnimatedEntity {
         return true;
     }
 
-    public boolean hasKey() {
-        return hasKey;
+    public boolean hasExitKey() {
+        return hasExitKey;
     }
 
-    public void setHasKey(Boolean bool) {
-        hasKey = bool;
+    public void setHasExitKey(Boolean bool) {
+        hasExitKey = bool;
+    }
+    public boolean hasChestRoomKey() {
+        return hasChestRoomKey;
+    }
+
+    public void setHasChestRoomKey(Boolean bool) {
+        hasChestRoomKey = bool;
     }
 }
