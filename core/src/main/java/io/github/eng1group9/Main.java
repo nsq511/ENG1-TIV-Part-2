@@ -57,6 +57,8 @@ public class Main extends ApplicationAdapter {
 
     private Chest chest;
 
+    public static Main instance;
+
 
 
     @Override
@@ -69,6 +71,7 @@ public class Main extends ApplicationAdapter {
         player = new Player(PLAYERSTARTPOS);
         dean = new Dean(DEANSTARTPOS);
         chest = new Chest();
+        instance = this;
     }
 
     public void setupWorld() {

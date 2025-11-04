@@ -2,6 +2,8 @@ package io.github.eng1group9.entities;
 
 import java.util.List;
 
+import io.github.eng1group9.Main;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
@@ -108,6 +110,7 @@ public class Player extends AnimatedEntity {
         if (bool) {
             System.out.println("Got key");
             hasChestRoomKey = bool;
+            Main.instance.deleteKeyTile();
         }
     }
 }
