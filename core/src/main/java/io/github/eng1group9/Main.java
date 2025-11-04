@@ -99,9 +99,19 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void render() {
+        checkForKey();
         input();
         logic();
         draw();
+    }
+
+    public void checkForKey() {
+        float playerX = player.getX();
+        float playerY = player.getY();
+
+        if (((playerX - 17) * (playerX - 17)) + ((playerY - 223) * (playerY - 223)) < 50) {
+            player.setHasChestRoomKey(true);
+        }
     }
 
     public void input() {
@@ -133,7 +143,6 @@ public class Main extends ApplicationAdapter {
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
             tryInteract();
-            deleteKeyTile();
         }
     }
 
@@ -145,8 +154,6 @@ public class Main extends ApplicationAdapter {
                 chest.open();
             }
         }
-
-        System.out.println(player.hasExitKey());
     }
 
     private void toggleFullscreen() {
