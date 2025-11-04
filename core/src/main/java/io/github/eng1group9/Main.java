@@ -28,6 +28,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import io.github.eng1group9.entities.*;
+import io.github.eng1group9.toasts.ToastManager;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
@@ -176,6 +177,8 @@ public class Main extends ApplicationAdapter {
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
             tryInteract();
+
+            ToastManager.addToast("hello");
         }
     }
 
@@ -272,7 +275,14 @@ public class Main extends ApplicationAdapter {
         font.draw(UI, getClock(), 10, 640 - 10);
 
 
-        List<String> toastTexts = new LinkedList<>();
+        ToastManager.clearExpiredToasts();
+        List<String> toastTexts = ToastManager.getToasts();
+        int offset = 0;
+
+        for (String text : toastTexts) {
+            offset += 50;
+            font.draw(UI, text, 10, (640 - 10) - offset);
+        }
 
 
 
