@@ -91,7 +91,10 @@ public class Main extends ApplicationAdapter {
     public void render() {
         input();
         logic();
-        draw();
+        renderingSystem.draw(player, dean, showCollision, elapsedTime, worldCollision);
+        if (isPaused) {
+            renderingSystem.renderPauseOverlay(960, 640);
+        }
     }
 
     public void checkForKey() {
@@ -227,10 +230,6 @@ public class Main extends ApplicationAdapter {
         dean.nextMove(worldCollision);
         checkForKey();
         checkForNearChestRoomDoorWithKey();
-    }
-
-    public void draw() {
-        renderingSystem.draw(player, dean, showCollision, elapsedTime, worldCollision);
     }
 
     @Override

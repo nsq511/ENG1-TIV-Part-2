@@ -96,4 +96,23 @@ public class RenderingSystem {
     public void resize(int width, int height) {
         viewport.update(width, height);
     }
+
+    public void renderPauseOverlay(int screenWidth, int screenHeight) {
+        uiBatch.begin();
+        uiBatch.setColor(0, 0, 0, 0.5f);
+        uiBatch.draw(missingTexture, 0, 0, screenWidth, screenHeight);
+        uiBatch.setColor(1, 1, 1, 1);
+
+        font.getData().setScale(2f);
+        font.draw(uiBatch, "Max's Maze", screenWidth / 2f, (screenHeight / 2f) + 40);
+        font.draw(uiBatch, "Instructions", screenWidth / 2f, (screenHeight / 2f) - 100);
+        font.getData().setScale(1f);
+        font.draw(uiBatch, "Press P to resume!", screenWidth / 2f, screenHeight / 2f);
+        font.draw(uiBatch, "Press ESC to quit.", screenWidth / 2f, (screenHeight / 2f) - 20);
+        font.draw(uiBatch, "Press E to interact.", screenWidth / 2f, (screenHeight / 2f) - 40);
+        font.draw(uiBatch, "Use WASD to move.", screenWidth / 2f, (screenHeight / 2f) - 60);
+        font.draw(uiBatch, "Avoid the dean and escape the maze in time!", screenWidth / 2f, (screenHeight / 2f) - 140);
+
+        uiBatch.end();
+    }
 }
