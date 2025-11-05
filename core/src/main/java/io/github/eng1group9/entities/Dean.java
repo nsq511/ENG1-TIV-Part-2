@@ -10,38 +10,59 @@ import com.badlogic.gdx.math.Vector2;
 public class Dean extends MovingEntity {
     private int reach = 3; // size of dean hitbox in tiles (3x3)
     private int moveNum = 0;
-    private char[] path;
+    private int stepsLeft = 32;
+    private Character[] path;
+    private Rectangle reachRectangle;
 
-    public Dean(Vector2 startPos, float speed, char[] path) {
+    public Dean(Vector2 startPos, float speed, Character[] path) {
         super(new Texture("Characters/deanAnimations.png"), new int[] {4, 4,4,4} , 32, 32, speed);
         setPosition(startPos);
         setScale(2);
 
         Rectangle reachHitbox = new Rectangle();
-        reachHitbox.setCenter(startPos);
-        reachHitbox.setSize(reach * 32);
-        setHitbox(reachHitbox);
+
+        reachRectangle = new Rectangle();
+        reachRectangle.setCenter(startPos);
+        reachRectangle.setSize(reach * 32);
 
         this.path = path;
     }
 
     public void nextMove(List<Rectangle> worldCollision) {
         if (!isFrozen()) {
-            switch (getNextMove()) {
-                case 'U':
-                    
-                    break;
-            
-                default:
-                    break;
-            }
+            Character direction = getNextDirection();
+             move(direction, worldCollision);
+             updateAnimation(direction);
+             stepsLeft--;
+             if (stepsLeft == 0) {
+                stepsLeft = 32;
+                moveNum++;
+             }
         }
     }
 
-    
-
-    private char getNextMove() {
+    private Character getNextDirection() {
+        if (moveNum >= path.length) {
+            moveNum = 0;
+        }
         return path[moveNum];
+    }
+
+    private void updateAnimation(Character direction) {
+        switch (direction) {
+                case 'U':
+                    changeAnimation(1);
+                    break;
+                case 'L':
+                    changeAnimation(3);
+                    break;
+                case 'D':
+                    changeAnimation(0);
+                    break;
+                case 'R':
+                    changeAnimation(2);
+                    break;
+            }
     }
 
 

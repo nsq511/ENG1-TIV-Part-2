@@ -55,15 +55,22 @@ public class Main extends ApplicationAdapter {
     final float DEFAULTPLAYERSPEED = 100;
 
     private Dean dean;
-    final Vector2 DEANSTARTPOS = new Vector2(16, 532);
-    final char[] DEANPATH = {'R', 'D', 'L', 'U'};
-    final float DEFAULTDEANSPEED = 10;
+    final Vector2 DEANSTARTPOS = new Vector2(32, 352);
+    final float DEFAULTDEANSPEED = 100;
+    final Character[] DEANPATH = {
+        'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
+        'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D',
+        'R', 'R', 'R', 
+        'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U',
+        'L', 'L', 'L',
+        'D', 'D', 'D', 'D',
+        'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L'
+    };
+    
 
     private Chest chest;
 
     public static Main instance;
-
-
 
     @Override
     public void create() {
@@ -162,8 +169,6 @@ public class Main extends ApplicationAdapter {
         }
     }
 
-
-
     public void miscInputs() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.F11)) {
             toggleFullscreen();
@@ -243,6 +248,7 @@ public class Main extends ApplicationAdapter {
         // Process game logic here
         float delta = Gdx.graphics.getDeltaTime();
         if (!isPaused) elapsedTime += (delta * 1000);
+        dean.nextMove(worldCollision);
     }
 
     public String getClock() {

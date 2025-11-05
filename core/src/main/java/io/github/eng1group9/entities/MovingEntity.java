@@ -17,6 +17,7 @@ import com.badlogic.gdx.math.Rectangle;
 public class MovingEntity extends AnimatedEntity {
 
     private float speed = 0;
+    private boolean frozen = false;
 
     public MovingEntity(Texture spriteSheetTexture, int[] frameNumbers, int tileWidth, int tileHeight, float speed) {
         super(spriteSheetTexture, frameNumbers, tileWidth, tileHeight);
@@ -32,31 +33,33 @@ public class MovingEntity extends AnimatedEntity {
     }
 
     /**
-     * Moves the entity in a given direction provided it wont collide with anything. 
+     * Moves the entity in a given direction provided it wont collide with anything and . 
      * @param direction The direction as either 'U' 'D' 'L' or'R' 
      * @param collisionRectangles A list of rectangles which the entity cannot move into.
      */
-    public void move(char direction, List<Rectangle> collisionRectangles){
-        float delta = Gdx.graphics.getDeltaTime();
-        float distance = delta * speed;
-        float newX = getX();
-        float newY = getY();
-        switch (direction) {
-            case 'U':
-                newY += distance;
-                break;
-            case 'D':
-                newY -= distance;
-                break;
-            case 'L':
-                newX-= distance;
-                break;
-            case 'R':
-                newX += distance;
-                break;
-        }
-        if (safeToMove(newX, newY, collisionRectangles)) {
+    public void move(Character direction, List<Rectangle> collisionRectangles){
+        if (!frozen) {
+            float delta = Gdx.graphics.getDeltaTime();
+            float distance = delta * speed;
+            float newX = getX();
+            float newY = getY();
+            switch (direction) {
+                case 'U':
+                    newY += distance;
+                    break;
+                case 'D':
+                    newY -= distance;
+                    break;
+                case 'L':
+                    newX-= distance;
+                    break;
+                case 'R':
+                    newX += distance;
+                    break;
+            }
+            if (safeToMove(newX, newY, collisionRectangles)) {
                 setPosition(newX, newY);
+            }
         }
     }
 
@@ -72,6 +75,20 @@ public class MovingEntity extends AnimatedEntity {
             }
         }
         return true;
+    }
+
+    public void freeze() {
+        frozen = true;
+        pauseAnimation();
+    }
+
+    public void unfreeze() {
+        frozen = false;
+        playAnimation();
+    }
+
+    public boolean isFrozen() {
+        return frozen;
     }
 
 }
