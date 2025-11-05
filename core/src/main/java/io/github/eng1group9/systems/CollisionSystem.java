@@ -27,22 +27,11 @@ public class CollisionSystem {
             nextRectangle.set(nextRectangle.x * 2,nextRectangle.y * 2, nextRectangle.width * 2, nextRectangle.height * 2);
             worldCollision.add(nextRectangle);
         }
-
-
-        MapLayer collisionLayer2 = map.getLayers().get("exitdoor collision");
-        MapObjects collisionObjects2 = collisionLayer2.getObjects();
-        exitDoorCollision = new LinkedList<>();
-        for (MapObject mapObject : collisionObjects2) {
-            Rectangle nextRectangle = ((RectangleMapObject) mapObject).getRectangle();
-            nextRectangle.set(nextRectangle.x * 2,nextRectangle.y * 2, nextRectangle.width * 2, nextRectangle.height * 2);
-            exitDoorCollision.add(nextRectangle);
-        }
     }
 
     public List<Rectangle> getWorldCollision() { return worldCollision; }
-    public List<Rectangle> getExitDoorCollision() { return exitDoorCollision; }
-
-    // Serches collision layer for name
+    
+    // Serches collision Rectangle for name
     // Then deletes from world collision by the rectangle
     public void removeCollisionByName(String name) {
         MapLayer collisionLayer = map.getLayers().get("Collision");
@@ -61,6 +50,14 @@ public class CollisionSystem {
             Rectangle r = ((RectangleMapObject) m).getRectangle();
             worldCollision.remove(r);
         }
+    }
+
+    public void hideLayer(String name) {
+        map.getLayers().get(name).setVisible(false);;
+    }
+
+    public void showLayer(String name) {
+        map.getLayers().get(name).setVisible(true);;
     }
 
     public void deleteKeyTile() {
@@ -86,13 +83,6 @@ public class CollisionSystem {
         for (Rectangle rectangle : worldCollision) {
             if (rectangle.overlaps(testHitbox)) {
                 return false;
-            }
-        }
-        if (!io.github.eng1group9.Main.instance.player.hasExitKey()) {
-            for (Rectangle rectangle : exitDoorCollision) {
-                if (rectangle.overlaps(testHitbox)) {
-                    return false;
-                }
             }
         }
         return true;

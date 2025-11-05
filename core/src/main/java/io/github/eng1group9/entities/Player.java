@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import io.github.eng1group9.systems.ToastSystem;
+import io.github.eng1group9.systems.CollisionSystem;
 
 /**
  * Handles everything connected to the player.
@@ -31,18 +32,21 @@ public class Player extends MovingEntity {
         return hasExitKey;
     }
 
-    public void setHasExitKey(Boolean bool) {
-        ToastSystem.addToast("You found the exit key!");
-        hasExitKey = bool;
+    public void giveExitKey() {
+        if (!hasExitKey) {
+            hasExitKey = true;
+            ToastSystem.addToast("You found the exit key!");
+            Main.collisionSystem.removeCollisionByName("mainDoor");
+        }
     }
+
     public boolean hasChestRoomKey() {
         return hasChestRoomKey;
     }
 
-    public void setHasChestRoomKey(Boolean bool) {
-        hasChestRoomKey = bool;
-
-        if (bool) {
+    public void giveChestRoomKey() {
+        if (!hasChestRoomKey) {
+            hasChestRoomKey = true;
             Main.instance.deleteKeyTile();
             ToastSystem.addToast("You found the key!");
         }

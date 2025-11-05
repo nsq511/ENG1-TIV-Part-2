@@ -23,6 +23,8 @@ public class Main extends ApplicationAdapter {
     boolean isPaused = false;
     boolean gameStarted = false;
 
+    public boolean chestDoorOpen = false;
+
     private TimerSystem timerSystem = new TimerSystem();
     public boolean showCollision = false;
 
@@ -97,7 +99,7 @@ public class Main extends ApplicationAdapter {
         float playerY = player.getY();
 
         if (((playerX - 17) * (playerX - 17)) + ((playerY - 223) * (playerY - 223)) < 50) {
-            player.setHasChestRoomKey(true);
+            player.giveChestRoomKey();
         }
     }
 
@@ -109,6 +111,7 @@ public class Main extends ApplicationAdapter {
             if (player.hasChestRoomKey()) {
                 ToastSystem.addToast("You opened the door");
                 collisionSystem.removeCollisionByName("chestRoomDoor");
+                collisionSystem.hideLayer("ChestDoorClosed");
             }
         }
     }
@@ -127,7 +130,7 @@ public class Main extends ApplicationAdapter {
     public void tryInteract() {
         if (!chest.opened) {
             if (chest.distanceTo(player) < 50) {
-                player.setHasExitKey(true);
+                player.giveExitKey();
                 chest.open();
             }
         }

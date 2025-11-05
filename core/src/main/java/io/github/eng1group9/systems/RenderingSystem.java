@@ -11,6 +11,8 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+
+import io.github.eng1group9.Main;
 import io.github.eng1group9.entities.Dean;
 import io.github.eng1group9.entities.Player;
 import io.github.eng1group9.systems.ToastSystem.Toast;
@@ -60,7 +62,7 @@ public class RenderingSystem {
         dean.draw(worldBatch);
         worldBatch.end();
 
-        int[] abovePlayer = {3, 4, 5, 6, 7, 8}; // the layers which should appear above the player
+        int[] abovePlayer = {3, 4, 5, 6, 7, 8, 9, 10}; // the layers which should appear above the player
         mapRenderer.render(abovePlayer);
 
         uiBatch.begin();
