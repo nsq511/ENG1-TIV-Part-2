@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import io.github.eng1group9.entities.Dean;
 import io.github.eng1group9.entities.Player;
+import io.github.eng1group9.systems.ToastSystem.Toast;
 
 import java.util.List;
 
@@ -75,17 +76,20 @@ public class RenderingSystem {
 
     public void renderToasts(BitmapFont font, SpriteBatch uiBatch) {
         ToastSystem.clearExpiredToasts();
-        List<String> toastTexts = ToastSystem.getToasts();
+        List<Toast> toasts = ToastSystem.getToasts();
         int offset = 0;
 
-        for (String text : toastTexts) {
+        for (Toast t : toasts) {
             offset += 30;
-            font.draw(uiBatch, text, 10, (640 - 10) - offset);
+            font.setColor(t.getColour());
+            font.draw(uiBatch, t.getText(), 10, (640 - 10) - offset);
         }
+        font.setColor(1, 1, 1, 1);
     }
 
     public void renderCollision(SpriteBatch uiBatch, List<Rectangle> worldCollision, Player player, Dean dean) {
         for (Rectangle rectangle : worldCollision) {
+            uiBatch.setColor(1, 0, 0, 0.75f);
             uiBatch.draw(missingTexture, rectangle.x, rectangle.y , rectangle.width, rectangle.height);
         }
         uiBatch.draw(missingTexture, player.getHitbox().x + 16, player.getHitbox().y+ 16, player.getHitbox().width, player.getHitbox().height);
@@ -105,12 +109,39 @@ public class RenderingSystem {
         font.getData().setScale(2f);
         font.draw(uiBatch, "Escape from Uni", screenWidth / 2f, (screenHeight / 2f) + 40);
         font.draw(uiBatch, "Instructions", screenWidth / 2f, (screenHeight / 2f) - 100);
+
         font.getData().setScale(1f);
         font.draw(uiBatch, "Press P to resume!", screenWidth / 2f, screenHeight / 2f);
         font.draw(uiBatch, "Press ESC to quit.", screenWidth / 2f, (screenHeight / 2f) - 20);
         font.draw(uiBatch, "Press E to interact.", screenWidth / 2f, (screenHeight / 2f) - 40);
         font.draw(uiBatch, "Use WASD or arrow keys to move.", screenWidth / 2f, (screenHeight / 2f) - 60);
         font.draw(uiBatch, "Avoid the dean and escape the maze in time!", screenWidth / 2f, (screenHeight / 2f) - 140);
+        
+        uiBatch.end();
+    }
+
+    public void renderStartOverlay(int screenWidth, int screenHeight) {
+        uiBatch.begin();
+        uiBatch.setColor(0, 0, 0, 0.5f);
+        uiBatch.draw(missingTexture, 0, 0, screenWidth, screenHeight);
+        uiBatch.setColor(1, 1, 1, 1);
+
+        font.getData().setScale(2f);
+        font.draw(uiBatch, "Escape from Uni", screenWidth / 2f, (screenHeight / 2f) + 40);
+        font.draw(uiBatch, "Instructions", screenWidth / 2f, (screenHeight / 2f) - 100);
+
+        font.setColor(0, 1, 1, 1);
+        font.draw(uiBatch, "Press Space to Start!", screenWidth / 2f, (screenHeight / 2f) - 200);
+        font.setColor(1, 1, 1, 1);
+
+        font.getData().setScale(1f);
+        font.draw(uiBatch, "Press P to pause!", screenWidth / 2f, screenHeight / 2f);
+        font.draw(uiBatch, "Press ESC to quit.", screenWidth / 2f, (screenHeight / 2f) - 20);
+        font.draw(uiBatch, "Press E to interact.", screenWidth / 2f, (screenHeight / 2f) - 40);
+        font.draw(uiBatch, "Use WASD or arrow keys to move.", screenWidth / 2f, (screenHeight / 2f) - 60);
+        font.draw(uiBatch, "Press P to pause!", screenWidth / 2f, screenHeight / 2f);
+        font.draw(uiBatch, "Avoid the dean and escape the maze in time!", screenWidth / 2f, (screenHeight / 2f) - 140);
+        
 
         uiBatch.end();
     }

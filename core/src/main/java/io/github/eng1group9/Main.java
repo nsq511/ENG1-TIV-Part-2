@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -44,6 +45,9 @@ public class Main extends ApplicationAdapter {
         'D', 'D', 'D', 'D',
         'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L'
     };
+
+    final Color BAD = new Color(1,1,0,1);
+    final Color GOOD = new Color(0,1,1,1);
 
 
     private Chest chest;
@@ -176,6 +180,8 @@ public class Main extends ApplicationAdapter {
         dean.setPosition(PLAYERSTARTPOS.x + 32, PLAYERSTARTPOS.y);
         playerCaught = true;
         timerSystem.addGradually(48000); // 48 not 50 because you spend 2s stood while the timer goes down.
+        ToastSystem.addToast("You were caught by the Dean!", BAD);
+        ToastSystem.addToast("You were stuck being lectured for 50s!", BAD);
     }
 
     private void endPlayerCatch() {
