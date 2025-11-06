@@ -17,16 +17,16 @@ public class InputSystem {
             Gdx.app.exit(); // Close the game
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
-            Main.instance.togglePause();
+            Main.togglePause();
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.F2)) {
             Main.instance.showCollision = !Main.instance.showCollision;
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-            Main.instance.tryInteract();
+            TriggerSystem.check(player);
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            Main.instance.startGame();
+            Main.startGame();
         }
         
 

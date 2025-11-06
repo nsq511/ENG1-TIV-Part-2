@@ -14,30 +14,37 @@ import io.github.eng1group9.systems.InputSystem;
 import io.github.eng1group9.systems.RenderingSystem;
 import io.github.eng1group9.systems.CollisionSystem;
 import io.github.eng1group9.systems.ToastSystem;
+import io.github.eng1group9.systems.TriggerSystem;
 import io.github.eng1group9.systems.TimerSystem;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
 
     boolean isFullscreen = false;
-    boolean isPaused = false;
-    boolean gameStarted = false;
+    static int gameState = 0;
+    /// 0 = Not started
+    /// 1 = Playing
+    /// 2 = Paused
+    /// 3 = Win
+    /// 4 = Lose
 
     public static boolean chestDoorOpen = false;
-    public static boolean mainDoorOpen = false;
+    public static boolean exitOpen = false;
 
-    private TimerSystem timerSystem = new TimerSystem();
+    private static TimerSystem timerSystem = new TimerSystem();
     public boolean showCollision = false;
 
     private List<Rectangle> worldCollision;
+    final static int LONGBOIBONUS = 2000;
+    final static String TMXPATH = "World/testMap.tmx";
 
-    public Player player;
-    private boolean playerCaught = false;
+    public static Player player;
+    private static boolean playerCaught = false;
     private float playerCaughtTime = 2;
     final Vector2 PLAYERSTARTPOS = new Vector2(16, 532);
     final float DEFAULTPLAYERSPEED = 100;
 
-    private Dean dean;
+    private static Dean dean;
     final Vector2 DEANSTARTPOS = new Vector2(32, 352);
     final float DEFAULTDEANSPEED = 100;
     final Character[] DEANPATH = {
@@ -50,8 +57,8 @@ public class Main extends ApplicationAdapter {
         'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L'
     };
 
-    final Color BAD = new Color(1,1,0,1);
-    final Color GOOD = new Color(0,1,1,1);
+    final static Color BAD = new Color(1,1,0,1);
+    final static Color GOOD = new Color(0,1,1,1);
 
 
     private Chest chest;
@@ -63,14 +70,14 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void create() {
-        renderingSystem.initWorld("World/testMap.tmx", 480, 320);
+        renderingSystem.initWorld(TMXPATH, 480, 320);
         collisionSystem.init(renderingSystem.getMapRenderer().getMap());
+        TriggerSystem.init(TMXPATH);
         worldCollision = collisionSystem.getWorldCollision();
-
         player = new Player(PLAYERSTARTPOS, DEFAULTPLAYERSPEED);
         dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEANPATH);
         chest = new Chest();
-        togglePause(); // so the game starts paused
+        togglePause();
         instance = this;
     }
 
@@ -81,40 +88,46 @@ public class Main extends ApplicationAdapter {
     @Override
     public void render() {
         input();
-        if (!isPaused) logic();
+        if (gameState == 1) logic();
         draw();
     }
 
     public void draw() {
         renderingSystem.draw(player, dean, showCollision, timerSystem.elapsedTime, worldCollision);
-        if (isPaused && gameStarted) {
-            renderingSystem.renderPauseOverlay(960, 640);
-        }
-        else if (!gameStarted) {
-            renderingSystem.renderStartOverlay(960, 640);
+        switch (gameState) {
+            case 0:
+                renderingSystem.renderStartOverlay(960, 640);
+                break;
+            case 2:
+                renderingSystem.renderPauseOverlay(960, 640);
+                break;
+            case 3:
+                renderingSystem.renderWinOverlay(960, 640, timerSystem.getTimeLeft(), calculateScore());
+                break;
+            case 4:
+                renderingSystem.renderLoseOverlay(960, 640);
+                break;
+            default:
+                break;
         }
     }
 
-    public void checkForKey() {
-        float playerX = player.getX();
-        float playerY = player.getY();
-
-        if (((playerX - 17) * (playerX - 17)) + ((playerY - 223) * (playerY - 223)) < 50) {
-            player.giveChestRoomKey();
+    public static void openChestRoomDoor() {
+        if (player.hasChestRoomKey() && !chestDoorOpen) {
+            ToastSystem.addToast("You Opened the Door!", GOOD);
+            collisionSystem.removeCollisionByName("chestRoomDoor");
+            collisionSystem.hideLayer("ChestDoorClosed");
+            chestDoorOpen = true;
         }
     }
 
-    private void checkForNearChestRoomDoorWithKey() {
-        float playerX = player.getX();
-        float playerY = player.getY();
-
-        if (((playerX - 238) * (playerX - 238)) + ((playerY - 353) * (playerY - 353)) < 50) {
-            if (player.hasChestRoomKey() && !chestDoorOpen) {
-                ToastSystem.addToast("You opened the door");
-                collisionSystem.removeCollisionByName("chestRoomDoor");
-                collisionSystem.hideLayer("ChestDoorClosed");
-                chestDoorOpen = true;
-            }
+    public static void openExit() {
+        if (player.hasExitKey() && !exitOpen) {
+            ToastSystem.addToast("You Opened the Exit!", GOOD);
+            collisionSystem.removeCollisionByName("exitDoor");
+            collisionSystem.hideLayer("ExitClosed");
+            exitOpen = true;
+            winGame();
         }
     }
 
@@ -122,11 +135,25 @@ public class Main extends ApplicationAdapter {
         inputSystem.handle(player);
     }
 
-    public void startGame() {
-        if (!gameStarted) {
-            gameStarted = true;
+    public static void startGame() {
+        if (gameState == 0) {
+            gameState = 2;
             togglePause();
         }
+    }
+
+    public static void winGame() {
+        togglePause();
+        gameState = 3;
+    }
+
+    public static void LoseGame() {
+        togglePause();
+        gameState = 4;
+    }
+
+    public static int calculateScore() {
+        return (int)timerSystem.getTimeLeft() * 1000 + LONGBOIBONUS;
     }
 
     public void tryInteract() {
@@ -148,24 +175,23 @@ public class Main extends ApplicationAdapter {
             isFullscreen = !isFullscreen;
     }
 
-    public void togglePause() {
-        if (isPaused && !playerCaught && gameStarted) {
+    public static void togglePause() {
+        if (gameState == 2 && !playerCaught) {
             player.unfreeze();
             dean.unfreeze();
+            gameState = 1;
         }
         else {
             player.freeze();
             dean.freeze();
+            if (gameState == 1) gameState = 2;
         }
-        isPaused = !isPaused;
     }
 
     public void logic() {
         // Process game logic here
         timerSystem.tick();
         dean.nextMove();
-        checkForKey();
-        checkForNearChestRoomDoorWithKey();
         checkDeanCatch();
     }
 
@@ -176,7 +202,7 @@ public class Main extends ApplicationAdapter {
         if (dean.canReach(player) && !playerCaught) {
             startPlayerCatch();
         }
-        else if (playerCaught && !isPaused) {
+        else if (playerCaught && gameState == 1) {
             if (playerCaughtTime <= 0) {
                 endPlayerCatch();
                 playerCaughtTime = 2;

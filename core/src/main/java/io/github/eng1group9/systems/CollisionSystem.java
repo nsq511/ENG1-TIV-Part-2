@@ -14,7 +14,6 @@ import java.util.List;
 
 public class CollisionSystem {
     private List<Rectangle> worldCollision;
-    private List<Rectangle> exitDoorCollision;
     private TiledMap map;
 
     public void init(TiledMap map) {

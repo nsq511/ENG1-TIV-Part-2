@@ -1,10 +1,6 @@
 package io.github.eng1group9.entities;
-
-import java.util.List;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.Rectangle;
 
 /**
  * An animated entity which can move. This class handles speed and collision. 

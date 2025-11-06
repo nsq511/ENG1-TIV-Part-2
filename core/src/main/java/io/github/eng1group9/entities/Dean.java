@@ -1,9 +1,4 @@
 package io.github.eng1group9.entities;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;

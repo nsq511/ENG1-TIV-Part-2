@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -71,6 +72,7 @@ public class RenderingSystem {
 
         if (showCollision && worldCollision != null) { // show collisions for debugging
             renderCollision(uiBatch, worldCollision, player, dean);
+            renderTriggers(uiBatch);
         }
         uiBatch.end();
     }
@@ -95,6 +97,14 @@ public class RenderingSystem {
         }
         uiBatch.draw(missingTexture, player.getHitbox().x + 16, player.getHitbox().y+ 16, player.getHitbox().width, player.getHitbox().height);
         uiBatch.draw(missingTexture, dean.getReachRectangle().x + 16, dean.getReachRectangle().y+ 16, dean.getReachRectangle().width, dean.getReachRectangle().height);
+    }
+
+    public void renderTriggers(SpriteBatch uiBatch) {
+        for (RectangleMapObject t : TriggerSystem.getTriggers()) {
+            Rectangle rectangle = t.getRectangle();
+            uiBatch.setColor(0, 1, 1, 0.75f);
+            uiBatch.draw(missingTexture, rectangle.x, rectangle.y , rectangle.width, rectangle.height);
+        }
     }
 
     public void resize(int width, int height) {
@@ -144,6 +154,39 @@ public class RenderingSystem {
         font.draw(uiBatch, "Avoid the dean and escape the maze in time!", screenWidth / 2f, (screenHeight / 2f) - 140);
         
 
+        uiBatch.end();
+    }
+
+    public void renderWinOverlay(int screenWidth, int screenHeight, float timeLeft, int Score) {
+        uiBatch.begin();
+        uiBatch.setColor(0, 0, 0, 0.5f);
+        uiBatch.draw(missingTexture, 0, 0, screenWidth, screenHeight);
+        uiBatch.setColor(1, 1, 1, 1);
+
+        font.getData().setScale(2f);
+        font.setColor(0, 1, 1, 1);
+        font.draw(uiBatch, "YOU WIN!", screenWidth / 2f, (screenHeight / 2f) + 40);
+        font.setColor(1, 1, 1, 1);
+        font.getData().setScale(1f);
+        font.draw(uiBatch, "Time Left: " + timeLeft, screenWidth / 2f, screenHeight / 2f);
+        font.draw(uiBatch, "Score: " + Integer.toString(Score), screenWidth / 2f, (screenHeight / 2f) - 20);
+        font.draw(uiBatch, "Press ESC to quit.", screenWidth / 2f, (screenHeight / 2f) - 40);
+        uiBatch.end();
+    }
+
+    public void renderLoseOverlay(int screenWidth, int screenHeight) {
+        uiBatch.begin();
+        uiBatch.setColor(0, 0, 0, 0.5f);
+        uiBatch.draw(missingTexture, 0, 0, screenWidth, screenHeight);
+        uiBatch.setColor(1, 1, 1, 1);
+
+        font.getData().setScale(2f);
+        font.setColor(1, 0, 0, 1);
+        font.draw(uiBatch, "TIME IS UP!", screenWidth / 2f, (screenHeight / 2f) + 40);
+        font.setColor(1, 1, 1, 1);
+        font.getData().setScale(1f);
+        font.draw(uiBatch, "Better luck next time.", screenWidth / 2f, screenHeight / 2f);
+        font.draw(uiBatch, "Press ESC to quit.", screenWidth / 2f, (screenHeight / 2f) - 40);
         uiBatch.end();
     }
 }

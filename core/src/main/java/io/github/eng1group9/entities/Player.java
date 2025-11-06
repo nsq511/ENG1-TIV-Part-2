@@ -35,8 +35,7 @@ public class Player extends MovingEntity {
     public void giveExitKey() {
         if (!hasExitKey) {
             hasExitKey = true;
-            ToastSystem.addToast("You found the exit key!");
-            Main.collisionSystem.removeCollisionByName("mainDoor");
+            ToastSystem.addToast("You found the Exit Key!");
         }
     }
 
@@ -48,7 +47,7 @@ public class Player extends MovingEntity {
         if (!hasChestRoomKey) {
             hasChestRoomKey = true;
             Main.instance.deleteKeyTile();
-            ToastSystem.addToast("You found the key!");
+            ToastSystem.addToast("You found the Storage Room Key!");
         }
     }
 }

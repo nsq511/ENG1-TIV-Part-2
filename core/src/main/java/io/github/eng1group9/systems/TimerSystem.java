@@ -2,10 +2,11 @@ package io.github.eng1group9.systems;
 
 import com.badlogic.gdx.Gdx;
 
+import io.github.eng1group9.Main;
+
 public class TimerSystem {
     public float elapsedTime;
     private float timeTooAdd;
-    private boolean paused = false;
 
     public TimerSystem() {
         elapsedTime = 0;
@@ -27,7 +28,7 @@ public class TimerSystem {
         float delta = Gdx.graphics.getDeltaTime();
         elapsedTime += (delta * 1000) + getExtraTime(delta);
         if (getTimeLeft() <= 0) {
-            ToastSystem.addToast("Time's up!");
+            Main.LoseGame();
         }
     }
 
