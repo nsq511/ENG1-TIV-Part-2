@@ -172,7 +172,7 @@
 </data>
  </layer>
  <objectgroup id="7" name="Entities"/>
- <layer id="18" name="key" width="30" height="20">
+ <layer id="18" name="Key" width="30" height="20">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
