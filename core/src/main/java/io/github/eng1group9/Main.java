@@ -110,6 +110,7 @@ public class Main extends ApplicationAdapter {
         player.reset();
         dean.reset();
         RenderingSystem.reset();
+        collisionSystem.reset();
     }
 
     @Override

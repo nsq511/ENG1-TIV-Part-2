@@ -7,6 +7,7 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import java.util.List;
 public class CollisionSystem {
     private List<Rectangle> worldCollision;
     private TiledMap map;
+    private List<Rectangle> removedCollisions; // used for resetting
 
     /**
      * Take a tilemap and setup a list of collision rectangles using the "Collision" layer. 
@@ -26,11 +28,16 @@ public class CollisionSystem {
         MapLayer collisionLayer = map.getLayers().get("Collision");
         MapObjects collisionObjects = collisionLayer.getObjects();
         worldCollision = new LinkedList<>();
+        removedCollisions = new ArrayList<>();
         for (MapObject mapObject : collisionObjects) {
             Rectangle nextRectangle = ((RectangleMapObject) mapObject).getRectangle();
             nextRectangle.set(nextRectangle.x * 2,nextRectangle.y * 2, nextRectangle.width * 2, nextRectangle.height * 2);
             worldCollision.add(nextRectangle);
         }
+    }
+
+    public void reset(){
+        worldCollision.addAll(removedCollisions);
     }
 
     public List<Rectangle> getWorldCollision() { return worldCollision; }
@@ -55,6 +62,7 @@ public class CollisionSystem {
 
             Rectangle r = ((RectangleMapObject) m).getRectangle();
             worldCollision.remove(r);
+            removedCollisions.add(r);
         }
     }
 
