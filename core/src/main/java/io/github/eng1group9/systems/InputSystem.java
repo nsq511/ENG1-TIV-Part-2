@@ -2,6 +2,8 @@ package io.github.eng1group9.systems;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Input.TextInputListener;
+
 import io.github.eng1group9.Main;
 import io.github.eng1group9.entities.Player;
 
@@ -47,6 +49,18 @@ public class InputSystem {
             if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 player.move('R');
             }
+        }
+    }
+
+    public class LeaderBoardInput implements TextInputListener{
+        @Override
+        public void input(String text){
+            System.out.println(text);
+        }
+
+        @Override
+        public void canceled(){
+
         }
     }
 }
