@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import io.github.eng1group9.entities.*;
 import io.github.eng1group9.systems.InputSystem;
+import io.github.eng1group9.systems.LeaderBoard;
 import io.github.eng1group9.systems.RenderingSystem;
 import io.github.eng1group9.systems.CollisionSystem;
 import io.github.eng1group9.systems.ToastSystem;
@@ -36,6 +37,9 @@ public class Main extends ApplicationAdapter {
     public static int hiddenEventCounter = 0;
     public static int negativeEventCounter = 0;
     public static int positiveEventCounter = 0;
+    public static final String leaderBoardFilePath = "leaderboard.txt";
+
+    public static LeaderBoard leaderBoard = LeaderBoard.loadFromFile(leaderBoardFilePath, 10);
 
     private static TimerSystem timerSystem = new TimerSystem(TIMERSTARTVALUE);
     public static boolean showCollision = false;
@@ -354,5 +358,10 @@ public class Main extends ApplicationAdapter {
     @Override
     public void resume() {
         togglePause();
+    }
+
+    @Override
+    public void dispose(){
+        leaderBoard.saveToFile(Main.leaderBoardFilePath);
     }
 }

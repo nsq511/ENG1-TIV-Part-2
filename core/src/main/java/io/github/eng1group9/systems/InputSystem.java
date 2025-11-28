@@ -51,16 +51,4 @@ public class InputSystem {
             }
         }
     }
-
-    public class LeaderBoardInput implements TextInputListener{
-        @Override
-        public void input(String text){
-            System.out.println(text);
-        }
-
-        @Override
-        public void canceled(){
-
-        }
-    }
 }

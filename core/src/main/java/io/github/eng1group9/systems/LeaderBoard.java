@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -115,7 +116,7 @@ public class LeaderBoard {
      */
     public ArrayList<Map.Entry<String, Integer>> getSortedList(){
         ArrayList<Map.Entry<String, Integer>> list = new ArrayList<>(entries.entrySet());
-        list.sort(Map.Entry.comparingByValue());
+        list.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
         return list;
     }
 
@@ -136,11 +137,16 @@ public class LeaderBoard {
      * Formats as an ordered leaderboard across multiple lines
      */
     public String toString(){
-        String rankedList = "";
+        String rankedList = "LEADERBOARD\n";
         int i = 1;
         for(Entry<String, Integer> e : getSortedList()){
-            rankedList += Integer.toString(i++) + ". " + e.getKey() + e.getValue().toString() + "\n";
+            rankedList += Integer.toString(i++) + ". " + e.getKey() + "    " + e.getValue().toString() + "\n";
         }
+        while(i <= maxLen){
+            rankedList += Integer.toString(i) + ".\n";
+            i++;
+        }
+
         return rankedList;
     }
 
@@ -167,8 +173,8 @@ public class LeaderBoard {
     private static LeaderBoard fromJson(String json, int maxLength){
         HashMap<String, Integer> newEntries = new HashMap<>();
 
-        json.replaceAll("[{}]", "");
-        String[] lines = json.split(",\n");
+        json = json.replaceAll("[{}\n]", "");
+        String[] lines = json.split(",");
         for(String line : lines){
             String[] parts = line.split(": ");
             String key = parts[0].replace("\"", "");
@@ -180,6 +186,7 @@ public class LeaderBoard {
 
     /**
      * Saves the leaderboard entry data to the specified file in JSON format
+     * Does not save if the file cannot be written to
      * 
      * @param filepath The file to save the data to
      */
@@ -197,10 +204,10 @@ public class LeaderBoard {
      * 
      * @param filepath The file containing the entry data in JSON format
      * @param maxLength The maximum number of entries
-     * @return The corresponding leaderboard
+     * @return The corresponding leaderboard. Or an empty leaderboard if the file is not readable
      */
     public static LeaderBoard loadFromFile(String filepath, int maxLength){
-        Path path = Paths.get("input.txt");
+        Path path = Paths.get(filepath);
         try {
             String content = Files.lines(path).collect(Collectors.joining("\n"));
             return fromJson(content, maxLength);

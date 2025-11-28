@@ -1,5 +1,7 @@
 package io.github.eng1group9.systems;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -10,8 +12,14 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+
+import io.github.eng1group9.Main;
 import io.github.eng1group9.entities.Dean;
 import io.github.eng1group9.entities.Player;
 import io.github.eng1group9.systems.ToastSystem.Toast;
@@ -31,6 +39,9 @@ public class RenderingSystem {
     private FitViewport viewport;
     private OrthogonalTiledMapRenderer mapRenderer;
     private static TiledMap map;
+    private Stage stage;
+    private static TextField textfield;
+    private static boolean firstLeaderBoard = true;
 
     /**
      * Takes and tileset and sets up a renderer to display it.
@@ -49,6 +60,14 @@ public class RenderingSystem {
         this.worldBatch = new SpriteBatch();
         this.uiBatch = new SpriteBatch();
         this.font = new BitmapFont();
+
+        stage = new Stage(new ScreenViewport());
+        Gdx.input.setInputProcessor(stage);
+        Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
+        textfield = new TextField("", skin);
+        textfield.setPosition(960 * 0.1f, 640 / 2f + 20);    // Change to not be hardcoded
+        textfield.setSize(300, 30);
+        stage.addActor(textfield);
     }
 
     public OrthogonalTiledMapRenderer getMapRenderer() { return mapRenderer; }
@@ -65,6 +84,11 @@ public class RenderingSystem {
      * Resets layers
      */
     public static void reset(){
+        textfield.setVisible(true);
+        textfield.setText("");
+        textfield.setDisabled(false);
+        firstLeaderBoard = true;
+
         for (MapLayer layer : map.getLayers()){
             if(layer.getName().equals("LONGBOI")){
                 layer.setVisible(false);
@@ -275,8 +299,29 @@ public class RenderingSystem {
         font.draw(uiBatch, TimerSystem.getClockDisplay(), screenWidth / 2f, screenHeight / 2f);
         font.draw(uiBatch, "Score: " + Integer.toString(score), screenWidth / 2f, (screenHeight / 2f) - 20);
         font.draw(uiBatch, "Press ESC to quit.", screenWidth / 2f, (screenHeight / 2f) - 40);
+        font.draw(uiBatch, "Press SPACE to restart.", screenWidth / 2f, (screenHeight / 2f) - 60);
+        font.draw(uiBatch, Main.leaderBoard.toString(), screenWidth * 0.1f, screenHeight * 0.5f);
+        if(firstLeaderBoard){
+            font.draw(uiBatch, "Enter Name:", screenWidth * 0.1f, screenHeight / 2f + 70);
+        }
         renderStats(screenWidth, screenHeight, positiveEventCounter, negativeEventCounter, hiddenEventCounter);
         uiBatch.end();
+        
+        // Leaderboard text input
+        stage.setKeyboardFocus(textfield);
+        textfield.setFocusTraversal(false);
+        stage.act(Gdx.graphics.getDeltaTime());
+        stage.draw();
+
+        if (firstLeaderBoard && textfield.hasKeyboardFocus() && Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            String name = textfield.getText();
+            Main.leaderBoard.addEntry(name, Main.calculateScore());
+            textfield.setVisible(false);
+            textfield.setText(null);
+            stage.unfocus(textfield);
+            textfield.setDisabled(true);
+            firstLeaderBoard = false;
+        }
     }
 
     /**
