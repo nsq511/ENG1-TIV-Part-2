@@ -60,7 +60,7 @@ public class Entity {
      */
     public void setPosition(Vector2 newPosition) {
         sprite.setPosition(newPosition.x, newPosition.y);
-        hitbox.setPosition(newPosition.x  + 16, newPosition.y + 16);  
+        hitbox.setPosition(newPosition.x, newPosition.y);  
     }
 
     /**

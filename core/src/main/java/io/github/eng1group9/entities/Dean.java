@@ -17,14 +17,19 @@ public class Dean extends MovingEntity {
     private Character[] path;
     private Rectangle reachRectangle;
     final Vector2 STARTPOS;
+    private float reachOffsetX;
+    private float reachOffsetY;
 
     public Dean(Vector2 startPos, float speed, Character[] path) {
         super(new Texture("Characters/deanAnimations.png"), new int[] {4, 4,4,4} , 32, 32, speed, startPos);
         setScale(2);
 
         reachRectangle = new Rectangle();
-        reachRectangle.setPosition(startPos.x -32, startPos.y -42);
-        reachRectangle.setSize(reach * 32);
+        int reachSize = reach * 32;
+        reachRectangle.setSize(reachSize);
+        reachOffsetX = (getWidth() - reachSize) / 2f;
+        reachOffsetY = (getHeight() - reachSize) / 2f;
+        reachRectangle.setPosition(getX() + reachOffsetX, getY() + reachOffsetY);
         setHitbox(new Rectangle());
         this.path = path;
         STARTPOS = startPos;
@@ -47,7 +52,7 @@ public class Dean extends MovingEntity {
         float distance = move(direction);
         nextTileDistance -= distance;
         if (!isFrozen()) updateAnimation(direction);
-        reachRectangle.setPosition(getX() - 32, getY() - 42);
+        reachRectangle.setPosition(getX() + reachOffsetX, getY() + reachOffsetY);
         haveIMovedOneTile();
     }
 
