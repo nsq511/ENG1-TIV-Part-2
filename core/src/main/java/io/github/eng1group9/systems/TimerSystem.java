@@ -10,12 +10,14 @@ import io.github.eng1group9.Main;
  * System used to keep track of how much time the player has left.
  */
 public class TimerSystem {
-    public static float elapsedTime = 0;// time passed in seconds;
-    private float timeTooAdd;
-    private static final float TIMESTARTVALUE = 300;
+    public static float elapsedTime = 0f;// time passed in seconds;
+    private float timeToAdd;
+    private static float TIMESTARTVALUE;
 
-    public TimerSystem() {
-        elapsedTime = 0;
+    public TimerSystem(float timeLimit) {
+        elapsedTime = 0f;
+        timeToAdd = 0f;
+        TIMESTARTVALUE = timeLimit;
     }
 
     public void add(float amount) {
@@ -23,11 +25,19 @@ public class TimerSystem {
     }
 
     /**
+     * Restarts the timer
+     */
+    public void reset(){
+        elapsedTime = 0f;
+        timeToAdd = 0f;
+    }
+
+    /**
      * Add to the timer, so that it goes up by this amount over time
      * @param amount
      */
     public void addGradually(float amount) {
-        timeTooAdd += amount;
+        timeToAdd += amount;
     }
 
     /**
@@ -45,10 +55,10 @@ public class TimerSystem {
      * @return How much time should be added to the timer as a result of the addGradually method. 
      */
     private float getExtraTime(float delta) {
-        if (timeTooAdd <= 0) return 0;
-        float change = delta * 25;
-        if (timeTooAdd < change) change = timeTooAdd;
-        timeTooAdd -= change;
+        if (timeToAdd <= 0) return 0;
+        float change = delta * 25;      // Upper bound to how much the time can change in any given instant
+        if (timeToAdd < change) change = timeToAdd;
+        timeToAdd -= change;
         return change;
     }
 

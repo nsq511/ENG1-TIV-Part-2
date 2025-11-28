@@ -27,26 +27,27 @@ public class Main extends ApplicationAdapter {
     /// 3 = Win
     /// 4 = Lose
 
-    public static boolean chestDoorOpen = false; // Wether the door to the chest room has been opened.
-    public static boolean exitOpen = false; // Wether the exit is open/
-    public static boolean spikesLowered = false; // Wether the spikes in the chest room have been lowered.
-    public static boolean scrollUsed = false; // Wether the scroll power up has been collected.
+    public static float TIMERSTARTVALUE = 300f;
+    public static boolean chestDoorOpen = false; // Whether the door to the chest room has been opened.
+    public static boolean exitOpen = false; // Whether the exit is open/
+    public static boolean spikesLowered = false; // Whether the spikes in the chest room have been lowered.
+    public static boolean scrollUsed = false; // Whether the scroll power up has been collected.
     public static int longboiBonus = 0; // the bonus to add based on wether LongBoi was found. 
     public static int hiddenEventCounter = 0;
     public static int negativeEventCounter = 0;
     public static int positiveEventCounter = 0;
 
-    private static TimerSystem timerSystem = new TimerSystem();
-    public boolean showCollision = false;
+    private static TimerSystem timerSystem = new TimerSystem(TIMERSTARTVALUE);
+    public static boolean showCollision = false;
 
     private List<Rectangle> worldCollision;
-    final static int LONGBOIBONUSAMOUNT = 201823;
+    final static int LONGBOIBONUSAMOUNT = 50;
     final static String TMXPATH = "World/testMap.tmx";
 
     public static Player player;
-    private static boolean playerCaught = false; // Wether the player is currently being held by the Dean.
-    final float INITALPLAYERCAUGHTTIME = 1.2f;
-    private float playerCaughtTime = INITALPLAYERCAUGHTTIME; // how many seconds the Dean will hold the player when caught.
+    private static boolean playerCaught = false; // Whether the player is currently being held by the Dean.
+    final static float INITALPLAYERCAUGHTTIME = 1.2f;
+    private static float playerCaughtTime = INITALPLAYERCAUGHTTIME; // how many seconds the Dean will hold the player when caught.
     final Vector2 PLAYERSTARTPOS = new Vector2(16, 532); // Where the player begins the game, and returns to when caught.
     final float DEFAULTPLAYERSPEED = 100; // The players speed. 
 
@@ -82,6 +83,29 @@ public class Main extends ApplicationAdapter {
         dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEANPATH);
         togglePause();
         instance = this;
+    }
+
+    /**
+     * Initialises variables such as game states and entity positions. Used on initialisation and reset
+     */
+    public static void initSystem(){
+        gameState = 0; // Not started
+
+        chestDoorOpen = false;
+        exitOpen = false;
+        spikesLowered = false;
+        scrollUsed = false;
+        longboiBonus = 0;
+        hiddenEventCounter = 0;
+        negativeEventCounter = 0;
+        positiveEventCounter = 0;
+        timerSystem.reset();
+        showCollision = false;
+        playerCaught = false;
+        playerCaughtTime = INITALPLAYERCAUGHTTIME;
+        player.reset();
+        dean.reset();
+        RenderingSystem.reset();
     }
 
     @Override
@@ -179,6 +203,10 @@ public class Main extends ApplicationAdapter {
             gameState = 2;
             togglePause();
         }
+        else if(gameState == 3 || gameState == 4){
+            initSystem();
+            gameState = 1;
+        }
     }
 
     /**
@@ -202,7 +230,7 @@ public class Main extends ApplicationAdapter {
      * @return The score.
      */
     public static int calculateScore() {
-        return TimerSystem.getTimeLeft() * 1000 + longboiBonus;
+        return TimerSystem.getTimeLeft() + longboiBonus;
     }
 
     /**
@@ -219,7 +247,7 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Toggle wether the game shoudl be paused. 
+     * Toggle wether the game should be paused. 
      * This will freeze the player/dean, stop all game logic and display the pause overlay. 
      */
     public static void togglePause() {
@@ -238,7 +266,7 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Where the game process its logic each frame. 
+     * Where the game processes its logic each frame. 
      * It will not run if the game is paused. 
      */
     public void logic() {
@@ -269,7 +297,7 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Run when the player is first caught by the game. 
+     * Run when the player is first caught by the Dean. 
      * This will begin the sequence where the player is held in detention while the timer goes down.
      * This will freeze the player and dean. 
      */
@@ -280,9 +308,9 @@ public class Main extends ApplicationAdapter {
         dean.freeze();
         dean.changeAnimation(3);
         dean.setPosition(PLAYERSTARTPOS.x + 32, PLAYERSTARTPOS.y);
-        timerSystem.addGradually(DEANPUNISHMENT - INITALPLAYERCAUGHTTIME); // 48 not 50 because you spend 2s stood while the timer goes down.
+        timerSystem.addGradually(DEANPUNISHMENT - INITALPLAYERCAUGHTTIME); 
         ToastSystem.addToast("You were caught by the Dean!", BAD);
-        ToastSystem.addToast("You were stuck being lectured for 50s!", BAD);
+        ToastSystem.addToast("You were stuck being lectured for " + Integer.toString(DEANPUNISHMENT) + "s!", BAD);
         negativeEventCounter++;
     }
 

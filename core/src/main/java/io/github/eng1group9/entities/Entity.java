@@ -26,6 +26,7 @@ public class Entity {
     private float scale = 1;
     private float width;
     private float height;
+    private Vector2 initPos;
 
     public Entity(Texture texture, Vector2 startPosition, float width, float height) {
         sprite.setTexture(texture);
@@ -34,12 +35,23 @@ public class Entity {
         sprite.setSize(width, height);
         sprite.setPosition(startPosition.x , startPosition.y);
         hitbox.set(startPosition.x + width, startPosition.y + height, width,    16);
+        initPos = startPosition.cpy();
     }
 
     public Entity(Vector2 startPosition, float width, float height) {
         sprite.setSize(width, height);
         sprite.setPosition(startPosition.x, startPosition.y);
         hitbox.set(startPosition.x  + 16, startPosition.y  + 16, width, 16);
+        initPos = startPosition.cpy(); 
+    }
+
+    /**
+     * Resets entity to original state
+     */
+    public void reset(){
+        setPosition(initPos);
+        canCollide = true;
+        System.out.println(initPos);
     }
 
     /**
@@ -48,7 +60,7 @@ public class Entity {
      */
     public void setPosition(Vector2 newPosition) {
         sprite.setPosition(newPosition.x, newPosition.y);
-        hitbox.setPosition(newPosition.x  + 16, newPosition.y + 16);
+        hitbox.setPosition(newPosition.x  + 16, newPosition.y + 16);  
     }
 
     /**

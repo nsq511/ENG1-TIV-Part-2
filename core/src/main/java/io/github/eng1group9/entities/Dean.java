@@ -11,7 +11,7 @@ import com.badlogic.gdx.math.Vector2;
  * @param path - The deans path, it will follow this on loop. 
  */
 public class Dean extends MovingEntity {
-    private int reach = 3; // size of dean hitbox in tiles (3x3)
+    private int reach = 2; // size of dean hitbox in tiles (3x3)
     private int moveNum = 0;
     private float nextTileDistance = 32;
     private Character[] path;
@@ -19,10 +19,8 @@ public class Dean extends MovingEntity {
     final Vector2 STARTPOS;
 
     public Dean(Vector2 startPos, float speed, Character[] path) {
-        super(new Texture("Characters/deanAnimations.png"), new int[] {4, 4,4,4} , 32, 32, speed);
+        super(new Texture("Characters/deanAnimations.png"), new int[] {4, 4,4,4} , 32, 32, speed, startPos);
         setScale(2);
-        setPosition(startPos);
-        setHitbox(new Rectangle());
 
         reachRectangle = new Rectangle();
         reachRectangle.setPosition(startPos.x -32, startPos.y -42);
@@ -30,6 +28,14 @@ public class Dean extends MovingEntity {
         setHitbox(new Rectangle());
         this.path = path;
         STARTPOS = startPos;
+    }
+
+    /**
+     * Resets the Dean to its original state
+     */
+    public void reset(){
+        super.reset();
+        restartPath();
     }
 
     /**

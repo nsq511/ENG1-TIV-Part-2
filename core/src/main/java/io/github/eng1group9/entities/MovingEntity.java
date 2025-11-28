@@ -1,6 +1,7 @@
 package io.github.eng1group9.entities;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
 
 /**
  * An animated entity which can move. This class handles speed and collision. 
@@ -14,10 +15,21 @@ public class MovingEntity extends AnimatedEntity {
 
     private float speed = 0;
     private boolean frozen = false;
+    private float initSpeed = 0f;
     
-    public MovingEntity(Texture spriteSheetTexture, int[] frameNumbers, int tileWidth, int tileHeight, float speed) {
-        super(spriteSheetTexture, frameNumbers, tileWidth, tileHeight);
+    public MovingEntity(Texture spriteSheetTexture, int[] frameNumbers, int tileWidth, int tileHeight, float speed, Vector2 startPos) {
+        super(spriteSheetTexture, frameNumbers, tileWidth, tileHeight, startPos);
         this.speed = speed;
+        initSpeed = speed;
+    }
+
+    /**
+     * Resets the MovingEntity to its original state
+     */
+    public void reset(){
+        super.reset();
+        speed = initSpeed;
+        frozen = false;
     }
 
     /**
