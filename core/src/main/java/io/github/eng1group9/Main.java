@@ -113,6 +113,7 @@ public class Main extends ApplicationAdapter {
         player.reset();
         dean.reset();
         RenderingSystem.reset();
+        collisionSystem.reset();
         loadRoom(0,0, PLAYERSTARTPOS, DEANSTARTPOS, DEANPATH);
     }
 
