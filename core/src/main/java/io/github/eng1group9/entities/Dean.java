@@ -4,11 +4,11 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 /**
- * This is the Dean, the games negative event and antagonist. 
+ * This is the Dean, the games negative event and antagonist.
  * They will not collide with the walls, but will catch the player if they get too close.
- * @param startPos - Where the dean will start. 
- * @param speed - How fast the dean will move. 
- * @param path - The deans path, it will follow this on loop. 
+ * @param startPos - Where the dean will start.
+ * @param speed - How fast the dean will move.
+ * @param path - The deans path, it will follow this on loop.
  */
 public class Dean extends MovingEntity {
     private int reach = 2; // size of dean hitbox in tiles (3x3)
@@ -19,6 +19,11 @@ public class Dean extends MovingEntity {
     final Vector2 STARTPOS;
     private float reachOffsetX;
     private float reachOffsetY;
+
+    public void setPath(Character[] newPath){
+        this.path = newPath;
+        this.reset();
+    }
 
     public Dean(Vector2 startPos, float speed, Character[] path) {
         super(new Texture("Characters/deanAnimations.png"), new int[] {4, 4,4,4} , 32, 32, speed, startPos);
@@ -33,6 +38,7 @@ public class Dean extends MovingEntity {
         setHitbox(new Rectangle());
         this.path = path;
         STARTPOS = startPos;
+
     }
 
     /**
@@ -45,7 +51,7 @@ public class Dean extends MovingEntity {
 
     /**
      * Move the dean along its set path.
-     * It will move in a given direction until it has moved one tile, then look at the next direction. 
+     * It will move in a given direction until it has moved one tile, then look at the next direction.
      */
     public void nextMove() {
         Character direction = getNextDirection();
@@ -67,7 +73,7 @@ public class Dean extends MovingEntity {
     }
 
     /**
-     * @return The direction the dean should move in next. 
+     * @return The direction the dean should move in next.
      */
     private Character getNextDirection() {
         if (moveNum >= path.length) {
@@ -78,7 +84,7 @@ public class Dean extends MovingEntity {
     }
 
     /**
-     * Update the dean's animation based on its current direction. 
+     * Update the dean's animation based on its current direction.
      * @param direction - The direction the dean is moving.
      */
     private void updateAnimation(Character direction) {
@@ -99,8 +105,8 @@ public class Dean extends MovingEntity {
     }
 
     /**
-     * Check if a player is within the dean's reach. 
-     * Will be false if the given player is invisible. 
+     * Check if a player is within the dean's reach.
+     * Will be false if the given player is invisible.
      * @param player - The player to check against.
      * @return True if the player is in the deans reach zone.
      */
@@ -109,7 +115,7 @@ public class Dean extends MovingEntity {
     }
 
     /**
-     * Make the dean go back to the start of its path (first instruction). 
+     * Make the dean go back to the start of its path (first instruction).
      */
     public void restartPath() {
         moveNum = 0;
@@ -117,7 +123,7 @@ public class Dean extends MovingEntity {
     }
 
     /**
-     * @return The dean's reach rectangle. 
+     * @return The dean's reach rectangle.
      */
     public Rectangle getReachRectangle() {
         return reachRectangle;

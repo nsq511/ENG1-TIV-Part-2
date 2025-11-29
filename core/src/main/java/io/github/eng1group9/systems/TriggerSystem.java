@@ -10,32 +10,35 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Rectangle;
 
+import com.badlogic.gdx.math.Vector2;
 import io.github.eng1group9.Main;
 import io.github.eng1group9.entities.Player;
 
 /**
  * The system used to make things happen if a player enters a given area.
  * The Triggers layer on the TileMap contains Rectangles used to denote these areas.
- * The name of the Rectangle is in the form "ID,triggerType" 
+ * The name of the Rectangle is in the form "ID,triggerType"
  * which is used to determine what happens when it is triggered, and how.
- * 
+ *
  * triggerType must be in the form T or I
  * for Touch or Interact
  */
 public class TriggerSystem {
 
     /**
-     * A Trigger with a zone and a player it relates too. 
+     * A Trigger with a zone and a player it relates too.
      */
     static class Trigger {
         private int ID;
         private Rectangle zone;
+        private Rectangle originalZone;
         private boolean activateOnTouch = false;
 
         public Trigger(int ID, boolean activateOnTouch, Rectangle zone) {
             this.ID = ID;
             this.activateOnTouch = activateOnTouch;
             this.zone = zone;
+            this.originalZone = new Rectangle(zone);
         }
 
         public int getID() {
@@ -57,6 +60,10 @@ public class TriggerSystem {
         public boolean playerInZone(Player player) {
             return player.isColliding(zone);
         }
+
+        public void moveZone(int x,int y){
+            this.zone.setPosition(originalZone.getX()+x,originalZone.getY()+y);
+        }
     }
 
     private static List<Trigger> touchTriggers = new LinkedList<>();
@@ -75,10 +82,10 @@ public class TriggerSystem {
     }
 
     /**
-     * Return a list of all triggers in a tileset. 
-     * This should only be used when first loading the tileset. 
+     * Return a list of all triggers in a tileset.
+     * This should only be used when first loading the tileset.
      * @param tmxPath - The path to the tileset (.tmx file).
-     * @return A list of all Triggers. 
+     * @return A list of all Triggers.
      */
     public static List<Trigger> getTriggers(String tmxPath) {
         TiledMap map = new TmxMapLoader().load(tmxPath);
@@ -116,9 +123,9 @@ public class TriggerSystem {
     }
 
     /**
-     * Remove a trigger from the system. 
-     * @param ID - The ID of the trigger which should be removed. 
-     * @return True if it was successful. 
+     * Remove a trigger from the system.
+     * @param ID - The ID of the trigger which should be removed.
+     * @return True if it was successful.
      */
     public static boolean remove(int ID) {
         for (Trigger t : touchTriggers) {
@@ -174,6 +181,23 @@ public class TriggerSystem {
     }
 
     /**
+     * <P>Adjusts the trigger zones to the current room.</P>
+     * <P>This should only be called from the loadRoom method in Main</P>
+     *
+     * @param x - The x coordinate of the room.
+     * @param y - The y coordinate of the room.
+     * @param viewportWidth - The viewport width.
+     * @param viewportHeight - The viewport height.
+     */
+    public static void loadRoom(int x,int y, int viewportWidth, int viewportHeight){
+        for(Trigger trigger : getTriggers()){
+            int posX = -(x*viewportWidth*2);
+            int posY = -(y*viewportHeight*2);
+
+            trigger.moveZone(posX,posY);
+        }
+    }
+    /**
      * Will act based on which trigger has been activated
      * @param ID the trigger that has been activated
      */
@@ -188,7 +212,7 @@ public class TriggerSystem {
             case 2: // Get the scroll
                 Main.getScroll();
                 break;
-            case 3: // Standing by the switch 
+            case 3: // Standing by the switch
                 Main.dropSpikes();
                 break;
             case 4: // Standing by the mouse hole
@@ -205,6 +229,12 @@ public class TriggerSystem {
                 break;
             case 8: // Pickup red potion.
                 player.giveRedPotion();
+                break;
+            case 9:
+                Main.loadRoom(0,1,new Vector2(30,30),new Vector2(50,50),new Character[]{'U','D'});
+                break;
+            case 10:
+                Main.loadRoom(0,0);
                 break;
             default:
                 break;
