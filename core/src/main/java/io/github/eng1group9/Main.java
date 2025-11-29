@@ -20,6 +20,9 @@ import io.github.eng1group9.systems.TimerSystem;
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
 
+    final static int VIEWPORTWIDTH = 480;
+    final static int VIEWPORTHEIGHT = 320;
+
     boolean isFullscreen = false;
     static int gameState = 0;
     /// 0 = Not started
@@ -33,7 +36,7 @@ public class Main extends ApplicationAdapter {
     public static boolean exitOpen = false; // Whether the exit is open/
     public static boolean spikesLowered = false; // Whether the spikes in the chest room have been lowered.
     public static boolean scrollUsed = false; // Whether the scroll power up has been collected.
-    public static int longboiBonus = 0; // the bonus to add based on wether LongBoi was found. 
+    public static int longboiBonus = 0; // the bonus to add based on wether LongBoi was found.
     public static int hiddenEventCounter = 0;
     public static int negativeEventCounter = 0;
     public static int positiveEventCounter = 0;
@@ -52,14 +55,14 @@ public class Main extends ApplicationAdapter {
     private static boolean playerCaught = false; // Whether the player is currently being held by the Dean.
     final static float INITALPLAYERCAUGHTTIME = 1.2f;
     private static float playerCaughtTime = INITALPLAYERCAUGHTTIME; // how many seconds the Dean will hold the player when caught.
-    final Vector2 PLAYERSTARTPOS = new Vector2(16, 532); // Where the player begins the game, and returns to when caught.
-    final float DEFAULTPLAYERSPEED = 100; // The players speed. 
+    final static Vector2 PLAYERSTARTPOS = new Vector2(16, 532); // Where the player begins the game, and returns to when caught.
+    final float DEFAULTPLAYERSPEED = 100; // The players speed.
 
     private static Dean dean;
-    final Vector2 DEANSTARTPOS = new Vector2(32, 352); // Where the Dean begins the game, and returns to after catching the player.
+    final static Vector2 DEANSTARTPOS = new Vector2(32, 352); // Where the Dean begins the game, and returns to after catching the player.
     final float DEFAULTDEANSPEED = 100;
     final int DEANPUNISHMENT = 30; // The number of seconds the Dean adds to the timer.
-    final Character[] DEANPATH = { // The path the dean will take (D = Down, U = Up, L = Left, R = Right). The path will loop. 
+    final static Character[] DEANPATH = { // The path the dean will take in the first room (D = Down, U = Up, L = Left, R = Right). The path will loop.
         'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
         'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D',
         'R', 'R', 'R',
@@ -79,7 +82,7 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void create() {
-        renderingSystem.initWorld(TMXPATH, 480, 320);
+        renderingSystem.initWorld(TMXPATH, VIEWPORTWIDTH, VIEWPORTHEIGHT);
         collisionSystem.init(renderingSystem.getMapRenderer().getMap());
         TriggerSystem.init(TMXPATH);
         worldCollision = collisionSystem.getWorldCollision();
@@ -110,6 +113,7 @@ public class Main extends ApplicationAdapter {
         player.reset();
         dean.reset();
         RenderingSystem.reset();
+        loadRoom(0,0, PLAYERSTARTPOS, DEANSTARTPOS, DEANPATH);
     }
 
     @Override
@@ -121,8 +125,8 @@ public class Main extends ApplicationAdapter {
 
     /**
      * Check if the player has the red potion.
-     * If they do, show Long Boi and complete the hidden event. 
-     * If not, tell the player they must find the potion. 
+     * If they do, show Long Boi and complete the hidden event.
+     * If not, tell the player they must find the potion.
      */
     public static void checkForLongboi() {
         Color messageColour = new Color(0.2f, 1, 0.2f ,1);
@@ -159,7 +163,7 @@ public class Main extends ApplicationAdapter {
 
     /**
      * Open the door of the room with the chest.
-     * Remove its hitbox and graphic. 
+     * Remove its hitbox and graphic.
      */
     public static void openChestRoomDoor() {
         if (player.hasChestRoomKey() && !chestDoorOpen) {
@@ -172,7 +176,7 @@ public class Main extends ApplicationAdapter {
 
     /**
      * Open the exit.
-     * Remove its hitbox and hide its graphic. 
+     * Remove its hitbox and hide its graphic.
      */
     public static void openExit() {
         if (player.hasExitKey() && !exitOpen) {
@@ -185,7 +189,7 @@ public class Main extends ApplicationAdapter {
 
     /**
      * Give the scroll powerup to the player, making the player invisible for 15s.
-     * Hide the scroll graphic. 
+     * Hide the scroll graphic.
      */
     public static void getScroll() {
         if (!scrollUsed) {
@@ -199,8 +203,8 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Set the game to the started state, and unpause it. 
-     * Used once to start the game. 
+     * Set the game to the started state, and unpause it.
+     * Used once to start the game.
      */
     public static void startGame() {
         if (gameState == 0) {
@@ -214,7 +218,7 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Set the game to the win state, used when the player escapes. 
+     * Set the game to the win state, used when the player escapes.
      */
     public static void winGame() {
         togglePause();
@@ -222,7 +226,7 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Set the game to the lose state, used when the player runs out of time. 
+     * Set the game to the lose state, used when the player runs out of time.
      */
     public static void LoseGame() {
         togglePause();
@@ -230,7 +234,7 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Calculate the players score based on how much time was left and wether they found Long Boi. 
+     * Calculate the players score based on how much time was left and wether they found Long Boi.
      * @return The score.
      */
     public static int calculateScore() {
@@ -238,7 +242,7 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Toggle wether the window should be in Windowed or Fullcreen mode. 
+     * Toggle wether the window should be in Windowed or Fullcreen mode.
      */
     public void toggleFullscreen() {
         if (isFullscreen) {
@@ -251,8 +255,8 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Toggle wether the game should be paused. 
-     * This will freeze the player/dean, stop all game logic and display the pause overlay. 
+     * Toggle wether the game should be paused.
+     * This will freeze the player/dean, stop all game logic and display the pause overlay.
      */
     public static void togglePause() {
         if (gameState == 2) {
@@ -270,8 +274,8 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Where the game processes its logic each frame. 
-     * It will not run if the game is paused. 
+     * Where the game processes its logic each frame.
+     * It will not run if the game is paused.
      */
     public void logic() {
         timerSystem.tick();
@@ -282,7 +286,7 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Checks if the dean has caught the player, and punishes them if he has by removing 50s from time left. 
+     * Checks if the dean has caught the player, and punishes them if he has by removing 50s from time left.
      */
     public void checkDeanCatch() {
         if (dean.canReach(player) && !playerCaught) {
@@ -301,9 +305,9 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Run when the player is first caught by the Dean. 
+     * Run when the player is first caught by the Dean.
      * This will begin the sequence where the player is held in detention while the timer goes down.
-     * This will freeze the player and dean. 
+     * This will freeze the player and dean.
      */
     private void startPlayerCatch() {
         playerCaught = true;
@@ -312,7 +316,7 @@ public class Main extends ApplicationAdapter {
         dean.freeze();
         dean.changeAnimation(3);
         dean.setPosition(PLAYERSTARTPOS.x + 32, PLAYERSTARTPOS.y);
-        timerSystem.addGradually(DEANPUNISHMENT - INITALPLAYERCAUGHTTIME); 
+        timerSystem.addGradually(DEANPUNISHMENT - INITALPLAYERCAUGHTTIME);
         ToastSystem.addToast("You were caught by the Dean!", BAD);
         ToastSystem.addToast("You were stuck being lectured for " + Integer.toString(DEANPUNISHMENT) + "s!", BAD);
         negativeEventCounter++;
@@ -321,7 +325,7 @@ public class Main extends ApplicationAdapter {
     /**
      * This will end the sequence where the player is held in detention while the timer goes down.
      * This will unfreeze the player and dean.
-     * It will rest the dean to the start of its patrol. 
+     * It will rest the dean to the start of its patrol.
      */
     private void endPlayerCatch() {
         dean.setPosition(DEANSTARTPOS);
@@ -332,7 +336,7 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Use to drop remove the spikes in the chest room when the switch is pressed. 
+     * Use to drop remove the spikes in the chest room when the switch is pressed.
      */
     public static void dropSpikes() {
         if (!spikesLowered) {
@@ -343,7 +347,54 @@ public class Main extends ApplicationAdapter {
             spikesLowered = true;
         }
     }
-        
+
+    /**
+     * <P>Teleports the player to a room on the tiled map based on the coordinates passed.</P>
+     * <P>Each coordinate represents one room.</P>
+     * <P>The width and height of each room in pixels is equivalent to the viewport width and height.</P>
+     *
+     * @param x the x coordinate of the room
+     * @param y The y coordinate of the room
+     * @param playerPos The coordinates of the player after they enter the room
+     * @param deanPos Where the dean starts in this room
+     * @param deanPath The path the dean takes in this room
+     */
+    public static void loadRoom(int x,int y, Vector2 playerPos, Vector2 deanPos, Character[] deanPath){
+        collisionSystem.loadRoom(x,y,VIEWPORTWIDTH,VIEWPORTHEIGHT);
+        TriggerSystem.loadRoom(x,y,VIEWPORTWIDTH,VIEWPORTHEIGHT);
+        renderingSystem.loadRoom(x,y,VIEWPORTWIDTH,VIEWPORTHEIGHT);
+        player.setX(playerPos.x);
+        player.setY(playerPos.y);
+        dean.setX(deanPos.x);
+        dean.setY(deanPos.y);
+        dean.setPath(deanPath);
+    }
+
+    /**
+     * <P>Teleports the player to a room on the tiled map based on the coordinates passed.</P>
+     * <P>Each coordinate represents one room.</P>
+     * <P>The width and height of each room in pixels is equivalent to the viewport width and height.</P>
+     *
+     * @param x the x coordinate of the room
+     * @param y The y coordinate of the room
+     */
+    public static void loadRoom(int x,int y){
+        loadRoom(x,y,PLAYERSTARTPOS,DEANSTARTPOS,DEANPATH);
+    }
+
+    /**
+     * <P>Teleports the player to a room on the tiled map based on the coordinates passed.</P>
+     * <P>Each coordinate represents one room.</P>
+     * <P>The width and height of each room in pixels is equivalent to the viewport width and height.</P>
+     *
+     * @param x the x coordinate of the room
+     * @param y The y coordinate of the room
+     * @param playerPos The coordinates of the player after they enter the room
+     */
+    public static void loadRoom(int x,int y, Vector2 playerPos){
+        loadRoom(x,y,playerPos,DEANSTARTPOS,DEANPATH);
+    }
+
 
     @Override
     public void resize(int width, int height) {
