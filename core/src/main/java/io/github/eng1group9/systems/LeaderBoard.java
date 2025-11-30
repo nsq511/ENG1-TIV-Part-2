@@ -27,10 +27,10 @@ public class LeaderBoard {
         maxLen = maxLength;
     }
     /**
-     * Creates an empty leaderboard with 10 spaces
+     * Creates an empty leaderboard with 5 spaces
      */
     public LeaderBoard(){
-        this(new HashMap<>(), 10);
+        this(new HashMap<>(), 5);
     }
 
     public int getLength(){

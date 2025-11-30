@@ -42,7 +42,7 @@ public class Main extends ApplicationAdapter {
     public static int positiveEventCounter = 0;
     public static final String leaderBoardFilePath = "leaderboard.txt";
 
-    public static LeaderBoard leaderBoard = LeaderBoard.loadFromFile(leaderBoardFilePath, 10);
+    public static LeaderBoard leaderBoard = LeaderBoard.loadFromFile(leaderBoardFilePath, 5);
 
     private static TimerSystem timerSystem = new TimerSystem(TIMERSTARTVALUE);
     public static boolean showCollision = false;
