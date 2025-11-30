@@ -1,6 +1,6 @@
 package io.github.eng1group9.systems;
 
-import java.util.ArrayList;
+import java.util.Collection;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -12,9 +12,9 @@ import com.badlogic.gdx.math.Vector2;
  * Class for achievemnts in the game
  */
 public class Achievement {
-    private static final float logoSize = 16f;
+    private static final float logoSize = 32f;
     public static float rowHeight = logoSize + 10f;    // The height of rows for rendering
-    public static float colWidth = 100f;               // The width of columns for rendering
+    public static float colWidth = 260f;               // The width of columns for rendering
 
     private Sprite logo;            // Achievement logo for displaying to user
     private String name;            // Title of achievement
@@ -43,7 +43,7 @@ public class Achievement {
         this.scoreModifier = scoreModifier;
         achieved = false;
         this.logo = new Sprite(logo);
-        this.logo.setScale(logoSize);
+        this.logo.setSize(logoSize, logoSize);
     }
     /**
      * Creates an achievement with no texture
@@ -62,7 +62,7 @@ public class Achievement {
         this.scoreModifier = scoreModifier;
         achieved = false;
         logo = new Sprite();
-        this.logo.setScale(logoSize);
+        this.logo.setSize(logoSize, logoSize);
     }
     /**
      * Creates an achievement with no texture and no score modifier
@@ -80,7 +80,15 @@ public class Achievement {
         this.scoreModifier = 0;
         achieved = false;
         logo = new Sprite();
-        this.logo.setScale(logoSize);
+        this.logo.setSize(logoSize, logoSize);
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public String getDescription(){
+        return description;
     }
 
     /**
@@ -89,10 +97,8 @@ public class Achievement {
      * @return Whether the achievment has met all conditions to be completed
      */
     public boolean incConditions(){
-        if(reqConditionCount < numReqConditions){
-            reqConditionCount++;
-        }
-        else{
+        reqConditionCount++;
+        if(reqConditionCount >= numReqConditions){
             achieved = true;
         }
         return achieved;
@@ -132,20 +138,25 @@ public class Achievement {
      * @param font The font to use to write text
      */
     private void render(Vector2 pos, SpriteBatch batch, BitmapFont font){
+        final float buffer = 10f;
+
         // Draw logo 
         logo.setPosition(pos.x, pos.y);
         logo.draw(batch);
 
+        float scale = font.getScaleX();
         // Draw text
-        pos.x += logo.getWidth();
+        pos.x += logo.getWidth() + buffer;
         pos.y += logo.getHeight();
+        font.getData().setScale(1.5f * scale);
         font.draw(batch, name, pos.x, pos.y);
-        pos.y -= logo.getHeight() / 2f;
+        pos.y -= logo.getHeight() * 0.6f;
+        font.getData().setScale(scale);
         font.draw(batch, description, pos.x, pos.y);
     }
 
     /**
-     * Draws the given achievements in a grid
+     * Draws the given achievements in a grid if they have been achieved
      * 
      * @param pos The position to draw the grid at. Anchored at the top left
      * @param cols The number of columns in the grid. The rows will be determined based on the size of achievements
@@ -153,16 +164,23 @@ public class Achievement {
      * @param font The font to use for drawing text
      * @param achievements The list of achievements to draw
      */
-    public static void draw(Vector2 pos, int cols, SpriteBatch batch, BitmapFont font, ArrayList<Achievement> achievements){        
-        for(int i=0; i < achievements.size(); i++){
+    public static void draw(Vector2 pos, int cols, SpriteBatch batch, BitmapFont font, Collection<Achievement> achievements){        
+        Achievement[] achievementsArray = achievements.toArray(new Achievement[0]);
+        final float buffer = 10f;
+
+        int i = 0;
+        for(Achievement achievement : achievementsArray){
+            if(!achievement.isAchieved()) continue;
+
             int col = i % cols;
             int row = i / cols;
             
             // Place cursor in the bottom left of the cell
-            float curX = pos.x + (col * colWidth);
+            float curX = pos.x + (col * (colWidth + buffer));
             float curY = (pos.y - rowHeight) - (row * rowHeight);
 
-            achievements.get(i).render(new Vector2(curX, curY), batch, font);
+            achievement.render(new Vector2(curX, curY), batch, font);
+            i++;
         }
     }
 }

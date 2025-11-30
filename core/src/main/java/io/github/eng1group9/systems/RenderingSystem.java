@@ -12,6 +12,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
@@ -305,6 +306,8 @@ public class RenderingSystem {
             font.draw(uiBatch, "Enter Name:", screenWidth * 0.1f, screenHeight / 2f + 70);
         }
         renderStats(screenWidth, screenHeight, positiveEventCounter, negativeEventCounter, hiddenEventCounter);
+        
+        Achievement.draw(new Vector2(10f, screenHeight - 10f), 3, uiBatch, font, Main.achievements.values());
         uiBatch.end();
 
         // Leaderboard text input

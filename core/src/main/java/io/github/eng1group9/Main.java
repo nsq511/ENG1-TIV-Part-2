@@ -1,10 +1,13 @@
 package io.github.eng1group9;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -12,6 +15,7 @@ import io.github.eng1group9.entities.*;
 import io.github.eng1group9.systems.InputSystem;
 import io.github.eng1group9.systems.LeaderBoard;
 import io.github.eng1group9.systems.RenderingSystem;
+import io.github.eng1group9.systems.Achievement;
 import io.github.eng1group9.systems.CollisionSystem;
 import io.github.eng1group9.systems.ToastSystem;
 import io.github.eng1group9.systems.TriggerSystem;
@@ -43,6 +47,7 @@ public class Main extends ApplicationAdapter {
     public static final String leaderBoardFilePath = "leaderboard.txt";
 
     public static LeaderBoard leaderBoard = LeaderBoard.loadFromFile(leaderBoardFilePath, 5);
+    public static HashMap<String, Achievement> achievements = new HashMap<>();
 
     private static TimerSystem timerSystem = new TimerSystem(TIMERSTARTVALUE);
     public static boolean showCollision = false;
@@ -61,7 +66,7 @@ public class Main extends ApplicationAdapter {
     private static Dean dean;
     final static Vector2 DEANSTARTPOS = new Vector2(32, 352); // Where the Dean begins the game, and returns to after catching the player.
     final float DEFAULTDEANSPEED = 100;
-    final int DEANPUNISHMENT = 30; // The number of seconds the Dean adds to the timer.
+    final int DEAN_TIME_PUNISHMENT = 30; // The number of seconds the Dean adds to the timer.
     final static Character[] DEANPATH = { // The path the dean will take in the first room (D = Down, U = Up, L = Left, R = Right). The path will loop.
         'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
         'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D',
@@ -71,14 +76,19 @@ public class Main extends ApplicationAdapter {
         'D', 'D', 'D', 'D',
         'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L'
     };
-
+    
     final static Color BAD = new Color(1,1,0,1);
     final static Color GOOD = new Color(0,1,1,1);
-
+    
     public static Main instance;
     public static RenderingSystem renderingSystem = new RenderingSystem();
     public static CollisionSystem collisionSystem = new CollisionSystem();
     public static InputSystem inputSystem = new InputSystem();
+    
+    // Achievement names
+    public static final String ACH_LONGBOI = "Bird Spotter";
+    public static final String ACH_DEAN_CAPTURES = "Troublemaker";
+    final int ACH_DEAN_CAPTURE_POINT_PUNISHMENT = -20;      // The points lost for getting the dean capture achievement
 
     @Override
     public void create() {
@@ -90,6 +100,25 @@ public class Main extends ApplicationAdapter {
         dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEANPATH);
         togglePause();
         instance = this;
+
+        // Achievement initialisation
+        Achievement longboi = new Achievement(
+             ACH_LONGBOI,
+             "You found Longboi!",
+             1,
+             LONGBOIBONUSAMOUNT,
+             new Texture("Achievements/ach_longboi.png")
+            );
+        achievements.put(longboi.getName(), longboi);
+
+        Achievement deanCaptures = new Achievement(
+             ACH_DEAN_CAPTURES,
+             "Get caught by the dean 3 times...",
+             3,
+             ACH_DEAN_CAPTURE_POINT_PUNISHMENT,
+             new Texture("Achievements/ach_dean_capture.png")
+            );
+        achievements.put(deanCaptures.getName(), deanCaptures);
     }
 
     /**
@@ -115,6 +144,9 @@ public class Main extends ApplicationAdapter {
         RenderingSystem.reset();
         collisionSystem.reset();
         loadRoom(0,0, PLAYERSTARTPOS, DEANSTARTPOS, DEANPATH);
+        for(Achievement a : achievements.values()){
+            a.reset();
+        }
     }
 
     @Override
@@ -139,6 +171,7 @@ public class Main extends ApplicationAdapter {
             ToastSystem.addToast("You found my potion! Thank you!", messageColour);
             RenderingSystem.showLayer("LONGBOI");
             hiddenEventCounter++;
+            achievements.get(ACH_LONGBOI).incConditions();
         }
     }
 
@@ -239,7 +272,11 @@ public class Main extends ApplicationAdapter {
      * @return The score.
      */
     public static int calculateScore() {
-        return TimerSystem.getTimeLeft() + longboiBonus;
+        int score = TimerSystem.getTimeLeft();
+        for(Achievement a : achievements.values()){
+            score = (int) a.modifyScore(score);
+        }
+        return score;
     }
 
     /**
@@ -291,6 +328,7 @@ public class Main extends ApplicationAdapter {
      */
     public void checkDeanCatch() {
         if (dean.canReach(player) && !playerCaught) {
+            achievements.get(ACH_DEAN_CAPTURES).incConditions();
             startPlayerCatch();
         }
         else if (playerCaught) {
@@ -317,9 +355,9 @@ public class Main extends ApplicationAdapter {
         dean.freeze();
         dean.changeAnimation(3);
         dean.setPosition(PLAYERSTARTPOS.x + 32, PLAYERSTARTPOS.y);
-        timerSystem.addGradually(DEANPUNISHMENT - INITALPLAYERCAUGHTTIME);
+        timerSystem.addGradually(DEAN_TIME_PUNISHMENT - INITALPLAYERCAUGHTTIME);
         ToastSystem.addToast("You were caught by the Dean!", BAD);
-        ToastSystem.addToast("You were stuck being lectured for " + Integer.toString(DEANPUNISHMENT) + "s!", BAD);
+        ToastSystem.addToast("You were stuck being lectured for " + Integer.toString(DEAN_TIME_PUNISHMENT) + "s!", BAD);
         negativeEventCounter++;
     }
 

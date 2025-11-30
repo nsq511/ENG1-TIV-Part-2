@@ -140,6 +140,8 @@ public class LeaderBoard {
         String rankedList = "LEADERBOARD\n";
         int i = 1;
         for(Entry<String, Integer> e : getSortedList()){
+            if(i > maxLen) break;
+
             rankedList += Integer.toString(i++) + ". " + e.getKey() + "    " + e.getValue().toString() + "\n";
         }
         while(i <= maxLen){
