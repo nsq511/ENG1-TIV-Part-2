@@ -298,7 +298,7 @@ public class RenderingSystem {
         font.setColor(1, 1, 1, 1);
         font.getData().setScale(1f);
         font.draw(uiBatch, TimerSystem.getClockDisplay(), screenWidth / 2f, screenHeight / 2f);
-        font.draw(uiBatch, "Score: " + Integer.toString(score), screenWidth / 2f, (screenHeight / 2f) - 20);
+        font.draw(uiBatch, "Score: " + Integer.toString(score) + "  (Time remaining + Achievement Bonus)", screenWidth / 2f, (screenHeight / 2f) - 20);
         font.draw(uiBatch, "Press ESC to quit.", screenWidth / 2f, (screenHeight / 2f) - 40);
         font.draw(uiBatch, "Press SPACE to restart.", screenWidth / 2f, (screenHeight / 2f) - 60);
         font.draw(uiBatch, Main.leaderBoard.toString(), screenWidth * 0.1f, screenHeight * 0.5f);
@@ -307,7 +307,7 @@ public class RenderingSystem {
         }
         renderStats(screenWidth, screenHeight, positiveEventCounter, negativeEventCounter, hiddenEventCounter);
         
-        Achievement.draw(new Vector2(10f, screenHeight - 10f), 3, uiBatch, font, Main.achievements.values());
+        AchievementSystem.draw(new Vector2(10f, screenHeight - 10f), 3, uiBatch, font);
         uiBatch.end();
 
         // Leaderboard text input

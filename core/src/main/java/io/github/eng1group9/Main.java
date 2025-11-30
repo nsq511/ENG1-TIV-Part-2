@@ -1,13 +1,10 @@
 package io.github.eng1group9;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -15,7 +12,7 @@ import io.github.eng1group9.entities.*;
 import io.github.eng1group9.systems.InputSystem;
 import io.github.eng1group9.systems.LeaderBoard;
 import io.github.eng1group9.systems.RenderingSystem;
-import io.github.eng1group9.systems.Achievement;
+import io.github.eng1group9.systems.AchievementSystem;
 import io.github.eng1group9.systems.CollisionSystem;
 import io.github.eng1group9.systems.ToastSystem;
 import io.github.eng1group9.systems.TriggerSystem;
@@ -47,15 +44,13 @@ public class Main extends ApplicationAdapter {
     public static final String leaderBoardFilePath = "leaderboard.txt";
 
     public static LeaderBoard leaderBoard = LeaderBoard.loadFromFile(leaderBoardFilePath, 5);
-    public static HashMap<String, Achievement> achievements = new HashMap<>();
 
     private static TimerSystem timerSystem = new TimerSystem(TIMERSTARTVALUE);
     public static boolean showCollision = false;
 
     private List<Rectangle> worldCollision;
-    final static int LONGBOIBONUSAMOUNT = 50;
     final static String TMXPATH = "World/testMap.tmx";
-
+    
     public static Player player;
     private static boolean playerCaught = false; // Whether the player is currently being held by the Dean.
     final static float INITALPLAYERCAUGHTTIME = 1.2f;
@@ -87,8 +82,13 @@ public class Main extends ApplicationAdapter {
     
     // Achievement names
     public static final String ACH_LONGBOI = "Bird Spotter";
+    public final static int LONGBOIBONUSAMOUNT = 50;
     public static final String ACH_DEAN_CAPTURES = "Troublemaker";
-    final int ACH_DEAN_CAPTURE_POINT_PUNISHMENT = -20;      // The points lost for getting the dean capture achievement
+    public static final int ACH_DEAN_CAPTURE_POINT_PUNISHMENT = -20;      // The points lost for getting the dean capture achievement
+    public static final String ACH_INVIS = "Now you see me...";
+    public static final String ACH_LOST = "Detour Champion";
+    public boolean achTriggered = false;
+    public static final String ACH_QUICK = "Fancy a Quickie?";
 
     @Override
     public void create() {
@@ -101,24 +101,7 @@ public class Main extends ApplicationAdapter {
         togglePause();
         instance = this;
 
-        // Achievement initialisation
-        Achievement longboi = new Achievement(
-             ACH_LONGBOI,
-             "You found Longboi!",
-             1,
-             LONGBOIBONUSAMOUNT,
-             new Texture("Achievements/ach_longboi.png")
-            );
-        achievements.put(longboi.getName(), longboi);
-
-        Achievement deanCaptures = new Achievement(
-             ACH_DEAN_CAPTURES,
-             "Get caught by the dean 3 times...",
-             3,
-             ACH_DEAN_CAPTURE_POINT_PUNISHMENT,
-             new Texture("Achievements/ach_dean_capture.png")
-            );
-        achievements.put(deanCaptures.getName(), deanCaptures);
+        AchievementSystem.init();
     }
 
     /**
@@ -144,9 +127,7 @@ public class Main extends ApplicationAdapter {
         RenderingSystem.reset();
         collisionSystem.reset();
         loadRoom(0,0, PLAYERSTARTPOS, DEANSTARTPOS, DEANPATH);
-        for(Achievement a : achievements.values()){
-            a.reset();
-        }
+        AchievementSystem.reset();
     }
 
     @Override
@@ -171,12 +152,12 @@ public class Main extends ApplicationAdapter {
             ToastSystem.addToast("You found my potion! Thank you!", messageColour);
             RenderingSystem.showLayer("LONGBOI");
             hiddenEventCounter++;
-            achievements.get(ACH_LONGBOI).incConditions();
+            AchievementSystem.incAchievement(ACH_LONGBOI);  // Trigger Longboi achievement
         }
     }
 
     public void draw() {
-        renderingSystem.draw(player, dean, showCollision, timerSystem.elapsedTime, worldCollision);
+        renderingSystem.draw(player, dean, showCollision, TimerSystem.elapsedTime, worldCollision);
         switch (gameState) {
             case 0:
                 renderingSystem.renderStartOverlay(960, 640);
@@ -185,7 +166,7 @@ public class Main extends ApplicationAdapter {
                 renderingSystem.renderPauseOverlay(960, 640, positiveEventCounter, negativeEventCounter, hiddenEventCounter);
                 break;
             case 3:
-                renderingSystem.renderWinOverlay(960, 640, timerSystem.getTimeLeft(), calculateScore(), positiveEventCounter, negativeEventCounter, hiddenEventCounter);
+                renderingSystem.renderWinOverlay(960, 640, TimerSystem.getTimeLeft(), calculateScore(), positiveEventCounter, negativeEventCounter, hiddenEventCounter);
                 break;
             case 4:
                 renderingSystem.renderLoseOverlay(960, 640, positiveEventCounter, negativeEventCounter, hiddenEventCounter);
@@ -227,6 +208,7 @@ public class Main extends ApplicationAdapter {
      */
     public static void getScroll() {
         if (!scrollUsed) {
+            AchievementSystem.incAchievement(ACH_INVIS);    // Trigger invisible achievement
             player.becomeInvisible();
             RenderingSystem.hideLayer("Scroll");
             scrollUsed = true;
@@ -256,6 +238,9 @@ public class Main extends ApplicationAdapter {
      */
     public static void winGame() {
         togglePause();
+        if(TimerSystem.elapsedTime <= 60){
+            AchievementSystem.incAchievement(ACH_QUICK);    // Trigger quick finish achievement
+        }
         gameState = 3;
     }
 
@@ -273,9 +258,7 @@ public class Main extends ApplicationAdapter {
      */
     public static int calculateScore() {
         int score = TimerSystem.getTimeLeft();
-        for(Achievement a : achievements.values()){
-            score = (int) a.modifyScore(score);
-        }
+        score = (int)AchievementSystem.modifyScore(score);
         return score;
     }
 
@@ -317,6 +300,10 @@ public class Main extends ApplicationAdapter {
      */
     public void logic() {
         timerSystem.tick();
+        // Trigger lost achievement
+        if(!achTriggered && TimerSystem.elapsedTime > 4 * 60){
+            AchievementSystem.incAchievement(ACH_LOST);         // Trigger slow finish achievement
+        }
         dean.nextMove();
         checkDeanCatch();
         TriggerSystem.checkTouchTriggers(player);
@@ -328,7 +315,7 @@ public class Main extends ApplicationAdapter {
      */
     public void checkDeanCatch() {
         if (dean.canReach(player) && !playerCaught) {
-            achievements.get(ACH_DEAN_CAPTURES).incConditions();
+            AchievementSystem.incAchievement(ACH_DEAN_CAPTURES);    // Increment count for Dean capture achievment
             startPlayerCatch();
         }
         else if (playerCaught) {
