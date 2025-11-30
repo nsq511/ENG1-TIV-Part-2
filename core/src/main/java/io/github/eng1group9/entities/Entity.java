@@ -34,14 +34,15 @@ public class Entity {
         this.height = height;
         sprite.setSize(width, height);
         sprite.setPosition(startPosition.x , startPosition.y);
-        hitbox.set(startPosition.x + width, startPosition.y + height, width,    16);
+
+        hitbox.set(startPosition.x, startPosition.y, width, height * 0.5f); // Height halved so only feet are the hitbox. Allows head to pass over things
         initPos = startPosition.cpy();
     }
 
     public Entity(Vector2 startPosition, float width, float height) {
         sprite.setSize(width, height);
         sprite.setPosition(startPosition.x, startPosition.y);
-        hitbox.set(startPosition.x  + 16, startPosition.y  + 16, width, 16);
+        hitbox.set(startPosition.x, startPosition.y, width, height * 0.5f); // Height halved so only feet are the hitbox. Allows head to pass over things
         initPos = startPosition.cpy(); 
     }
 
@@ -86,7 +87,7 @@ public class Entity {
      */
     public void setX(float x) {
         sprite.setX(x);
-        hitbox.setX(x + (0.5f * width));
+        hitbox.setX(x);
     }
 
     /**
@@ -95,7 +96,7 @@ public class Entity {
      */
     public void setY(float y) {
         sprite.setY(y);
-        hitbox.setY(y + (0.5f * height));
+        hitbox.setY(y);
     }
 
     /**

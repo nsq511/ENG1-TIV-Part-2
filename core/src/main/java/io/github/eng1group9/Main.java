@@ -55,7 +55,7 @@ public class Main extends ApplicationAdapter {
     private static boolean playerCaught = false; // Whether the player is currently being held by the Dean.
     final static float INITALPLAYERCAUGHTTIME = 1.2f;
     private static float playerCaughtTime = INITALPLAYERCAUGHTTIME; // how many seconds the Dean will hold the player when caught.
-    final static Vector2 PLAYERSTARTPOS = new Vector2(16, 532); // Where the player begins the game, and returns to when caught.
+    final static Vector2 PLAYERSTARTPOS = new Vector2(16, 516); // Where the player begins the game, and returns to when caught.
     final float DEFAULTPLAYERSPEED = 100; // The players speed.
 
     private static Dean dean;
@@ -146,7 +146,7 @@ public class Main extends ApplicationAdapter {
         Color messageColour = new Color(0.2f, 1, 0.2f ,1);
         if (longboiBonus == 0 && !player.hasRedPotion()) {
             ToastSystem.addToast("Hello There! I seem to have misplaced my Red Potion, could you get it for me?", messageColour);
-         }
+        }
         else if (longboiBonus == 0 && player.hasRedPotion()){
             longboiBonus = LONGBOIBONUSAMOUNT;
             ToastSystem.addToast("You found my potion! Thank you!", messageColour);

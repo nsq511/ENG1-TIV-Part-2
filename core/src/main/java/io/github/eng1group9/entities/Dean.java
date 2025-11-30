@@ -11,7 +11,7 @@ import com.badlogic.gdx.math.Vector2;
  * @param path - The deans path, it will follow this on loop.
  */
 public class Dean extends MovingEntity {
-    private int reach = 2; // size of dean hitbox in tiles (3x3)
+    private int reach = 1; // size of dean hitbox in tiles (3x3)
     private int moveNum = 0;
     private float nextTileDistance = 32;
     private Character[] path;
@@ -32,9 +32,9 @@ public class Dean extends MovingEntity {
         reachRectangle = new Rectangle();
         int reachSize = reach * 32;
         reachRectangle.setSize(reachSize);
-        reachOffsetX = (getWidth() - reachSize) / 2f;
-        reachOffsetY = (getHeight() - reachSize) / 2f;
-        reachRectangle.setPosition(getX() + reachOffsetX, getY() + reachOffsetY);
+        reachOffsetX = (reachSize - getWidth()) / 2f;
+        reachOffsetY = (reachSize - getHeight()) / 2f;
+        reachRectangle.setPosition(getX() - reachOffsetX, getY() - reachOffsetY);
         setHitbox(new Rectangle());
         this.path = path;
         STARTPOS = startPos;
@@ -58,7 +58,7 @@ public class Dean extends MovingEntity {
         float distance = move(direction);
         nextTileDistance -= distance;
         if (!isFrozen()) updateAnimation(direction);
-        reachRectangle.setPosition(getX() + reachOffsetX, getY() + reachOffsetY);
+        reachRectangle.setPosition(getX() - reachOffsetX, getY() - reachOffsetY);
         haveIMovedOneTile();
     }
 
