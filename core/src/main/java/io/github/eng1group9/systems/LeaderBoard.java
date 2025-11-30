@@ -173,13 +173,19 @@ public class LeaderBoard {
     private static LeaderBoard fromJson(String json, int maxLength){
         HashMap<String, Integer> newEntries = new HashMap<>();
 
-        json = json.replaceAll("[{}\n]", "");
-        String[] lines = json.split(",");
-        for(String line : lines){
-            String[] parts = line.split(": ");
-            String key = parts[0].replace("\"", "");
-            Integer value =  Integer.parseInt(parts[1]);
-            newEntries.put(key, value);
+        try{
+            json = json.replaceAll("[{}\n]", "");
+            String[] lines = json.split(",");
+            for(String line : lines){
+                String[] parts = line.split(": ");
+                String key = parts[0].replace("\"", "");
+                Integer value =  Integer.parseInt(parts[1]);
+                newEntries.put(key, value);
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            System.err.println("Error parsing leaderboard JSON. Using empty leaderboard");
         }
         return new LeaderBoard(newEntries, maxLength);
     }
