@@ -72,8 +72,9 @@ public class Main extends ApplicationAdapter {
         'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L'
     };
     
-    final static Color BAD = new Color(1,1,0,1);
-    final static Color GOOD = new Color(0,1,1,1);
+    final static Color BAD = new Color(1f,1f,0f,1f);
+    final static Color GOOD = new Color(0f,1f,1f,1f);
+    final static Color ACHIEVEMENT = new Color(1f, 0.7f, 0.1f, 1f);
     
     public static Main instance;
     public static RenderingSystem renderingSystem = new RenderingSystem();
@@ -87,7 +88,7 @@ public class Main extends ApplicationAdapter {
     public static final int ACH_DEAN_CAPTURE_POINT_PUNISHMENT = -20;      // The points lost for getting the dean capture achievement
     public static final String ACH_INVIS = "Now you see me...";
     public static final String ACH_LOST = "Detour Champion";
-    public boolean achTriggered = false;
+    public static boolean achTriggered = false;
     public static final String ACH_QUICK = "Fancy a Quickie?";
 
     @Override
@@ -128,6 +129,7 @@ public class Main extends ApplicationAdapter {
         collisionSystem.reset();
         loadRoom(0,0, PLAYERSTARTPOS, DEANSTARTPOS, DEANPATH);
         AchievementSystem.reset();
+        achTriggered = false;
     }
 
     @Override
@@ -148,12 +150,35 @@ public class Main extends ApplicationAdapter {
             ToastSystem.addToast("Hello There! I seem to have misplaced my Red Potion, could you get it for me?", messageColour);
         }
         else if (longboiBonus == 0 && player.hasRedPotion()){
-            longboiBonus = LONGBOIBONUSAMOUNT;
             ToastSystem.addToast("You found my potion! Thank you!", messageColour);
             RenderingSystem.showLayer("LONGBOI");
             hiddenEventCounter++;
-            AchievementSystem.incAchievement(ACH_LONGBOI);  // Trigger Longboi achievement
+            incAchievement(ACH_LONGBOI);    // Trigger longboi achievement
         }
+    }
+
+    /**
+     * Adds an achievement toast
+     * 
+     * @param text The 
+     */
+    private static void achNotif(String achievementName){
+        ToastSystem.addToast("Achievement: " + achievementName, ACHIEVEMENT);
+    }
+    
+    /**
+     * Increments an achievement and adds a toast message if this increment acquired the achievement
+     * 
+     * @param achievement_name The name of the achievment to increment
+     * 
+     * @return Whether the achievement was acquired in this increment
+     */
+    private static boolean incAchievement(String achievement_name){
+        boolean ach_achieved = AchievementSystem.incAchievement(achievement_name);
+        if(ach_achieved){
+            achNotif(achievement_name);
+        }
+        return ach_achieved;
     }
 
     public void draw() {
@@ -208,7 +233,7 @@ public class Main extends ApplicationAdapter {
      */
     public static void getScroll() {
         if (!scrollUsed) {
-            AchievementSystem.incAchievement(ACH_INVIS);    // Trigger invisible achievement
+            incAchievement(ACH_INVIS);      // Trigger invisible scroll achievement
             player.becomeInvisible();
             RenderingSystem.hideLayer("Scroll");
             scrollUsed = true;
@@ -239,7 +264,7 @@ public class Main extends ApplicationAdapter {
     public static void winGame() {
         togglePause();
         if(TimerSystem.elapsedTime <= 60){
-            AchievementSystem.incAchievement(ACH_QUICK);    // Trigger quick finish achievement
+            incAchievement(ACH_QUICK);      // Trigger quick finish achievement
         }
         gameState = 3;
     }
@@ -300,10 +325,11 @@ public class Main extends ApplicationAdapter {
      */
     public void logic() {
         timerSystem.tick();
-        // Trigger lost achievement
+        
         if(!achTriggered && TimerSystem.elapsedTime > 4 * 60){
-            AchievementSystem.incAchievement(ACH_LOST);         // Trigger slow finish achievement
+            achTriggered = incAchievement(ACH_LOST);         // Trigger slow finish achievement
         }
+
         dean.nextMove();
         checkDeanCatch();
         TriggerSystem.checkTouchTriggers(player);
@@ -315,7 +341,7 @@ public class Main extends ApplicationAdapter {
      */
     public void checkDeanCatch() {
         if (dean.canReach(player) && !playerCaught) {
-            AchievementSystem.incAchievement(ACH_DEAN_CAPTURES);    // Increment count for Dean capture achievment
+            incAchievement(ACH_DEAN_CAPTURES);      // Increment count for Dean capture achievment
             startPlayerCatch();
         }
         else if (playerCaught) {

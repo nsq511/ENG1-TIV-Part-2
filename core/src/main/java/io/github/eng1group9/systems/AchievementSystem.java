@@ -62,6 +62,16 @@ public class AchievementSystem{
     }
 
     /**
+     * Gets the specified achievement 
+     * 
+     * @param title The title of the achievement
+     * @return The achievement with the given title or null if it does not exist
+     */
+    public static Achievement getAchievement(String title){
+        return achievements.get(title);        
+    }
+
+    /**
      * Adds an achievement to the system
      * 
      * @param title The name of the achievment 
@@ -273,14 +283,17 @@ class Achievement {
     /**
      * Increments the number of conditions that have been completed
      * 
-     * @return Whether the achievment has met all conditions to be completed
+     * @return Whether the achievment has been achieved on this increment call
      */
     public boolean incConditions(){
-        reqConditionCount++;
-        if(reqConditionCount >= numReqConditions){
+        if(reqConditionCount < numReqConditions) reqConditionCount++;
+
+        if(reqConditionCount == numReqConditions){
             achieved = true;
+            return true;
         }
-        return achieved;
+
+        return false;
     }
 
     /**
