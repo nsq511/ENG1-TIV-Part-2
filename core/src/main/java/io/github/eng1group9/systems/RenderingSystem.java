@@ -205,7 +205,7 @@ public class RenderingSystem {
      */
     public void renderPauseOverlay(int screenWidth, int screenHeight, int positiveEventCounter, int negativeEventCounter, int hiddenEventCounter) {
         uiBatch.begin();
-        uiBatch.setColor(0, 0, 0, 0.5f);
+        uiBatch.setColor(0, 0, 0, 0.75f);
         uiBatch.draw(missingTexture, 0, 0, screenWidth, screenHeight);
         uiBatch.setColor(1, 1, 1, 1);
 
@@ -227,7 +227,7 @@ public class RenderingSystem {
      */
     public void renderStartOverlay(int screenWidth, int screenHeight) {
         uiBatch.begin();
-        uiBatch.setColor(0, 0, 0, 0.5f);
+        uiBatch.setColor(0, 0, 0, 0.75f);
         uiBatch.draw(missingTexture, 0, 0, screenWidth, screenHeight);
         uiBatch.setColor(1, 1, 1, 1);
 
@@ -287,7 +287,7 @@ public class RenderingSystem {
      */
     public void renderWinOverlay(int screenWidth, int screenHeight, float timeLeft, int score, int positiveEventCounter, int negativeEventCounter, int hiddenEventCounter) {
         uiBatch.begin();
-        uiBatch.setColor(0, 0, 0, 0.5f);
+        uiBatch.setColor(0, 0, 0, 0.75f);
         uiBatch.draw(missingTexture, 0, 0, screenWidth, screenHeight);
         uiBatch.setColor(1, 1, 1, 1);
 
@@ -337,7 +337,7 @@ public class RenderingSystem {
      */
     public void renderLoseOverlay(int screenWidth, int screenHeight, int positiveEventCounter, int negativeEventCounter, int hiddenEventCounter) {
         uiBatch.begin();
-        uiBatch.setColor(0, 0, 0, 0.5f);
+        uiBatch.setColor(0, 0, 0, 0.75f);
         uiBatch.draw(missingTexture, 0, 0, screenWidth, screenHeight);
         uiBatch.setColor(1, 1, 1, 1);
 
