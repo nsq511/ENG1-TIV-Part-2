@@ -17,8 +17,8 @@ public class MovingEntity extends AnimatedEntity {
     private boolean frozen = false;
     private float initSpeed = 0f;
     
-    public MovingEntity(Texture spriteSheetTexture, int[] frameNumbers, int tileWidth, int tileHeight, float speed, Vector2 startPos) {
-        super(spriteSheetTexture, frameNumbers, tileWidth, tileHeight, startPos);
+    public MovingEntity(Texture spriteSheetTexture, int[] frameNumbers, int tileWidth, int tileHeight, float speed, Vector2 startPos, Vector2 hitboxOffset) {
+        super(spriteSheetTexture, frameNumbers, tileWidth, tileHeight, startPos, hitboxOffset);
         this.speed = speed;
         initSpeed = speed;
     }

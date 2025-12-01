@@ -11,7 +11,7 @@ import com.badlogic.gdx.math.Vector2;
  * @param path - The deans path, it will follow this on loop.
  */
 public class Dean extends MovingEntity {
-    private int reach = 1; // size of dean hitbox in tiles (3x3)
+    private int reach = 2; // size of dean hitbox in tiles (3x3)
     private int moveNum = 0;
     private float nextTileDistance = 32;
     private Character[] path;
@@ -26,7 +26,7 @@ public class Dean extends MovingEntity {
     }
 
     public Dean(Vector2 startPos, float speed, Character[] path) {
-        super(new Texture("Characters/deanAnimations.png"), new int[] {4, 4,4,4} , 32, 32, speed, startPos);
+        super(new Texture("Characters/deanAnimations.png"), new int[] {4, 4,4,4} , 32, 32, speed, startPos, new Vector2(16, 0));
         setScale(2);
 
         reachRectangle = new Rectangle();
@@ -34,6 +34,11 @@ public class Dean extends MovingEntity {
         reachRectangle.setSize(reachSize);
         reachOffsetX = (reachSize - getWidth()) / 2f;
         reachOffsetY = (reachSize - getHeight()) / 2f;
+        /* 
+        Entity hitboxes are at the feet so the deans hitbox should be adjusted downwards so that the dean still captures
+        the player when it looks like the players head overlaps with the dean
+        */
+        reachOffsetY += 32;     
         reachRectangle.setPosition(getX() - reachOffsetX, getY() - reachOffsetY);
         setHitbox(new Rectangle());
         this.path = path;
@@ -59,6 +64,13 @@ public class Dean extends MovingEntity {
         nextTileDistance -= distance;
         if (!isFrozen()) updateAnimation(direction);
         reachRectangle.setPosition(getX() - reachOffsetX, getY() - reachOffsetY);
+
+        System.out.println("Sprite Pos: " + Float.toString(getX()) + ", " + Float.toString(getY()));
+        System.out.println("Sprite Size: " + Float.toString(getWidth()) + ", " + Float.toString(getHeight()));
+        System.out.println("Reach Pos: " + Float.toString(reachRectangle.getX()) + ", " + Float.toString(reachRectangle.getY()));
+        System.out.println("Reach Size: " + Float.toString(reachRectangle.getWidth()) + ", " + Float.toString(reachRectangle.getHeight()));
+
+
         haveIMovedOneTile();
     }
 

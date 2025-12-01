@@ -21,7 +21,7 @@ public class Player extends MovingEntity {
     private boolean invisibilityWarningGiven = true;
 
     public Player(Vector2 startPos, float speed) {
-        super(new Texture("Characters/playerAnimations.png"), new int[] {4, 4, 4, 4, 4, 4, 4, 4} , 32, 32, speed, startPos);
+        super(new Texture("Characters/playerAnimations.png"), new int[] {4, 4, 4, 4, 4, 4, 4, 4} , 32, 32, speed, startPos, new Vector2(16, 0));
         setScale(2);
     }
 
@@ -107,20 +107,25 @@ public class Player extends MovingEntity {
         int animationOffset = 0;
         if (!isVisible()) animationOffset = 4;
         switch (direction) {
-                case 'U':
-                    changeAnimation(1 + animationOffset);
-                    break;
-                case 'D':
-                    changeAnimation(0 + animationOffset);
-                    break;
-                case 'L':
-                    changeAnimation(3 + animationOffset);
-                    break;
-                case 'R':
-                    changeAnimation(2 + animationOffset);
-                    break;
-            }
+            case 'U':
+                changeAnimation(1 + animationOffset);
+                break;
+            case 'D':
+                changeAnimation(0 + animationOffset);
+                break;
+            case 'L':
+                changeAnimation(3 + animationOffset);
+                break;
+            case 'R':
+                changeAnimation(2 + animationOffset);
+                break;
+        }
+        System.out.println("Player Sprite Pos: " + Float.toString(getX()) + ", " + Float.toString(getY()));
+        System.out.println("Player Sprite Size: " + Float.toString(getWidth()) + ", " + Float.toString(getHeight()));
+        System.out.println("Hitbox Pos: " + Float.toString(getHitbox().getX()) + ", " + Float.toString(getHitbox().getY()));
+        System.out.println("Hitbox Size: " + Float.toString(getHitbox().getWidth()) + ", " + Float.toString(getHitbox().getHeight()));
         return super.move(direction);
+
     }
 
     /**
