@@ -120,12 +120,7 @@ public class Player extends MovingEntity {
                 changeAnimation(2 + animationOffset);
                 break;
         }
-        System.out.println("Player Sprite Pos: " + Float.toString(getX()) + ", " + Float.toString(getY()));
-        System.out.println("Player Sprite Size: " + Float.toString(getWidth()) + ", " + Float.toString(getHeight()));
-        System.out.println("Hitbox Pos: " + Float.toString(getHitbox().getX()) + ", " + Float.toString(getHitbox().getY()));
-        System.out.println("Hitbox Size: " + Float.toString(getHitbox().getWidth()) + ", " + Float.toString(getHitbox().getHeight()));
         return super.move(direction);
-
     }
 
     /**

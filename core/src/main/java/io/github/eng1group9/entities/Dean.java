@@ -64,13 +64,6 @@ public class Dean extends MovingEntity {
         nextTileDistance -= distance;
         if (!isFrozen()) updateAnimation(direction);
         reachRectangle.setPosition(getX() - reachOffsetX, getY() - reachOffsetY);
-
-        System.out.println("Sprite Pos: " + Float.toString(getX()) + ", " + Float.toString(getY()));
-        System.out.println("Sprite Size: " + Float.toString(getWidth()) + ", " + Float.toString(getHeight()));
-        System.out.println("Reach Pos: " + Float.toString(reachRectangle.getX()) + ", " + Float.toString(reachRectangle.getY()));
-        System.out.println("Reach Size: " + Float.toString(reachRectangle.getWidth()) + ", " + Float.toString(reachRectangle.getHeight()));
-
-
         haveIMovedOneTile();
     }
 
