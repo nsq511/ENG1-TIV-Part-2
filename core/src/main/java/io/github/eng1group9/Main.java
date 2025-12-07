@@ -50,13 +50,13 @@ public class Main extends ApplicationAdapter {
     final static float INITALPLAYERCAUGHTTIME = 1.2f;
     private static float playerCaughtTime = INITALPLAYERCAUGHTTIME; // how many seconds the Dean will hold the player when caught.
     final static Vector2 PLAYERSTARTPOS = new Vector2(730, 500); // Where the player begins the game, and returns to when caught.
-    final float DEFAULTPLAYERSPEED = 200; // The players speed.
+    final static float DEFAULTPLAYERSPEED = 200; // The players speed.
 
     private static Dean dean;
     final static Vector2 DEANSTARTPOS = new Vector2(32, 352); // Where the Dean begins the game, and returns to after catching the player.
-    final float DEFAULTDEANSPEED = 100;
+    static final float DEFAULTDEANSPEED = 100;
     final int DEANPUNISHMENT = 30; // The number of seconds the Dean adds to the timer.
-    final static Character[] DEANPATH = { // The path the dean will take in the first room (D = Down, U = Up, L = Left, R = Right). The path will loop.
+    final static Character[] DEFAULTDEANPATH = { // The path the dean will take in the first room (D = Down, U = Up, L = Left, R = Right). The path will loop.
         'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
         'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D',
         'R', 'R', 'R',
@@ -82,7 +82,7 @@ public class Main extends ApplicationAdapter {
         RoomSystem.init(TMXPATH,  VIEWPORTWIDTH, VIEWPORTHEIGHT);
         worldCollision = collisionSystem.getWorldCollision();
         player = new Player(PLAYERSTARTPOS, DEFAULTPLAYERSPEED);
-        dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEANPATH);
+        dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEFAULTDEANPATH);
         togglePause();
         instance = this;
     }
@@ -109,7 +109,7 @@ public class Main extends ApplicationAdapter {
         dean.reset();
         RenderingSystem.reset();
         collisionSystem.reset();
-        loadRoom(0,0, PLAYERSTARTPOS, DEANSTARTPOS, DEANPATH);
+        loadRoom(0, 0, PLAYERSTARTPOS);
     }
 
     @Override
@@ -352,21 +352,55 @@ public class Main extends ApplicationAdapter {
      * @param x the x coordinate of the room
      * @param y The y coordinate of the room
      * @param playerPos The coordinates of the player after they enter the room
-     * @param deanPos Where the dean starts in this room
-     * @param deanPath The path the dean takes in this room
      */
-    public static void loadRoom(int x,int y, Vector2 playerPos, Vector2 deanPos, Character[] deanPath){
+    public static void loadRoom(int x,int y, Vector2 playerPos){
+
         RoomSystem.loadRoom(x,y,VIEWPORTWIDTH,VIEWPORTHEIGHT);
         collisionSystem.loadRoom(x,y,VIEWPORTWIDTH,VIEWPORTHEIGHT);
         TriggerSystem.loadRoom(x,y,VIEWPORTWIDTH,VIEWPORTHEIGHT);
         renderingSystem.loadRoom(x,y,VIEWPORTWIDTH,VIEWPORTHEIGHT);
         player.setX(playerPos.x);
         player.setY(playerPos.y);
-        dean.setX(deanPos.x);
-        dean.setY(deanPos.y);
-        dean.setPath(deanPath);
 
-        System.out.println(player.getX() + " " + player.getY());
+        if(x == 0 && y == 0){
+            dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEFAULTDEANPATH);
+        }
+        else if(x == 1 && y == 0){
+            Vector2 pos = new Vector2(80,80);
+            Character[] path = {
+                'R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R',
+                'L','L','L','L','L','L','L','L','L','L','L','L','L','L','L','L','L','L','L','L','L','L','L','L'
+            };
+
+            dean = new Dean(pos, DEFAULTDEANSPEED, path);
+        }
+        else if(x == 2 && y == 1){
+            Vector2 pos = new Vector2(280,400);
+            Character[] path = {
+                'D','D','D','D','D','D',
+                'U','U','U','U','U','U',
+                'R','R','R','R','R','R','R','R','R','R','R',
+                'D','D','D','D','D','D',
+                'U','U','U','U','U','U',
+                'D','D','D','D','D','D',
+                'L','L','L','L','L','L','L','L','L','L','L',
+                'U','U','U','U','U','U'
+            };
+
+            dean = new Dean(pos, 2000, path);
+        }
+        else if(x == 1 && y == 2){
+            Vector2 pos = new Vector2(16,490);
+            Character[] path = {
+                'R',
+                'L'
+            };
+
+            dean = new Dean(pos, DEFAULTDEANSPEED, path);
+        }
+        else{
+            dean = new Dean(new Vector2(9999,9999), DEFAULTDEANSPEED, DEFAULTDEANPATH);
+        }
     }
 
     /**
@@ -378,7 +412,7 @@ public class Main extends ApplicationAdapter {
      * @param y The y coordinate of the room
      */
     public static void loadRoom(int x,int y){
-        loadRoom(x,y,PLAYERSTARTPOS,DEANSTARTPOS,DEANPATH);
+        loadRoom(x,y,PLAYERSTARTPOS);
     }
 
     /**
@@ -390,38 +424,10 @@ public class Main extends ApplicationAdapter {
      */
     public static void loadRoom(Vector2 coordinates, Vector2 playerPos)
     {
-        int x;
-        int y;
-        if(coordinates.x <= 0){
-            x = 0;
-        }
-        else{
-            x = (int)(coordinates.x);
-        }
-        if(coordinates.y <= 0){
-            y = 0;
-        }
-        else{
-            y = (int)(coordinates.y);
-        }
-        System.out.println("ROOM X: " + x + " Y: " +y);
-        System.out.println("PLAYER X: " + playerPos.x + " Y: " + playerPos.y);
-        loadRoom(x,y,playerPos,DEANSTARTPOS,DEANPATH);
+        int x = (int)coordinates.x;
+        int y = (int)coordinates.y;
+        loadRoom(x,y,playerPos);
     }
-
-    /**
-     * <P>Teleports the player to a room on the tiled map based on the coordinates passed.</P>
-     * <P>Each coordinate represents one room.</P>
-     * <P>The width and height of each room in pixels is equivalent to the viewport width and height.</P>
-     *
-     * @param x the x coordinate of the room
-     * @param y The y coordinate of the room
-     * @param playerPos The coordinates of the player after they enter the room
-     */
-    public static void loadRoom(int x,int y, Vector2 playerPos){
-        loadRoom(x,y,playerPos,DEANSTARTPOS,DEANPATH);
-    }
-
 
     @Override
     public void resize(int width, int height) {

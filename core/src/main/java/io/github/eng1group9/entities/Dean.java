@@ -38,6 +38,7 @@ public class Dean extends MovingEntity {
         setHitbox(new Rectangle());
         this.path = path;
         STARTPOS = startPos;
+        setHitbox(new Rectangle());
 
     }
 

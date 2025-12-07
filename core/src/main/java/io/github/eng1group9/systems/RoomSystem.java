@@ -84,7 +84,7 @@ public class RoomSystem {
                 Vector2 roomCoordinates =  new Vector2((float)roomX, (float)roomY);
                 Door d = new Door(ID, transitionID, locked.equals("L"), zone, roomCoordinates);
                 doors.add(d);
-                System.out.println("Door " + ID + " to " + transitionID + " with coordinates " + roomCoordinates + "and X: " + zone.getX() + " Y: " + zone.getY());
+                System.out.println("Initialised door " + ID + " to " + transitionID + " with coordinates " + roomCoordinates + "and X: " + zone.getX() + " Y: " + zone.getY());
             }
             catch(Exception e){
                 System.out.println("Failed to initialise door");
@@ -113,8 +113,6 @@ public class RoomSystem {
     }
 
     public static void checkDoor(Player player){
-        System.out.println("DOORDOORDOORCHECK " + player.getX() + " " + player.getY());
-        System.out.println(canUse);
         for(Door door : doors){
             if(door.playerInZone(player) && canUse){
                 useDoor(door,player);
@@ -127,27 +125,8 @@ public class RoomSystem {
         Door transitionDoor =  getDoor(door.transitionID);
         int ID = door.getID();
 
-        System.out.println("Door " + ID + " to " + door.transitionID);
-
-        System.out.println("ROOM COORDS:" + transitionDoor.roomCoordinates);
-//
-//        System.out.println("X: ");
-//
-//        System.out.println(transitionDoor.originalZone.getX());
-//        System.out.println(transitionDoor.getRoomX());
-//        System.out.println(RenderingSystem.getViewportWidth()*2);
-//
-//        System.out.println("Y: ");
-//
-//        System.out.println(transitionDoor.originalZone.getY());
-//        System.out.println(transitionDoor.getRoomY());
-//        System.out.println(RenderingSystem.getViewportHeight()*2);
-
         float playerPosX = transitionDoor.originalZone.getX()-(transitionDoor.getRoomX()*RenderingSystem.getViewportWidth()*2);
         float playerPosY = transitionDoor.originalZone.getY()-(transitionDoor.getRoomY()*RenderingSystem.getViewportHeight()*2);
-
-
-//        System.out.println("ROOM COORDS:" + transitionDoor.roomCoordinates);
 
         Vector2 playerPosition = new Vector2(playerPosX, playerPosY);
 

@@ -231,12 +231,6 @@ public class TriggerSystem {
             case 8: // Pickup red potion.
                 player.giveRedPotion();
                 break;
-            case 9:
-                Main.loadRoom(0,1,new Vector2(30,30),new Vector2(50,50),new Character[]{'U','D'});
-                break;
-            case 10:
-                Main.loadRoom(0,0);
-                break;
             default:
                 break;
         }
