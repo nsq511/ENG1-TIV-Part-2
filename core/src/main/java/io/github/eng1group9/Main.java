@@ -9,13 +9,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import io.github.eng1group9.entities.*;
-import io.github.eng1group9.systems.InputSystem;
-import io.github.eng1group9.systems.LeaderBoard;
-import io.github.eng1group9.systems.RenderingSystem;
-import io.github.eng1group9.systems.CollisionSystem;
-import io.github.eng1group9.systems.ToastSystem;
-import io.github.eng1group9.systems.TriggerSystem;
-import io.github.eng1group9.systems.TimerSystem;
+import io.github.eng1group9.systems.*;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
@@ -55,8 +49,8 @@ public class Main extends ApplicationAdapter {
     private static boolean playerCaught = false; // Whether the player is currently being held by the Dean.
     final static float INITALPLAYERCAUGHTTIME = 1.2f;
     private static float playerCaughtTime = INITALPLAYERCAUGHTTIME; // how many seconds the Dean will hold the player when caught.
-    final static Vector2 PLAYERSTARTPOS = new Vector2(16, 532); // Where the player begins the game, and returns to when caught.
-    final float DEFAULTPLAYERSPEED = 100; // The players speed.
+    final static Vector2 PLAYERSTARTPOS = new Vector2(730, 500); // Where the player begins the game, and returns to when caught.
+    final float DEFAULTPLAYERSPEED = 200; // The players speed.
 
     private static Dean dean;
     final static Vector2 DEANSTARTPOS = new Vector2(32, 352); // Where the Dean begins the game, and returns to after catching the player.
@@ -84,7 +78,8 @@ public class Main extends ApplicationAdapter {
     public void create() {
         renderingSystem.initWorld(TMXPATH, VIEWPORTWIDTH, VIEWPORTHEIGHT);
         collisionSystem.init(renderingSystem.getMapRenderer().getMap());
-        TriggerSystem.init(TMXPATH);
+        TriggerSystem.init(TMXPATH, VIEWPORTWIDTH, VIEWPORTHEIGHT);
+        RoomSystem.init(TMXPATH,  VIEWPORTWIDTH, VIEWPORTHEIGHT);
         worldCollision = collisionSystem.getWorldCollision();
         player = new Player(PLAYERSTARTPOS, DEFAULTPLAYERSPEED);
         dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEANPATH);
@@ -361,6 +356,7 @@ public class Main extends ApplicationAdapter {
      * @param deanPath The path the dean takes in this room
      */
     public static void loadRoom(int x,int y, Vector2 playerPos, Vector2 deanPos, Character[] deanPath){
+        RoomSystem.loadRoom(x,y,VIEWPORTWIDTH,VIEWPORTHEIGHT);
         collisionSystem.loadRoom(x,y,VIEWPORTWIDTH,VIEWPORTHEIGHT);
         TriggerSystem.loadRoom(x,y,VIEWPORTWIDTH,VIEWPORTHEIGHT);
         renderingSystem.loadRoom(x,y,VIEWPORTWIDTH,VIEWPORTHEIGHT);
@@ -369,6 +365,8 @@ public class Main extends ApplicationAdapter {
         dean.setX(deanPos.x);
         dean.setY(deanPos.y);
         dean.setPath(deanPath);
+
+        System.out.println(player.getX() + " " + player.getY());
     }
 
     /**
@@ -381,6 +379,34 @@ public class Main extends ApplicationAdapter {
      */
     public static void loadRoom(int x,int y){
         loadRoom(x,y,PLAYERSTARTPOS,DEANSTARTPOS,DEANPATH);
+    }
+
+    /**
+     * <P>Teleports the player to a room on the tiled map based on the coordinates passed.</P>
+     * <P>Each coordinate represents one room.</P>
+     * <P>The width and height of each room in pixels is equivalent to the viewport width and height.</P>
+     *
+     * @param coordinates the coordinates of the room
+     */
+    public static void loadRoom(Vector2 coordinates, Vector2 playerPos)
+    {
+        int x;
+        int y;
+        if(coordinates.x <= 0){
+            x = 0;
+        }
+        else{
+            x = (int)(coordinates.x);
+        }
+        if(coordinates.y <= 0){
+            y = 0;
+        }
+        else{
+            y = (int)(coordinates.y);
+        }
+        System.out.println("ROOM X: " + x + " Y: " +y);
+        System.out.println("PLAYER X: " + playerPos.x + " Y: " + playerPos.y);
+        loadRoom(x,y,playerPos,DEANSTARTPOS,DEANPATH);
     }
 
     /**

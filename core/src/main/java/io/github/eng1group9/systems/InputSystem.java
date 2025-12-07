@@ -7,6 +7,8 @@ import com.badlogic.gdx.Input.TextInputListener;
 import io.github.eng1group9.Main;
 import io.github.eng1group9.entities.Player;
 
+import java.util.concurrent.TimeUnit;
+
 /**
 * Handles user input, both for movement and misc inputs.
 */
@@ -30,11 +32,12 @@ public class InputSystem {
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
             TriggerSystem.checkInteractTriggers(player);
+            RoomSystem.checkDoor(player);
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             Main.startGame();
         }
-        
+
 
         if (!player.isFrozen()) {
             if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {

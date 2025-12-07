@@ -49,10 +49,13 @@ public class TimerSystem {
         if (getTimeLeft() <= 0) {
             Main.LoseGame();
         }
+        if(getTimeLeft() <= 299) {
+            RoomSystem.canUse = true;
+        }
     }
 
     /**
-     * @return How much time should be added to the timer as a result of the addGradually method. 
+     * @return How much time should be added to the timer as a result of the addGradually method.
      */
     private float getExtraTime(float delta) {
         if (timeToAdd <= 0) return 0;
@@ -74,9 +77,9 @@ public class TimerSystem {
         String mins = getMinsDisplay(timeLeft);
         String secs = getSecsDisplay(timeLeft);
         return "Time Left: " + mins + ":" + secs;
-        
+
     }
-    
+
     private static String getMinsDisplay(int seconds) {
         return Integer.toString(getMins(seconds));
     }

@@ -33,6 +33,7 @@ public class TriggerSystem {
         private Rectangle zone;
         private Rectangle originalZone;
         private boolean activateOnTouch = false;
+        private Vector2 roomCoordinates;
 
         public Trigger(int ID, boolean activateOnTouch, Rectangle zone) {
             this.ID = ID;
@@ -69,8 +70,8 @@ public class TriggerSystem {
     private static List<Trigger> touchTriggers = new LinkedList<>();
     private static List<Trigger> interactTriggers = new LinkedList<>();
 
-    public static void init(String tmxPath) {
-        List<Trigger> triggers = getTriggers(tmxPath);
+    public static void init(String tmxPath, int viewportWidth, int viewportHeight) {
+        List<Trigger> triggers = getTriggers(tmxPath, viewportWidth, viewportHeight);
         for (Trigger t : triggers) {
             if (t.isActivateOnTouch()) {
                 touchTriggers.add(t);
@@ -87,7 +88,7 @@ public class TriggerSystem {
      * @param tmxPath - The path to the tileset (.tmx file).
      * @return A list of all Triggers.
      */
-    public static List<Trigger> getTriggers(String tmxPath) {
+    public static List<Trigger> getTriggers(String tmxPath, int viewportWidth, int viewportHeight) {
         TiledMap map = new TmxMapLoader().load(tmxPath);
         MapLayer triggerLayer = map.getLayers().get("Triggers");
         MapObjects triggerObjects = triggerLayer.getObjects();
@@ -103,7 +104,7 @@ public class TriggerSystem {
             String triggerType = recMapObj.getName().split(",")[1];
             Trigger t = new Trigger(ID, triggerType.equals("T"), zone);
             triggers.add(t);
-            System.out.println("Loaded Trigger " + t.getID());
+            System.out.println("Loaded Trigger " + t.getID() + " X:" + zone.getX() + " Y:" + zone.getY());
         }
         return triggers;
     }

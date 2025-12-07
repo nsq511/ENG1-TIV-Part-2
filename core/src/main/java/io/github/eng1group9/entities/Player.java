@@ -17,6 +17,7 @@ public class Player extends MovingEntity {
     private boolean hasExitKey = false;
     private boolean hasChestRoomKey = false;
     private boolean hasRedPotion = false;
+    private boolean hasLockpick = true;
     private float invisibilityLeft = 0;
     private boolean invisibilityWarningGiven = true;
 
@@ -45,6 +46,12 @@ public class Player extends MovingEntity {
     }
 
     /**
+     *
+     * @return if the player has the lockpick
+     */
+    public boolean hasLockpick() { return hasLockpick; }
+
+    /**
      * Give the player the key to open the exit.
      */
     public void giveExitKey() {
@@ -53,7 +60,7 @@ public class Player extends MovingEntity {
             ToastSystem.addToast("You found the Exit Key!");
         }
     }
-    
+
     /**
      * @return wether the player has the key to open the room with the chest.
      */
@@ -97,9 +104,9 @@ public class Player extends MovingEntity {
         invisibilityLeft = 15;
         invisibilityWarningGiven = false;
     }
-    
+
     /**
-     * Move the player in the given direction 
+     * Move the player in the given direction
      * @param direction The direction to move (D = Down, U = Up, L = Left, R = Right).
      */
     @Override
@@ -141,14 +148,14 @@ public class Player extends MovingEntity {
                 ToastSystem.addToast("Your invisibility has run out!");
                 changeAnimation(1);
             }
-            
+
             if (invisibilityLeft <= 5 && !invisibilityWarningGiven) {
                 ToastSystem.addToast("Your invisibility is about to run out!");
                 invisibilityWarningGiven = true;
             }
-            
-        } 
+
+        }
     }
 
-    
+
 }

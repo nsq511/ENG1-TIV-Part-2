@@ -42,6 +42,8 @@ public class RenderingSystem {
     private Stage stage;
     private static TextField textfield;
     private static boolean firstLeaderBoard = true;
+    private static int viewportWidth;
+    private static int viewportHeight;
 
     /**
      * Takes and tileset and sets up a renderer to display it.
@@ -68,6 +70,9 @@ public class RenderingSystem {
         textfield.setPosition(960 * 0.1f, 640 / 2f + 20);    // Change to not be hardcoded
         textfield.setSize(300, 30);
         stage.addActor(textfield);
+
+        setViewportWidth(viewportWidth);
+        setViewportHeight(viewportHeight);
     }
 
     public OrthogonalTiledMapRenderer getMapRenderer() { return mapRenderer; }
@@ -364,5 +369,21 @@ public class RenderingSystem {
         this.camera.setToOrtho(false, viewportWidth, viewportHeight);
         this.camera.translate(x*viewportWidth, y*viewportHeight);
         this.camera.update();
+    }
+
+    public static void setViewportWidth(int width){
+        viewportWidth = width;
+    }
+
+    public static void setViewportHeight(int height){
+        viewportHeight = height;
+    }
+
+    public static int getViewportWidth() {
+        return viewportWidth;
+    }
+
+    public static int getViewportHeight() {
+        return viewportHeight;
     }
 }
