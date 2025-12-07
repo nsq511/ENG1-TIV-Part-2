@@ -45,6 +45,9 @@ public class Main extends ApplicationAdapter {
     final static int LONGBOIBONUSAMOUNT = 50;
     final static String TMXPATH = "World/testMap.tmx";
 
+    final static Vector2 prisonCoords = new Vector2(3,0);
+    final static Vector2 playerPrisonPos = new Vector2(380,200);
+
     public static Player player;
     private static boolean playerCaught = false; // Whether the player is currently being held by the Dean.
     final static float INITALPLAYERCAUGHTTIME = 1.2f;
@@ -74,6 +77,10 @@ public class Main extends ApplicationAdapter {
     public static CollisionSystem collisionSystem = new CollisionSystem();
     public static InputSystem inputSystem = new InputSystem();
 
+    private static Boss boss;
+    final static float BOSSSPEED = 100;
+    final static Vector2 BOSSSTARTPOS = new Vector2(480, 320);
+
     @Override
     public void create() {
         renderingSystem.initWorld(TMXPATH, VIEWPORTWIDTH, VIEWPORTHEIGHT);
@@ -83,6 +90,7 @@ public class Main extends ApplicationAdapter {
         worldCollision = collisionSystem.getWorldCollision();
         player = new Player(PLAYERSTARTPOS, DEFAULTPLAYERSPEED);
         dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEFAULTDEANPATH);
+        boss = new Boss(BOSSSTARTPOS,BOSSSPEED, false);
         togglePause();
         instance = this;
     }
@@ -107,6 +115,7 @@ public class Main extends ApplicationAdapter {
         playerCaughtTime = INITALPLAYERCAUGHTTIME;
         player.reset();
         dean.reset();
+        boss.reset();
         RenderingSystem.reset();
         collisionSystem.reset();
         loadRoom(0, 0, PLAYERSTARTPOS);
@@ -281,6 +290,7 @@ public class Main extends ApplicationAdapter {
         player.update();
     }
 
+
     /**
      * Checks if the dean has caught the player, and punishes them if he has by removing 50s from time left.
      */
@@ -307,14 +317,11 @@ public class Main extends ApplicationAdapter {
      */
     private void startPlayerCatch() {
         playerCaught = true;
+        loadRoom(prisonCoords, playerPrisonPos);
         player.freeze();
-        player.setPosition(PLAYERSTARTPOS);
-        dean.freeze();
-        dean.changeAnimation(3);
-        dean.setPosition(PLAYERSTARTPOS.x + 32, PLAYERSTARTPOS.y);
         timerSystem.addGradually(DEANPUNISHMENT - INITALPLAYERCAUGHTTIME);
-        ToastSystem.addToast("You were caught by the Dean!", BAD);
-        ToastSystem.addToast("You were stuck being lectured for " + Integer.toString(DEANPUNISHMENT) + "s!", BAD);
+        ToastSystem.addToast("You were thrown in the dungeon by the Dean!", BAD);
+        ToastSystem.addToast("Luckily for you the door isn't very sturdy, it only takes you " + Integer.toString(DEANPUNISHMENT) + "s to break it down", BAD);
         negativeEventCounter++;
     }
 
@@ -362,6 +369,7 @@ public class Main extends ApplicationAdapter {
         player.setX(playerPos.x);
         player.setY(playerPos.y);
 
+        dean.activate();
         if(x == 0 && y == 0){
             dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEFAULTDEANPATH);
         }
@@ -398,8 +406,12 @@ public class Main extends ApplicationAdapter {
 
             dean = new Dean(pos, DEFAULTDEANSPEED, path);
         }
+        else if (x == 3 && y == 2) {
+
+        }
         else{
-            dean = new Dean(new Vector2(9999,9999), DEFAULTDEANSPEED, DEFAULTDEANPATH);
+            dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEFAULTDEANPATH);
+            dean.deactivate();
         }
     }
 

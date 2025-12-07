@@ -19,6 +19,7 @@ public class Player extends MovingEntity {
     private boolean hasRedPotion = false;
     private boolean hasLockpick = true;
     private float invisibilityLeft = 0;
+    private float invincibilityLeft = 0;
     private boolean invisibilityWarningGiven = true;
 
     public Player(Vector2 startPos, float speed) {
@@ -36,6 +37,8 @@ public class Player extends MovingEntity {
         hasRedPotion = false;
         invisibilityLeft = 0;
         invisibilityWarningGiven = true;
+        invincibilityLeft = 0;
+
     }
 
     /**
@@ -138,6 +141,14 @@ public class Player extends MovingEntity {
     }
 
     /**
+     * @return WHETHER the player is invincible after being damaged
+     *
+     */
+    public boolean isInvincible() {
+        return invincibilityLeft <= 0;
+    }
+
+    /**
      * Used to update the players invisiblity timer (could be used for more).
      */
     public void update() {
@@ -154,6 +165,13 @@ public class Player extends MovingEntity {
                 invisibilityWarningGiven = true;
             }
 
+        }
+
+        if(isInvincible()){
+            invincibilityLeft -= Gdx.graphics.getDeltaTime();
+            if (!isInvincible()) {
+                changeAnimation(1);
+            }
         }
     }
 

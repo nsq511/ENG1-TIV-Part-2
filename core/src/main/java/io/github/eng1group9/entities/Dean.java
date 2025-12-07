@@ -112,7 +112,7 @@ public class Dean extends MovingEntity {
      * @return True if the player is in the deans reach zone.
      */
     public boolean canReach(Player player) {
-        return player.isColliding(reachRectangle) && player.isVisible();
+        return player.isColliding(reachRectangle) && player.isVisible() && isActive();
     }
 
     /**

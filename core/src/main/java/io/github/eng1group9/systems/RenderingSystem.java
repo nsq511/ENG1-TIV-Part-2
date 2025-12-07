@@ -130,8 +130,15 @@ public class RenderingSystem {
         mapRenderer.render(belowPlayer);
 
         worldBatch.begin();
-        player.draw(worldBatch);
-        dean.draw(worldBatch);
+
+        if(player.isActive()){
+            player.draw(worldBatch);
+        }
+
+        if(dean.isActive()){
+            dean.draw(worldBatch);
+        }
+
         worldBatch.end();
 
         int[] abovePlayer = {10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21}; // the layers which should appear above the player
@@ -145,6 +152,7 @@ public class RenderingSystem {
             renderCollision(uiBatch, worldCollision, player, dean);
             renderTriggers(uiBatch);
         }
+
         uiBatch.end();
     }
 
@@ -172,7 +180,6 @@ public class RenderingSystem {
      * @param uiBatch - The SpriteBatch used for this (should be the ui batch).
      * @param worldCollision - A list of rectangles representing the games collison.
      * @param player
-     * @param dean
      */
     public void renderCollision(SpriteBatch uiBatch, List<Rectangle> worldCollision, Player player, Dean dean) {
         for (Rectangle rectangle : worldCollision) {

@@ -4,24 +4,42 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
 /**
- * An animated entity which can move. This class handles speed and collision. 
+ * An animated entity which can move. This class handles speed and collision.
  * @param spriteSheetTexture - The texture contaning the frames laid out in a grid, which are then used to create the aniamtions.
  * @param frameNumbers - An array of integers which state how many frames are in each animation, values should match the number of sprites on each row of the spriteSheet.
  * @param tileWidth - How wide each tile in the SpriteSheet is in pixels.
  * @param tileHeight - How high each tile in the SpriteSheet is in pixels.
  * @param speed - How fast the entity will move.
+ * @param active- If the entity is active on game start
  */
 public class MovingEntity extends AnimatedEntity {
 
     private float speed = 0;
     private boolean frozen = false;
     private float initSpeed = 0f;
-    
+    private boolean initActive = true;
+    private boolean active = true;
+    private boolean canCollide = true;
+    private boolean initCollide = true;
+
     public MovingEntity(Texture spriteSheetTexture, int[] frameNumbers, int tileWidth, int tileHeight, float speed, Vector2 startPos) {
         super(spriteSheetTexture, frameNumbers, tileWidth, tileHeight, startPos);
         this.speed = speed;
         initSpeed = speed;
+        initActive = true;
+        active = true;
     }
+
+    public MovingEntity(Texture spriteSheetTexture, int[] frameNumbers, int tileWidth, int tileHeight, float speed, Vector2 startPos, boolean active, boolean canCollide) {
+        super(spriteSheetTexture, frameNumbers, tileWidth, tileHeight, startPos);
+        this.speed = speed;
+        initSpeed = speed;
+        initActive = active;
+        this.active = active;
+        canCollide = canCollide;
+        this.canCollide = canCollide;
+    }
+
 
     /**
      * Resets the MovingEntity to its original state
@@ -30,10 +48,16 @@ public class MovingEntity extends AnimatedEntity {
         super.reset();
         speed = initSpeed;
         frozen = false;
+        if(initActive){
+            activate();
+        }
+        else{
+            deactivate();
+        }
     }
 
     /**
-     * Update the speed of the entity. 
+     * Update the speed of the entity.
      * @param newSpeed - How fast the entity will now move.
      */
     public void setSpeed(float newSpeed) {
@@ -48,8 +72,8 @@ public class MovingEntity extends AnimatedEntity {
     }
 
     /**
-     * Moves the entity in a given direction provided it wont collide with anything and . 
-     * @param direction The direction as either 'U' 'D' 'L' or'R' 
+     * Moves the entity in a given direction provided it wont collide with anything and .
+     * @param direction The direction as either 'U' 'D' 'L' or'R'
      * @param collisionRectangles A list of rectangles which the entity cannot move into.
      */
     public float move(Character direction){
@@ -73,7 +97,7 @@ public class MovingEntity extends AnimatedEntity {
                     newX += distance;
                     break;
             }
-            if (io.github.eng1group9.Main.collisionSystem.safeToMove(newX, newY, getHitbox())) {
+            if (io.github.eng1group9.Main.collisionSystem.safeToMove(newX, newY, getHitbox()) || !canCollide) {
                 setPosition(newX, newY);
                 return distance;
             }
@@ -81,7 +105,7 @@ public class MovingEntity extends AnimatedEntity {
         return 0;
     }
 
- 
+
     /**
      * Prevent the entity from moving, and pause their animation.
      */
@@ -105,4 +129,26 @@ public class MovingEntity extends AnimatedEntity {
         return frozen;
     }
 
+    /**
+     * Makes the entity visible and unfreezes it, as well as whatever is defined in the inherited entity class
+     */
+    public void activate(){
+        active = true;
+        freeze();
+    }
+
+    /**
+     * Hides the entity and freezes it, as well as whatever is defined in the inherited entity class
+     */
+    public void deactivate(){
+        active = false;
+        unfreeze();
+    }
+
+    /**
+     * @return whether the entity is active
+     */
+    public boolean isActive() {
+        return active;
+    }
 }
