@@ -58,6 +58,7 @@ public class Main extends ApplicationAdapter {
 
     public static Player player;
     private static boolean playerCaught = false; // Whether the player is currently being held by the Dean.
+    private static boolean playerCaughtByLibrarian = false;
     final static float INITALPLAYERCAUGHTTIME = 1.2f;
     private static float playerCaughtTime = INITALPLAYERCAUGHTTIME; // how many seconds the Dean will hold the player
                                                                     // when caught.
@@ -402,6 +403,7 @@ public class Main extends ApplicationAdapter {
             startPlayerCatch();
         } else if (librarian.canReach(player) && !playerCaught) {
             incAchievement(ACH_DEAN_CAPTURES); // Increment count for Dean capture achievment
+            playerCaughtByLibrarian = true;
             startPlayerCatch();
         } else if (playerCaught) {
             if (playerCaughtTime <= 0) {
@@ -424,12 +426,23 @@ public class Main extends ApplicationAdapter {
         playerCaught = true;
         player.freeze();
         player.setPosition(PLAYERSTARTPOS);
-        dean.freeze();
-        dean.changeAnimation(3);
-        dean.setPosition(PLAYERSTARTPOS.x + 32, PLAYERSTARTPOS.y);
-        timerSystem.addGradually(DEAN_TIME_PUNISHMENT - INITALPLAYERCAUGHTTIME);
-        ToastSystem.addToast("You were caught by the Dean!", BAD);
-        ToastSystem.addToast("You were stuck being lectured for " + Integer.toString(DEAN_TIME_PUNISHMENT) + "s!", BAD);
+        if (playerCaughtByLibrarian) {
+            librarian.freeze();
+            librarian.changeAnimation(3);
+            librarian.setPosition(PLAYERSTARTPOS.x + 32, PLAYERSTARTPOS.y);
+            timerSystem.addGradually(DEAN_TIME_PUNISHMENT - INITALPLAYERCAUGHTTIME);
+            ToastSystem.addToast("Librarian took his book back", BAD);
+            ToastSystem.addToast(
+                    "You were stuck being his assistant for " + Integer.toString(DEAN_TIME_PUNISHMENT) + "s!", BAD);
+        } else {
+            dean.freeze();
+            dean.changeAnimation(3);
+            dean.setPosition(PLAYERSTARTPOS.x + 32, PLAYERSTARTPOS.y);
+            timerSystem.addGradually(DEAN_TIME_PUNISHMENT - INITALPLAYERCAUGHTTIME);
+            ToastSystem.addToast("You were caught by the Dean!", BAD);
+            ToastSystem.addToast("You were stuck being lectured for " + Integer.toString(DEAN_TIME_PUNISHMENT) + "s!",
+                    BAD);
+        }
         negativeEventCounter++;
     }
 
@@ -440,11 +453,18 @@ public class Main extends ApplicationAdapter {
      * It will rest the dean to the start of its patrol.
      */
     private void endPlayerCatch() {
-        dean.setPosition(DEANSTARTPOS);
-        dean.restartPath();
-        dean.unfreeze();
+        if (playerCaughtByLibrarian) {
+            librarian.setPosition(LIBRARIANSTARTPOS);
+            librarian.restartPath();
+            librarian.unfreeze();
+        } else {
+            dean.setPosition(DEANSTARTPOS);
+            dean.restartPath();
+            dean.unfreeze();
+        }
         player.unfreeze();
         playerCaught = false;
+        playerCaughtByLibrarian = false;
     }
 
     /**
