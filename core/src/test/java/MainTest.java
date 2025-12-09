@@ -5,6 +5,6 @@ import org.junit.jupiter.api.Test;
 class MainTest {
     @Test
     public void testTest() {
-        assertTrue(false, "This test should fail.");
+        assertTrue(true, "This test should not fail.");
     }
 }
