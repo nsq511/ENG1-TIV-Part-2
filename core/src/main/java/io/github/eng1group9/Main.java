@@ -90,7 +90,7 @@ public class Main extends ApplicationAdapter {
     final static float BOSSSPEED = 0;
     final static Vector2 BOSSSTARTPOS = new Vector2(450, 255);
     private static float BOSSATTACKCOOLDOWN = 2.5f;
-    final static float BOSSFIGHTLENGTH = 10f;
+    final static float BOSSFIGHTLENGTH = 60f;
 
     private static ArrayList<BossProjectile> projectiles;
     private static ArrayList<ProjectileWarning> projectileWarnings;
