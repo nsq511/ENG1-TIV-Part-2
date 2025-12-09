@@ -19,6 +19,12 @@ public class Player extends MovingEntity {
     private boolean hasChestRoomKey = false;
     private boolean hasRedPotion = false;
     private boolean hasLockpick = true;
+    private boolean defeatedBoss = false;
+    private boolean hasFirestarter = false;
+    private boolean hasMoney = false;
+    private boolean hasStaff = false;
+    private boolean hasJanitorKey = false;
+    private int booksRead = 0;
     private float invisibilityLeft = 0;
     private float invincibilityLeft = 0;
     private boolean invisibilityWarningGiven = true;
@@ -27,6 +33,50 @@ public class Player extends MovingEntity {
     public Player(Vector2 startPos, float speed) {
         super(new Texture("Characters/playerAnimations.png"), new int[] {4, 4, 4, 4, 4, 4, 4, 4} , 32, 32, speed, startPos);
         setScale(2);
+    }
+
+    public boolean hasFirestarter(){
+        return hasFirestarter;
+    }
+
+    public boolean hasMoney(){
+        return hasMoney;
+    }
+
+    public int booksRead(){
+        return booksRead;
+    }
+
+    public boolean hasStaff(){
+        return hasStaff;
+    }
+
+    public boolean hasJanitorKey(){
+        return hasJanitorKey;
+    }
+
+    public void giveLockpick(){
+        hasLockpick = true;
+    }
+
+    public void giveFirestarter(){
+        hasFirestarter = true;
+    }
+
+    public void giveJanitorKey(){
+        hasJanitorKey = true;
+    }
+
+    public void giveStaff(){
+        hasStaff = true;
+    }
+
+    public void giveMoney(){
+        hasMoney = true;
+    }
+
+    public void readBook(){
+        booksRead++;
     }
 
     /**

@@ -220,7 +220,7 @@ public class TriggerSystem {
                 Main.checkForLongboi();
                 break;
             case 5: // Standing by the chest
-                player.giveExitKey();
+                player.giveJanitorKey();
                 break;
             case 6: // Standing by the chest room door
                 Main.openChestRoomDoor();
@@ -231,6 +231,68 @@ public class TriggerSystem {
             case 8: // Pickup red potion.
                 player.giveRedPotion();
                 break;
+            case 9:
+                player.giveExitKey();
+                break;
+            case 10:
+                player.giveStaff();
+                break;
+            case 11:
+                player.giveFirestarter();
+                break;
+            case 12:
+                player.giveLockpick();
+                break;
+            case 13:
+                Main.releasePope();
+                break;
+            case 14:
+                Main.releaseBob();
+                break;
+            case 15:
+                Main.convertBoss();
+                break;
+            case 16:
+                player.readBook();
+                remove(16);
+                break;
+            case 17:
+                Main.openPrisonDoor();
+                break;
+            case 18:
+                Main.openLockpickRoomDoor();
+                break;
+            case 19:
+                player.giveMoney();
+                break;
+            case 20:
+                player.readBook();
+                remove(20);
+                break;
+            case 21:
+                player.readBook();
+                remove(21);
+                break;
+            case 22:
+                player.readBook();
+                remove(22);
+                break;
+            case 23:
+                player.readBook();
+                remove(23);
+                break;
+            case 24:
+                player.readBook();
+                remove(24);
+                break;
+            case 25:
+                player.readBook();
+                remove(25);
+                break;
+            case 26:
+                Main.openPNQDoor();
+                break;
+
             default:
                 break;
         }

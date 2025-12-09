@@ -131,7 +131,7 @@ public class RenderingSystem {
 
         camera.update();
         mapRenderer.setView(camera);
-        int[] belowPlayer = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}; // the layers which should appear below the player
+        int[] belowPlayer = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11,12,13,14}; // the layers which should appear below the player
         mapRenderer.render(belowPlayer);
 
         worldBatch.begin();
@@ -150,7 +150,7 @@ public class RenderingSystem {
 
         worldBatch.end();
 
-        int[] abovePlayer = {10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21}; // the layers which should appear above the player
+        int[] abovePlayer = {15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,27,28,29,30,31,32,33,34,35,36,27}; // the layers which should appear above the player
         mapRenderer.render(abovePlayer);
 
         projectileBatch.begin();

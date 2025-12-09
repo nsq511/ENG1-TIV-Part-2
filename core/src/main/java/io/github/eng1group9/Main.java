@@ -32,6 +32,13 @@ public class Main extends ApplicationAdapter {
     public static boolean exitOpen = false; // Whether the exit is open/
     public static boolean spikesLowered = false; // Whether the spikes in the chest room have been lowered.
     public static boolean scrollUsed = false; // Whether the scroll power up has been collected.
+    public static boolean prisonDoorOpened = false;
+    public static boolean lockpickRoomOpened = false;
+    public static boolean PNQDoorOpened  = false;
+    public static boolean releasedPope = false;
+    public static boolean bossConverted = false;
+    public static boolean bobReleased  = false;
+    public static boolean defeatedBoss = true;
     public static int longboiBonus = 0; // the bonus to add based on wether LongBoi was found.
     public static int hiddenEventCounter = 0;
     public static int negativeEventCounter = 0;
@@ -83,6 +90,7 @@ public class Main extends ApplicationAdapter {
     final static float BOSSSPEED = 0;
     final static Vector2 BOSSSTARTPOS = new Vector2(450, 255);
     private static float BOSSATTACKCOOLDOWN = 2.5f;
+    final static float BOSSFIGHTLENGTH = 60f;
 
     private static ArrayList<BossProjectile> projectiles;
     private static ArrayList<ProjectileWarning> projectileWarnings;
@@ -118,6 +126,13 @@ public class Main extends ApplicationAdapter {
         exitOpen = false;
         spikesLowered = false;
         scrollUsed = false;
+        prisonDoorOpened = false;
+        lockpickRoomOpened = false;
+        PNQDoorOpened  = false;
+        releasedPope = false;
+        bossConverted = false;
+        bobReleased  = false;
+        defeatedBoss = true;
         longboiBonus = 0;
         hiddenEventCounter = 0;
         negativeEventCounter = 0;
@@ -148,7 +163,7 @@ public class Main extends ApplicationAdapter {
     public void logic() {
         timerSystem.tick();
         dean.nextMove();
-        boss.nextAttack();
+        boss.logic();
         checkProjectiles();
         checkDeanCatch();
         TriggerSystem.checkTouchTriggers(player);
@@ -203,6 +218,21 @@ public class Main extends ApplicationAdapter {
             collisionSystem.removeCollisionByName("chestRoomDoor");
             RenderingSystem.hideLayer("ChestDoorClosed");
             chestDoorOpen = true;
+        }
+    }
+
+    public static void defeatBoss(){
+        if(!defeatedBoss){
+            defeatedBoss = true;
+            collisionSystem.removeCollisionByName("BossBarrier");
+            RenderingSystem.showLayer("Boss");
+            RenderingSystem.hideLayer("Flames");
+            RenderingSystem.hideLayer("LibraryBookshelves1");
+            RenderingSystem.hideLayer("LibraryBookshelves2");
+            RenderingSystem.hideLayer("LibraryBookshelves3");
+            RenderingSystem.hideLayer("Pyre");
+            RenderingSystem.showLayer("Staff");
+            RenderingSystem.showLayer("ExitKey");
         }
     }
 
@@ -398,6 +428,53 @@ public class Main extends ApplicationAdapter {
         }
     }
 
+    public static void openLockpickRoomDoor() {
+        if(!lockpickRoomOpened && (player.hasLockpick() || player.hasJanitorKey())){
+            collisionSystem.removeCollisionByName("lockpickRoomDoor");
+            RenderingSystem.hideLayer("LockpickRoomDoor");
+            lockpickRoomOpened = true;
+        }
+    }
+
+    public static void openPrisonDoor() {
+        if(!prisonDoorOpened && (player.hasLockpick() || player.hasJanitorKey())){
+            collisionSystem.removeCollisionByName("prisonDoor");
+            RenderingSystem.hideLayer("PrisonDoor");
+            prisonDoorOpened = true;
+        }
+    }
+
+    public static void openPNQDoor(){
+        if(!PNQDoorOpened && (player.hasLockpick() || player.hasJanitorKey())){
+            collisionSystem.removeCollisionByName("PNQDoor");
+            RenderingSystem.hideLayer("PNQDoor");
+            PNQDoorOpened = true;
+        }
+    }
+
+    public static void releasePope(){
+        if(!releasedPope){
+            releasedPope = true;
+            collisionSystem.removeCollisionByName("popeCellDoor");
+            RenderingSystem.hideLayer("Pope");
+            RenderingSystem.hideLayer("PopeCellDoor");
+            RenderingSystem.showLayer("PopeSeraph");
+            ToastSystem.addToast("\"GSZMP BLF UIRVMW! R DROO KIZB ULI BLFI ERXGLIB!\"");
+        }
+    }
+
+    public static void convertBoss(){
+        bossConverted = true;
+        winGame();
+    }
+
+    public static void releaseBob(){
+        if(player.hasLockpick()){
+            bobReleased = true;
+            LoseGame();
+        }
+    }
+
     /**
      * <P>Teleports the player to a room on the tiled map based on the coordinates passed.</P>
      * <P>Each coordinate represents one room.</P>
@@ -416,11 +493,12 @@ public class Main extends ApplicationAdapter {
         player.setX(playerPos.x);
         player.setY(playerPos.y);
 
-        dean.activate();
+        dean.deactivate();
         if(x == 0 && y == 0){
-            dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEFAULTDEANPATH);
+            dean.activate();
         }
         else if(x == 1 && y == 0){
+            dean.activate();
             Vector2 pos = new Vector2(80,64);
             Character[] path = {
                 'R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R',
@@ -430,6 +508,7 @@ public class Main extends ApplicationAdapter {
             dean = new Dean(pos, DEFAULTDEANSPEED, path);
         }
         else if(x == 2 && y == 1){
+            dean.activate();
             Vector2 pos = new Vector2(250,400);
             Character[] path = {
                 'D','D','D','D','D','D',
@@ -445,6 +524,7 @@ public class Main extends ApplicationAdapter {
             dean = new Dean(pos, 2000, path);
         }
         else if(x == 1 && y == 2){
+            dean.activate();
             Vector2 pos = new Vector2(16,490);
             Character[] path = {
                 'R',
@@ -453,13 +533,17 @@ public class Main extends ApplicationAdapter {
 
             dean = new Dean(pos, DEFAULTDEANSPEED, path);
         }
-        else if (x == 3 && y == 2) {
-            dean.deactivate();
-            boss.activate();
+        else if(x == 2 && y == 2){
+            if(!boss.isDefeated()){
+                ToastSystem.addToast("You sense an evil presence at the end of this hallway...", BAD);
+            }
         }
-        else{
-            dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEFAULTDEANPATH);
-            dean.deactivate();
+        else if (x == 3 && y == 2) {
+            if(!boss.isDefeated()){
+                RenderingSystem.showLayer("Flames");
+                boss.start(BOSSFIGHTLENGTH);
+                RenderingSystem.hideLayer("Boss");
+            }
         }
     }
 
