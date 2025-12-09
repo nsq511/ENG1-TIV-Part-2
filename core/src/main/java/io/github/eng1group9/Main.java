@@ -512,11 +512,7 @@ public class Main extends ApplicationAdapter {
             dean.activate();
             Vector2 pos = new Vector2(250,400);
             Character[] path = {
-                'D','D','D','D','D','D',
-                'U','U','U','U','U','U',
                 'R','R','R','R','R','R','R','R','R','R','R',
-                'D','D','D','D','D','D',
-                'U','U','U','U','U','U',
                 'D','D','D','D','D','D',
                 'L','L','L','L','L','L','L','L','L','L','L',
                 'U','U','U','U','U','U'
