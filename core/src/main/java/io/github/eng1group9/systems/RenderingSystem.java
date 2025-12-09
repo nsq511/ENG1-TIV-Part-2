@@ -46,8 +46,9 @@ public class RenderingSystem {
 
     /**
      * Takes and tileset and sets up a renderer to display it.
-     * @param tmxPath - The path to the tileset (.tmx file).
-     * @param viewportWidth - how many pixels wide the world is.
+     * 
+     * @param tmxPath        - The path to the tileset (.tmx file).
+     * @param viewportWidth  - how many pixels wide the world is.
      * @param viewportHeight - how many pixels high the world is.
      */
     public void initWorld(String tmxPath, int viewportWidth, int viewportHeight) {
@@ -66,15 +67,18 @@ public class RenderingSystem {
         Gdx.input.setInputProcessor(stage);
         Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
         textfield = new TextField("", skin);
-        textfield.setPosition(960 * 0.1f, 640 / 2f + 20);    // Change to not be hardcoded
+        textfield.setPosition(960 * 0.1f, 640 / 2f + 20); // Change to not be hardcoded
         textfield.setSize(300, 30);
         stage.addActor(textfield);
     }
 
-    public OrthogonalTiledMapRenderer getMapRenderer() { return mapRenderer; }
+    public OrthogonalTiledMapRenderer getMapRenderer() {
+        return mapRenderer;
+    }
 
     /**
      * Hide a layer so that tiles on it are NOT rendered.
+     * 
      * @param name - The name of the layer.
      */
     public static void hideLayer(String name) {
@@ -84,17 +88,16 @@ public class RenderingSystem {
     /**
      * Resets layers
      */
-    public static void reset(){
+    public static void reset() {
         textfield.setVisible(true);
         textfield.setText("");
         textfield.setDisabled(false);
         firstLeaderBoard = true;
 
-        for (MapLayer layer : map.getLayers()){
-            if(layer.getName().equals("LONGBOI")){
+        for (MapLayer layer : map.getLayers()) {
+            if (layer.getName().equals("LONGBOI")) {
                 layer.setVisible(false);
-            }
-            else{
+            } else {
                 layer.setVisible(true);
             }
         }
@@ -102,6 +105,7 @@ public class RenderingSystem {
 
     /**
      * Show a layer so that tiles on it are rendered.
+     * 
      * @param name - The name of the layer.
      */
     public static void showLayer(String name) {
@@ -110,27 +114,31 @@ public class RenderingSystem {
 
     /**
      * Draw a frame to display.
-     * @param player - The current player object.
-     * @param dean - The dean object.
-     * @param showCollision - Wether to render the zones for collision / triggers (dev mode).
-     * @param elapsedTime - How much time has passed since the game began.
+     * 
+     * @param player         - The current player object.
+     * @param dean           - The dean object.
+     * @param showCollision  - Wether to render the zones for collision / triggers
+     *                       (dev mode).
+     * @param elapsedTime    - How much time has passed since the game began.
      * @param worldCollision - A list of rectangles representing the games collison.
      */
-    public void draw(Player player, Dean dean, boolean showCollision, float elapsedTime, List<Rectangle> worldCollision) {
+    public void draw(Player player, Dean dean, Dean librarian, boolean showCollision, float elapsedTime,
+            List<Rectangle> worldCollision) {
         ScreenUtils.clear(Color.BLACK);
         viewport.apply();
 
         camera.update();
         mapRenderer.setView(camera);
-        int[] belowPlayer = {0, 1, 2, 3, 4, 5, 6}; // the layers which should appear below the player
+        int[] belowPlayer = { 0, 1, 2, 3, 4, 5, 6 }; // the layers which should appear below the player
         mapRenderer.render(belowPlayer);
 
         worldBatch.begin();
         player.draw(worldBatch);
         dean.draw(worldBatch);
+        librarian.draw(worldBatch);
         worldBatch.end();
 
-        int[] abovePlayer = {7, 8, 9, 10, 11, 12, 13, 14, 15}; // the layers which should appear above the player
+        int[] abovePlayer = { 7, 8, 9, 10, 11, 12, 13, 14, 15 }; // the layers which should appear above the player
         mapRenderer.render(abovePlayer);
         uiBatch.begin();
         font.draw(uiBatch, TimerSystem.getClockDisplay(), 10, 640 - 10);
@@ -138,7 +146,7 @@ public class RenderingSystem {
         renderToasts(font, uiBatch);
 
         if (showCollision && worldCollision != null) { // show collisions for debugging
-            renderCollision(uiBatch, worldCollision, player, dean);
+            renderCollision(uiBatch, worldCollision, player, dean, librarian);
             renderTriggers(uiBatch);
         }
         uiBatch.end();
@@ -147,7 +155,8 @@ public class RenderingSystem {
     /**
      * Render the toast display on the top left of the screen.
      * This is used to display text messages to the user for 5s.
-     * @param font The BitmapFont which used to render the text.
+     * 
+     * @param font    The BitmapFont which used to render the text.
      * @param uiBatch - The SpriteBatch used for this (should be the ui batch).
      */
     public void renderToasts(BitmapFont font, SpriteBatch uiBatch) {
@@ -165,29 +174,37 @@ public class RenderingSystem {
 
     /**
      * Render the zones for collision / triggers (dev mode).
-     * @param uiBatch - The SpriteBatch used for this (should be the ui batch).
+     * 
+     * @param uiBatch        - The SpriteBatch used for this (should be the ui
+     *                       batch).
      * @param worldCollision - A list of rectangles representing the games collison.
      * @param player
      * @param dean
      */
-    public void renderCollision(SpriteBatch uiBatch, List<Rectangle> worldCollision, Player player, Dean dean) {
+    public void renderCollision(SpriteBatch uiBatch, List<Rectangle> worldCollision, Player player, Dean dean,
+            Dean librarian) {
         for (Rectangle rectangle : worldCollision) {
             uiBatch.setColor(1, 0, 0, 0.75f);
-            uiBatch.draw(missingTexture, rectangle.x, rectangle.y , rectangle.width, rectangle.height);
+            uiBatch.draw(missingTexture, rectangle.x, rectangle.y, rectangle.width, rectangle.height);
         }
-        uiBatch.draw(missingTexture, player.getHitbox().x + 16, player.getHitbox().y+ 16, player.getHitbox().width, player.getHitbox().height);
-        uiBatch.draw(missingTexture, dean.getReachRectangle().x + 16, dean.getReachRectangle().y+ 16, dean.getReachRectangle().width, dean.getReachRectangle().height);
+        uiBatch.draw(missingTexture, player.getHitbox().x + 16, player.getHitbox().y + 16, player.getHitbox().width,
+                player.getHitbox().height);
+        uiBatch.draw(missingTexture, dean.getReachRectangle().x + 16, dean.getReachRectangle().y + 16,
+                dean.getReachRectangle().width, dean.getReachRectangle().height);
+        uiBatch.draw(missingTexture, librarian.getReachRectangle().x + 16, librarian.getReachRectangle().y + 16,
+                librarian.getReachRectangle().width, librarian.getReachRectangle().height);
     }
 
     /**
      * Render the zones for triggers (dev mode).
+     * 
      * @param uiBatch - The SpriteBatch used for this (should be the ui batch).
      */
     public void renderTriggers(SpriteBatch uiBatch) {
         for (Trigger t : TriggerSystem.getTriggers()) {
             Rectangle rectangle = t.getZone();
             uiBatch.setColor(0, 1, 1, 0.75f);
-            uiBatch.draw(missingTexture, rectangle.x, rectangle.y , rectangle.width, rectangle.height);
+            uiBatch.draw(missingTexture, rectangle.x, rectangle.y, rectangle.width, rectangle.height);
         }
     }
 
@@ -197,13 +214,15 @@ public class RenderingSystem {
 
     /**
      * Display the pause overlay, with instructions and controls.
-     * @param screenWidth - how many pixels wide the screen is.
-     * @param screenHeight - how many pixels high the screen is.
+     * 
+     * @param screenWidth          - how many pixels wide the screen is.
+     * @param screenHeight         - how many pixels high the screen is.
      * @param positiveEventCounter - Number of PowerUps collected.
      * @param negativeEventCounter - Number of times caught by the dean.
-     * @param hiddenEventCounter - Number of secrets found.
+     * @param hiddenEventCounter   - Number of secrets found.
      */
-    public void renderPauseOverlay(int screenWidth, int screenHeight, int positiveEventCounter, int negativeEventCounter, int hiddenEventCounter) {
+    public void renderPauseOverlay(int screenWidth, int screenHeight, int positiveEventCounter,
+            int negativeEventCounter, int hiddenEventCounter) {
         uiBatch.begin();
         uiBatch.setColor(0, 0, 0, 0.75f);
         uiBatch.draw(missingTexture, 0, 0, screenWidth, screenHeight);
@@ -221,8 +240,10 @@ public class RenderingSystem {
     }
 
     /**
-     * Display the start overlay, with instructions, controls and how to start the game.
-     * @param screenWidth - how many pixels wide the screen is.
+     * Display the start overlay, with instructions, controls and how to start the
+     * game.
+     * 
+     * @param screenWidth  - how many pixels wide the screen is.
      * @param screenHeight - how many pixels high the screen is.
      */
     public void renderStartOverlay(int screenWidth, int screenHeight) {
@@ -243,13 +264,13 @@ public class RenderingSystem {
         renderControls(screenWidth, screenHeight);
         font.draw(uiBatch, "Avoid the dean and escape the maze in time!", screenWidth / 2f, (screenHeight / 2f) - 160);
 
-
         uiBatch.end();
     }
 
     /**
      * Render the controls list, tellign you all the buttons and what they do.
-     * @param screenWidth - how many pixels wide the screen is.
+     * 
+     * @param screenWidth  - how many pixels wide the screen is.
      * @param screenHeight - how many pixels high the screen is.
      */
     private void renderControls(int screenWidth, int screenHeight) {
@@ -262,14 +283,17 @@ public class RenderingSystem {
     }
 
     /**
-     * Render the Stats at the bottom of the overlay, showing PowerUps collected, times caught and secrets found.
-     * @param screenWidth - how many pixels wide the screen is.
-     * @param screenHeight - how many pixels high the screen is.
+     * Render the Stats at the bottom of the overlay, showing PowerUps collected,
+     * times caught and secrets found.
+     * 
+     * @param screenWidth          - how many pixels wide the screen is.
+     * @param screenHeight         - how many pixels high the screen is.
      * @param positiveEventCounter - Number of PowerUps collected.
      * @param negativeEventCounter - Number of times caught by the dean.
-     * @param hiddenEventCounter - Number of secrets found.
+     * @param hiddenEventCounter   - Number of secrets found.
      */
-    private void renderStats(int screenWidth, int screenHeight, int positiveEventCounter, int negativeEventCounter, int hiddenEventCounter) {
+    private void renderStats(int screenWidth, int screenHeight, int positiveEventCounter, int negativeEventCounter,
+            int hiddenEventCounter) {
         font.draw(uiBatch, "PowerUps Collected: " + positiveEventCounter, screenWidth / 2f, (screenHeight / 2f) - 240);
         font.draw(uiBatch, "Dean Captures: " + negativeEventCounter, screenWidth / 2f, (screenHeight / 2f) - 260);
         font.draw(uiBatch, "Secrets Found: " + hiddenEventCounter, screenWidth / 2f, (screenHeight / 2f) - 280);
@@ -277,15 +301,17 @@ public class RenderingSystem {
 
     /**
      * Display the win overlay, with your score and how much time was left.
-     * @param screenWidth - How many pixels wide the screen is.
-     * @param screenHeight - How many pixels high the screen is.
-     * @param timeLeft - How much time was left when the player escaped.
-     * @param score - the score the player managed to get.
+     * 
+     * @param screenWidth          - How many pixels wide the screen is.
+     * @param screenHeight         - How many pixels high the screen is.
+     * @param timeLeft             - How much time was left when the player escaped.
+     * @param score                - the score the player managed to get.
      * @param positiveEventCounter - Number of PowerUps collected.
      * @param negativeEventCounter - Number of times caught by the dean.
-     * @param hiddenEventCounter - Number of secrets found.
+     * @param hiddenEventCounter   - Number of secrets found.
      */
-    public void renderWinOverlay(int screenWidth, int screenHeight, float timeLeft, int score, int positiveEventCounter, int negativeEventCounter, int hiddenEventCounter) {
+    public void renderWinOverlay(int screenWidth, int screenHeight, float timeLeft, int score, int positiveEventCounter,
+            int negativeEventCounter, int hiddenEventCounter) {
         uiBatch.begin();
         uiBatch.setColor(0, 0, 0, 0.75f);
         uiBatch.draw(missingTexture, 0, 0, screenWidth, screenHeight);
@@ -298,15 +324,16 @@ public class RenderingSystem {
         font.setColor(1, 1, 1, 1);
         font.getData().setScale(1f);
         font.draw(uiBatch, TimerSystem.getClockDisplay(), screenWidth / 2f, screenHeight / 2f);
-        font.draw(uiBatch, "Score: " + Integer.toString(score) + "  (Time remaining + Achievement Bonus)", screenWidth / 2f, (screenHeight / 2f) - 20);
+        font.draw(uiBatch, "Score: " + Integer.toString(score) + "  (Time remaining + Achievement Bonus)",
+                screenWidth / 2f, (screenHeight / 2f) - 20);
         font.draw(uiBatch, "Press ESC to quit.", screenWidth / 2f, (screenHeight / 2f) - 40);
         font.draw(uiBatch, "Press SPACE to restart.", screenWidth / 2f, (screenHeight / 2f) - 60);
         font.draw(uiBatch, Main.leaderBoard.toString(), screenWidth * 0.1f, screenHeight * 0.5f);
-        if(firstLeaderBoard){
+        if (firstLeaderBoard) {
             font.draw(uiBatch, "Enter Name:", screenWidth * 0.1f, screenHeight / 2f + 70);
         }
         renderStats(screenWidth, screenHeight, positiveEventCounter, negativeEventCounter, hiddenEventCounter);
-        
+
         AchievementSystem.draw(new Vector2(10f, screenHeight - 10f), 3, uiBatch, font);
         uiBatch.end();
 
@@ -329,13 +356,15 @@ public class RenderingSystem {
 
     /**
      * Display the lose overlay, for when you run out of time.
-     * @param screenWidth - How many pixels wide the screen is.
-     * @param screenHeight - How many pixels high the screen is.
+     * 
+     * @param screenWidth          - How many pixels wide the screen is.
+     * @param screenHeight         - How many pixels high the screen is.
      * @param positiveEventCounter - Number of PowerUps collected.
      * @param negativeEventCounter - Number of times caught by the dean.
-     * @param hiddenEventCounter - Number of secrets found.
+     * @param hiddenEventCounter   - Number of secrets found.
      */
-    public void renderLoseOverlay(int screenWidth, int screenHeight, int positiveEventCounter, int negativeEventCounter, int hiddenEventCounter) {
+    public void renderLoseOverlay(int screenWidth, int screenHeight, int positiveEventCounter, int negativeEventCounter,
+            int hiddenEventCounter) {
         uiBatch.begin();
         uiBatch.setColor(0, 0, 0, 0.75f);
         uiBatch.draw(missingTexture, 0, 0, screenWidth, screenHeight);
@@ -354,18 +383,22 @@ public class RenderingSystem {
     }
 
     /**
-     * <P>Moves the camera to the show the current room.</P>
-     * <P>This should only be called from the loadRoom method in Main</P>
+     * <P>
+     * Moves the camera to the show the current room.
+     * </P>
+     * <P>
+     * This should only be called from the loadRoom method in Main
+     * </P>
      *
-     * @param x - The x coordinate of the room.
-     * @param y - The y coordinate of the room.
-     * @param viewportWidth - The viewport width.
+     * @param x              - The x coordinate of the room.
+     * @param y              - The y coordinate of the room.
+     * @param viewportWidth  - The viewport width.
      * @param viewportHeight - The viewport height.
      */
-    public void loadRoom(int x,int y, int viewportWidth, int viewportHeight){
+    public void loadRoom(int x, int y, int viewportWidth, int viewportHeight) {
         this.camera = new OrthographicCamera();
         this.camera.setToOrtho(false, viewportWidth, viewportHeight);
-        this.camera.translate(x*viewportWidth, y*viewportHeight);
+        this.camera.translate(x * viewportWidth, y * viewportHeight);
         this.camera.update();
     }
 }
