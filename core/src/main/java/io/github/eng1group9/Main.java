@@ -108,6 +108,7 @@ public class Main extends ApplicationAdapter {
     public static final String ACH_LOST = "Detour Champion";
     public static boolean achTriggered = false;
     public static final String ACH_QUICK = "Fancy a Quickie?";
+    public static final String ACH_BOOK = "Thief";
 
     @Override
     public void create() {
@@ -132,7 +133,6 @@ public class Main extends ApplicationAdapter {
     public static void initSystem() {
         gameState = 0; // Not started
 
-        librarian.freeze();
         chestDoorOpen = false;
         outsideDoorOpen = false;
         exitOpen = false;
@@ -150,6 +150,7 @@ public class Main extends ApplicationAdapter {
         player.reset();
         dean.reset();
         librarian.reset();
+        librarian.freeze();
         RenderingSystem.reset();
         collisionSystem.reset();
         loadRoom(0, 0, PLAYERSTARTPOS, DEANSTARTPOS, DEANPATH, LIBRARIANSTARTPOS, LIBRARIANPATH);
@@ -290,6 +291,7 @@ public class Main extends ApplicationAdapter {
             ToastSystem.addToast("You stole a book...", BAD);
             ToastSystem.addToast("RUN!!!!", BAD);
             negativeEventCounter++;
+            incAchievement(ACH_BOOK);
 
         }
     }
