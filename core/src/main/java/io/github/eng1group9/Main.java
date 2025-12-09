@@ -146,6 +146,7 @@ public class Main extends ApplicationAdapter {
         boss.reset();
         RenderingSystem.reset();
         collisionSystem.reset();
+        renderingSystem.hideLayer("PopeSeraph");
         loadRoom(0, 0, PLAYERSTARTPOS);
     }
 
@@ -541,7 +542,14 @@ public class Main extends ApplicationAdapter {
         else if (x == 3 && y == 2) {
             if(!boss.isDefeated()){
                 RenderingSystem.showLayer("Flames");
-                boss.start(BOSSFIGHTLENGTH);
+                float timeModifier = 0f;
+                if(releasedPope){
+                    timeModifier += 30f;
+                }
+                if(player.hasFirestarter()){
+                    timeModifier += 20f;
+                }
+                boss.start(BOSSFIGHTLENGTH-timeModifier);
                 RenderingSystem.hideLayer("Boss");
             }
         }
