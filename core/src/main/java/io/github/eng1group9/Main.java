@@ -364,7 +364,7 @@ public class Main extends ApplicationAdapter {
             BossProjectile projectile = projectiles.get(i);
             projectile.nextMove();
             if(projectile.hittingPlayer(player)){
-                System.out.println("player is hit");
+                player.damage();
             }
             int removeOffset = 100; // how far off the screen in pixels the projectile is before it is removed
 

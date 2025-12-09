@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
+import io.github.eng1group9.Main;
 import io.github.eng1group9.systems.RenderingSystem;
 import io.github.eng1group9.systems.ToastSystem;
 
@@ -21,6 +22,7 @@ public class Player extends MovingEntity {
     private float invisibilityLeft = 0;
     private float invincibilityLeft = 0;
     private boolean invisibilityWarningGiven = true;
+    private int health;
 
     public Player(Vector2 startPos, float speed) {
         super(new Texture("Characters/playerAnimations.png"), new int[] {4, 4, 4, 4, 4, 4, 4, 4} , 32, 32, speed, startPos);
@@ -32,6 +34,7 @@ public class Player extends MovingEntity {
      */
     public void reset(){
         super.reset();
+        health = 5;
         hasChestRoomKey = false;
         hasExitKey = false;
         hasRedPotion = false;
@@ -41,6 +44,18 @@ public class Player extends MovingEntity {
 
     }
 
+    public int getHealth(){
+        return health;
+    }
+
+    public void damage(){
+        if(health > 1){
+            health -= 1;
+        }
+        else{
+            Main.LoseGame();
+        }
+    }
     /**
      * @return wether the player has the key to open the exit.
      */

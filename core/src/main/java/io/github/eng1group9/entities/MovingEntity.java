@@ -99,7 +99,6 @@ public class MovingEntity extends AnimatedEntity {
                     break;
             }
             if (io.github.eng1group9.Main.collisionSystem.safeToMove(newX, newY, getHitbox()) || !canCollide) {
-                System.out.println(newX);
                 setPosition(newX, newY);
                 return distance;
             }
