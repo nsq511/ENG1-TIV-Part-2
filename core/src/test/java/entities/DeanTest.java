@@ -1,12 +1,13 @@
+package entities;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.eng1group9.*;
+import io.github.eng1group9.entities.Dean;
 
-class MainTest {
+public class DeanTest {
     @Test
-    public void testTest() {
+    void testTest() {
         assertTrue(true, "This test should not fail.");
     }
 }
