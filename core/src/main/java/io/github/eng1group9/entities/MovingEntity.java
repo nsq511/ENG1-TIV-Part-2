@@ -28,6 +28,7 @@ public class MovingEntity extends AnimatedEntity {
         initSpeed = speed;
         initActive = true;
         active = true;
+        frozen = false;
     }
 
     public MovingEntity(Texture spriteSheetTexture, int[] frameNumbers, int tileWidth, int tileHeight, float speed, Vector2 startPos, boolean active, boolean canCollide) {
@@ -98,6 +99,7 @@ public class MovingEntity extends AnimatedEntity {
                     break;
             }
             if (io.github.eng1group9.Main.collisionSystem.safeToMove(newX, newY, getHitbox()) || !canCollide) {
+                System.out.println(newX);
                 setPosition(newX, newY);
                 return distance;
             }
@@ -134,7 +136,7 @@ public class MovingEntity extends AnimatedEntity {
      */
     public void activate(){
         active = true;
-        freeze();
+        unfreeze();
     }
 
     /**
@@ -142,7 +144,7 @@ public class MovingEntity extends AnimatedEntity {
      */
     public void deactivate(){
         active = false;
-        unfreeze();
+        freeze();
     }
 
     /**

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -20,11 +21,11 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import io.github.eng1group9.Main;
-import io.github.eng1group9.entities.Dean;
-import io.github.eng1group9.entities.Player;
+import io.github.eng1group9.entities.*;
 import io.github.eng1group9.systems.ToastSystem.Toast;
 import io.github.eng1group9.systems.TriggerSystem.Trigger;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,6 +34,7 @@ import java.util.List;
 public class RenderingSystem {
     private Texture missingTexture;
     private SpriteBatch worldBatch;
+    private SpriteBatch projectileBatch;
     private SpriteBatch uiBatch;
     private BitmapFont font;
     private OrthographicCamera camera;
@@ -60,6 +62,7 @@ public class RenderingSystem {
         this.mapRenderer = new OrthogonalTiledMapRenderer(map);
         this.missingTexture = new Texture("missingTexture.png");
         this.worldBatch = new SpriteBatch();
+        this.projectileBatch = new SpriteBatch();
         this.uiBatch = new SpriteBatch();
         this.font = new BitmapFont();
 
@@ -120,7 +123,7 @@ public class RenderingSystem {
      * @param elapsedTime - How much time has passed since the game began.
      * @param worldCollision - A list of rectangles representing the games collison.
      */
-    public void draw(Player player, Dean dean, boolean showCollision, float elapsedTime, List<Rectangle> worldCollision) {
+    public void draw(Player player, Dean dean, Boss boss, boolean showCollision, float elapsedTime, List<Rectangle> worldCollision, ArrayList<BossProjectile> projectiles, ArrayList<ProjectileWarning> projectileWarnings) {
         ScreenUtils.clear(Color.BLACK);
         viewport.apply();
 
@@ -139,10 +142,29 @@ public class RenderingSystem {
             dean.draw(worldBatch);
         }
 
+        if(boss.isActive()){
+            boss.draw(worldBatch);
+        }
+
         worldBatch.end();
 
         int[] abovePlayer = {10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21}; // the layers which should appear above the player
         mapRenderer.render(abovePlayer);
+
+        projectileBatch.begin();
+
+        for(BossProjectile projectile : projectiles){
+            if(projectile.isActive()){
+                projectile.draw(projectileBatch);
+            }
+        }
+
+        for(ProjectileWarning warning : projectileWarnings){
+            warning.draw(projectileBatch);
+        }
+
+        projectileBatch.end();
+
         uiBatch.begin();
         font.draw(uiBatch, TimerSystem.getClockDisplay(), 10, 640 - 10);
 

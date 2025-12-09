@@ -1,10 +1,12 @@
 package io.github.eng1group9;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -78,8 +80,15 @@ public class Main extends ApplicationAdapter {
     public static InputSystem inputSystem = new InputSystem();
 
     private static Boss boss;
-    final static float BOSSSPEED = 100;
-    final static Vector2 BOSSSTARTPOS = new Vector2(480, 320);
+    final static float BOSSSPEED = 0;
+    final static Vector2 BOSSSTARTPOS = new Vector2(450, 255);
+    private static float BOSSATTACKCOOLDOWN = 2.5f;
+
+    private static ArrayList<BossProjectile> projectiles;
+    private static ArrayList<ProjectileWarning> projectileWarnings;
+    private static float PROJECTILESPEED = 1000f;
+    private static final float PROJECTILEWARNINGLENGTH = 2.5f;
+    private static final int PROJECTILESPACING = 96;
 
     @Override
     public void create() {
@@ -90,7 +99,10 @@ public class Main extends ApplicationAdapter {
         worldCollision = collisionSystem.getWorldCollision();
         player = new Player(PLAYERSTARTPOS, DEFAULTPLAYERSPEED);
         dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEFAULTDEANPATH);
-        boss = new Boss(BOSSSTARTPOS,BOSSSPEED, false);
+        boss = new Boss(BOSSSTARTPOS,BOSSSPEED, false,BOSSATTACKCOOLDOWN,PROJECTILESPACING);
+        projectiles = new ArrayList<>();
+        projectileWarnings = new ArrayList<>();
+        loadRoom(0, 0, PLAYERSTARTPOS);
         togglePause();
         instance = this;
     }
@@ -100,7 +112,8 @@ public class Main extends ApplicationAdapter {
      */
     public static void initSystem(){
         gameState = 0; // Not started
-
+        projectiles = new ArrayList<>();
+        projectileWarnings = new ArrayList<>();
         chestDoorOpen = false;
         exitOpen = false;
         spikesLowered = false;
@@ -129,6 +142,20 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
+     * Where the game processes its logic each frame.
+     * It will not run if the game is paused.
+     */
+    public void logic() {
+        timerSystem.tick();
+        dean.nextMove();
+        boss.nextAttack();
+        checkProjectiles();
+        checkDeanCatch();
+        TriggerSystem.checkTouchTriggers(player);
+        player.update();
+    }
+
+    /**
      * Check if the player has the red potion.
      * If they do, show Long Boi and complete the hidden event.
      * If not, tell the player they must find the potion.
@@ -147,7 +174,7 @@ public class Main extends ApplicationAdapter {
     }
 
     public void draw() {
-        renderingSystem.draw(player, dean, showCollision, timerSystem.elapsedTime, worldCollision);
+        renderingSystem.draw(player, dean, boss, showCollision, timerSystem.elapsedTime, worldCollision, projectiles, projectileWarnings);
         switch (gameState) {
             case 0:
                 renderingSystem.renderStartOverlay(960, 640);
@@ -213,6 +240,7 @@ public class Main extends ApplicationAdapter {
      */
     public static void startGame() {
         if (gameState == 0) {
+            initSystem();
             gameState = 2;
             togglePause();
         }
@@ -279,19 +307,6 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Where the game processes its logic each frame.
-     * It will not run if the game is paused.
-     */
-    public void logic() {
-        timerSystem.tick();
-        dean.nextMove();
-        checkDeanCatch();
-        TriggerSystem.checkTouchTriggers(player);
-        player.update();
-    }
-
-
-    /**
      * Checks if the dean has caught the player, and punishes them if he has by removing 50s from time left.
      */
     public void checkDeanCatch() {
@@ -338,6 +353,38 @@ public class Main extends ApplicationAdapter {
         playerCaught = false;
     }
 
+    public static void checkProjectiles(){
+        for(int i = projectileWarnings.size() - 1; i >= 0; i--){
+            ProjectileWarning warning = projectileWarnings.get(i);
+            if(warning.getWarningLength() <= 0){
+                projectileWarnings.remove(i);
+            }
+        }
+        for(int i = projectiles.size() - 1; i >= 0; i--){
+            BossProjectile projectile = projectiles.get(i);
+            projectile.nextMove();
+            if(projectile.hittingPlayer(player)){
+                System.out.println("player is hit");
+            }
+            int removeOffset = 100; // how far off the screen in pixels the projectile is before it is removed
+
+            if(projectile.getX() < 0-removeOffset || projectile.getX() > VIEWPORTWIDTH*2+removeOffset ||
+                projectile.getY() < 0-removeOffset || projectile.getY() > VIEWPORTHEIGHT*2+removeOffset)
+            {
+                projectiles.remove(projectile);
+            }
+        }
+    }
+
+    public static void spawnProjectile(Vector2 position, Character direction){
+        float warningLength = PROJECTILEWARNINGLENGTH;
+        float delta = Gdx.graphics.getDeltaTime();
+        ProjectileWarning warning = new  ProjectileWarning(position, direction, warningLength);
+        BossProjectile projectile = new BossProjectile(position, direction, PROJECTILESPEED, PROJECTILEWARNINGLENGTH);
+        projectileWarnings.add(warning);
+        projectiles.add(projectile);
+    }
+
     /**
      * Use to drop remove the spikes in the chest room when the switch is pressed.
      */
@@ -374,7 +421,7 @@ public class Main extends ApplicationAdapter {
             dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEFAULTDEANPATH);
         }
         else if(x == 1 && y == 0){
-            Vector2 pos = new Vector2(80,80);
+            Vector2 pos = new Vector2(80,64);
             Character[] path = {
                 'R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R','R',
                 'L','L','L','L','L','L','L','L','L','L','L','L','L','L','L','L','L','L','L','L','L','L','L','L'
@@ -383,7 +430,7 @@ public class Main extends ApplicationAdapter {
             dean = new Dean(pos, DEFAULTDEANSPEED, path);
         }
         else if(x == 2 && y == 1){
-            Vector2 pos = new Vector2(280,400);
+            Vector2 pos = new Vector2(250,400);
             Character[] path = {
                 'D','D','D','D','D','D',
                 'U','U','U','U','U','U',
@@ -407,7 +454,8 @@ public class Main extends ApplicationAdapter {
             dean = new Dean(pos, DEFAULTDEANSPEED, path);
         }
         else if (x == 3 && y == 2) {
-
+            dean.deactivate();
+            boss.activate();
         }
         else{
             dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEFAULTDEANPATH);
@@ -440,6 +488,7 @@ public class Main extends ApplicationAdapter {
         int y = (int)coordinates.y;
         loadRoom(x,y,playerPos);
     }
+
 
     @Override
     public void resize(int width, int height) {
