@@ -1,12 +1,14 @@
+package systems;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.eng1group9.*;
+import io.github.eng1group9.systems.RenderingSystem;
 
-class MainTest {
+public class RenderingSystemTest {
     @Test
-    public void testTest() {
+    void testTest() {
         assertTrue(true, "This test should not fail.");
     }
 }
