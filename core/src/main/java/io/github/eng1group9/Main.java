@@ -150,10 +150,10 @@ public class Main extends ApplicationAdapter {
         player.reset();
         dean.reset();
         librarian.reset();
-        librarian.freeze();
         RenderingSystem.reset();
         collisionSystem.reset();
         loadRoom(0, 0, PLAYERSTARTPOS, DEANSTARTPOS, DEANPATH, LIBRARIANSTARTPOS, LIBRARIANPATH);
+        librarian.freeze();
         AchievementSystem.reset();
         achTriggered = false;
     }
