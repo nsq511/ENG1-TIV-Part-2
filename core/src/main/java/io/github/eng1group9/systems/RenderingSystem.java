@@ -138,7 +138,8 @@ public class RenderingSystem {
         librarian.draw(worldBatch);
         worldBatch.end();
 
-        int[] abovePlayer = { 7, 8, 9, 10, 11, 12, 13, 14, 15 }; // the layers which should appear above the player
+        int[] abovePlayer = { 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 }; // the layers which should appear above the
+                                                                         // player
         mapRenderer.render(abovePlayer);
         uiBatch.begin();
         font.draw(uiBatch, TimerSystem.getClockDisplay(), 10, 640 - 10);

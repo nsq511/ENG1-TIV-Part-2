@@ -5,6 +5,7 @@ import java.util.List;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -42,6 +43,10 @@ public class Main extends ApplicationAdapter {
     public static boolean spikesLowered = false; // Whether the spikes in the chest room have been lowered.
     public static boolean scrollUsed = false; // Whether the scroll power up has been collected.
     public static boolean bookUsed = false; // Whether the book power up has been collected.
+    public static boolean speedPotActive = false;
+    public static boolean slowPotActive = false;
+    public static boolean darkPotActive = false;
+    public static String[] potions = { "speed", "slow", "dark" };
     public static int longboiBonus = 0; // the bonus to add based on wether LongBoi was found.
     public static int hiddenEventCounter = 0;
     public static int negativeEventCounter = 0;
@@ -139,6 +144,9 @@ public class Main extends ApplicationAdapter {
         spikesLowered = false;
         scrollUsed = false;
         bookUsed = false;
+        speedPotActive = false;
+        slowPotActive = false;
+        darkPotActive = false;
         longboiBonus = 0;
         hiddenEventCounter = 0;
         negativeEventCounter = 0;
@@ -292,6 +300,26 @@ public class Main extends ApplicationAdapter {
             ToastSystem.addToast("RUN!!!!", BAD);
             negativeEventCounter++;
             incAchievement(ACH_BOOK);
+
+        }
+    }
+
+    public static void getPotion() {
+        String effect = potions[MathUtils.random(potions.length - 1)];
+
+        if (effect == "speed") {
+            ToastSystem.addToast("SPEED POTION ACTIVATED", GOOD);
+            speedPotActive = true;
+
+        }
+        if (effect == "slow") {
+            ToastSystem.addToast("SLOW POTION ACTIVATED", BAD);
+            slowPotActive = true;
+
+        }
+        if (effect == "dark") {
+            ToastSystem.addToast("DARKNESS POTION ACTIVATED", BAD);
+            darkPotActive = true;
 
         }
     }

@@ -255,6 +255,11 @@ public class TriggerSystem {
             case 12:
                 Main.getBook();
                 break;
+            case 13:
+                RenderingSystem.hideLayer("Potion1");
+                remove(13);
+                Main.getPotion();
+                break;
             default:
                 break;
         }
