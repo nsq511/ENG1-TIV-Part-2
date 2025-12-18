@@ -43,11 +43,15 @@ public class Main extends ApplicationAdapter {
     public static boolean spikesLowered = false; // Whether the spikes in the chest room have been lowered.
     public static boolean scrollUsed = false; // Whether the scroll power up has been collected.
     public static boolean bookUsed = false; // Whether the book power up has been collected.
+    public static boolean potionAch = false;
     public static String[] potions = { "speed", "slow", "dark" };
     public static int longboiBonus = 0; // the bonus to add based on wether LongBoi was found.
     public static int hiddenEventCounter = 0;
     public static int negativeEventCounter = 0;
     public static int positiveEventCounter = 0;
+    public static int speedCounter = 0;
+    public static int slowCounter = 0;
+    public static int darknessCounter = 0;
     public static final String leaderBoardFilePath = "leaderboard.txt";
 
     public static LeaderBoard leaderBoard = LeaderBoard.loadFromFile(leaderBoardFilePath, 5);
@@ -111,6 +115,7 @@ public class Main extends ApplicationAdapter {
     public static boolean achTriggered = false;
     public static final String ACH_QUICK = "Fancy a Quickie?";
     public static final String ACH_BOOK = "Thief";
+    public static final String ACH_POTION = "A true Witch";
 
     @Override
     public void create() {
@@ -145,6 +150,10 @@ public class Main extends ApplicationAdapter {
         hiddenEventCounter = 0;
         negativeEventCounter = 0;
         positiveEventCounter = 0;
+        speedCounter = 0;
+        slowCounter = 0;
+        darknessCounter = 0;
+        potionAch = false;
         timerSystem.reset();
         showCollision = false;
         playerCaught = false;
@@ -307,12 +316,14 @@ public class Main extends ApplicationAdapter {
             ToastSystem.addToast("SPEED POTION ACTIVATED", GOOD);
             ToastSystem.addToast("Press Q to Dash", GOOD);
             positiveEventCounter++;
+            speedCounter++;
 
         }
         if (effect == "slow") {
             player.slownessPotion();
             ToastSystem.addToast("SLOW POTION ACTIVATED", BAD);
             negativeEventCounter++;
+            slowCounter++;
 
         }
         if (effect == "dark") {
@@ -320,7 +331,12 @@ public class Main extends ApplicationAdapter {
             ToastSystem.addToast("DARKNESS POTION ACTIVATED", BAD);
             ToastSystem.addToast("Who turned off the lights...?", BAD);
             negativeEventCounter++;
+            darknessCounter++;
 
+        }
+
+        if (!potionAch && speedCounter >= 1 && slowCounter >= 1 && darknessCounter >= 1) {
+            incAchievement(ACH_POTION);
         }
     }
 

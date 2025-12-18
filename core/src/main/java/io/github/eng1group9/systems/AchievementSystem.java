@@ -61,6 +61,13 @@ public class AchievementSystem {
                 1,
                 50,
                 "ach_book.png");
+
+        AchievementSystem.addAchievement(
+                Main.ACH_POTION,
+                "Use all 3 potions",
+                1,
+                50,
+                "ach_potion.png");
     }
 
     /**
