@@ -43,9 +43,6 @@ public class Main extends ApplicationAdapter {
     public static boolean spikesLowered = false; // Whether the spikes in the chest room have been lowered.
     public static boolean scrollUsed = false; // Whether the scroll power up has been collected.
     public static boolean bookUsed = false; // Whether the book power up has been collected.
-    public static boolean speedPotActive = false;
-    public static boolean slowPotActive = false;
-    public static boolean darkPotActive = false;
     public static String[] potions = { "speed", "slow", "dark" };
     public static int longboiBonus = 0; // the bonus to add based on wether LongBoi was found.
     public static int hiddenEventCounter = 0;
@@ -144,9 +141,6 @@ public class Main extends ApplicationAdapter {
         spikesLowered = false;
         scrollUsed = false;
         bookUsed = false;
-        speedPotActive = false;
-        slowPotActive = false;
-        darkPotActive = false;
         longboiBonus = 0;
         hiddenEventCounter = 0;
         negativeEventCounter = 0;
@@ -160,6 +154,7 @@ public class Main extends ApplicationAdapter {
         librarian.reset();
         RenderingSystem.reset();
         collisionSystem.reset();
+        TriggerSystem.init(TMXPATH);
         loadRoom(0, 0, PLAYERSTARTPOS, DEANSTARTPOS, DEANPATH, LIBRARIANSTARTPOS, LIBRARIANPATH);
         librarian.freeze();
         AchievementSystem.reset();
@@ -308,18 +303,23 @@ public class Main extends ApplicationAdapter {
         String effect = potions[MathUtils.random(potions.length - 1)];
 
         if (effect == "speed") {
+            player.speedPotion();
             ToastSystem.addToast("SPEED POTION ACTIVATED", GOOD);
-            speedPotActive = true;
+            ToastSystem.addToast("Press Q to Dash", GOOD);
+            positiveEventCounter++;
 
         }
         if (effect == "slow") {
+            player.slownessPotion();
             ToastSystem.addToast("SLOW POTION ACTIVATED", BAD);
-            slowPotActive = true;
+            negativeEventCounter++;
 
         }
         if (effect == "dark") {
+            renderingSystem.activateDarkness();
             ToastSystem.addToast("DARKNESS POTION ACTIVATED", BAD);
-            darkPotActive = true;
+            ToastSystem.addToast("Who turned off the lights...?", BAD);
+            negativeEventCounter++;
 
         }
     }

@@ -1,5 +1,6 @@
 package io.github.eng1group9.systems;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import com.badlogic.gdx.maps.MapLayer;
@@ -130,15 +131,17 @@ public class TriggerSystem {
      * @return True if it was successful.
      */
     public static boolean remove(int ID) {
-        for (Trigger t : touchTriggers) {
+        for (Iterator<Trigger> it = touchTriggers.iterator(); it.hasNext();) {
+            Trigger t = it.next();
             if (t.getID() == ID) {
-                touchTriggers.remove(t);
+                it.remove();
                 return true;
             }
         }
-        for (Trigger t : interactTriggers) {
+        for (Iterator<Trigger> it = interactTriggers.iterator(); it.hasNext();) {
+            Trigger t = it.next();
             if (t.getID() == ID) {
-                interactTriggers.remove(t);
+                it.remove();
                 return true;
             }
         }
@@ -179,9 +182,12 @@ public class TriggerSystem {
      *               This is run each frame.
      */
     public static void checkTouchTriggers(Player player) {
-        for (Trigger t : touchTriggers) {
+        for (Iterator<Trigger> it = touchTriggers.iterator(); it.hasNext();) {
+            Trigger t = it.next();
+
             if (t.playerInZone(player)) {
                 trigger(t.getID(), player);
+                it.remove();
             }
         }
     }
@@ -257,7 +263,14 @@ public class TriggerSystem {
                 break;
             case 13:
                 RenderingSystem.hideLayer("Potion1");
-                remove(13);
+                Main.getPotion();
+                break;
+            case 14:
+                RenderingSystem.hideLayer("Potion2");
+                Main.getPotion();
+                break;
+            case 15:
+                RenderingSystem.hideLayer("Potion3");
                 Main.getPotion();
                 break;
             default:

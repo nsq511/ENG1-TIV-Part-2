@@ -1,23 +1,32 @@
 package io.github.eng1group9.entities;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
 /**
- * An animated entity which can move. This class handles speed and collision. 
- * @param spriteSheetTexture - The texture contaning the frames laid out in a grid, which are then used to create the aniamtions.
- * @param frameNumbers - An array of integers which state how many frames are in each animation, values should match the number of sprites on each row of the spriteSheet.
- * @param tileWidth - How wide each tile in the SpriteSheet is in pixels.
- * @param tileHeight - How high each tile in the SpriteSheet is in pixels.
- * @param speed - How fast the entity will move.
+ * An animated entity which can move. This class handles speed and collision.
+ * 
+ * @param spriteSheetTexture - The texture contaning the frames laid out in a
+ *                           grid, which are then used to create the aniamtions.
+ * @param frameNumbers       - An array of integers which state how many frames
+ *                           are in each animation, values should match the
+ *                           number of sprites on each row of the spriteSheet.
+ * @param tileWidth          - How wide each tile in the SpriteSheet is in
+ *                           pixels.
+ * @param tileHeight         - How high each tile in the SpriteSheet is in
+ *                           pixels.
+ * @param speed              - How fast the entity will move.
  */
 public class MovingEntity extends AnimatedEntity {
 
     private float speed = 0;
     private boolean frozen = false;
     private float initSpeed = 0f;
-    
-    public MovingEntity(Texture spriteSheetTexture, int[] frameNumbers, int tileWidth, int tileHeight, float speed, Vector2 startPos, Vector2 hitboxOffset) {
+    private float dash = 75;
+
+    public MovingEntity(Texture spriteSheetTexture, int[] frameNumbers, int tileWidth, int tileHeight, float speed,
+            Vector2 startPos, Vector2 hitboxOffset) {
         super(spriteSheetTexture, frameNumbers, tileWidth, tileHeight, startPos, hitboxOffset);
         this.speed = speed;
         initSpeed = speed;
@@ -26,21 +35,22 @@ public class MovingEntity extends AnimatedEntity {
     /**
      * Resets the MovingEntity to its original state
      */
-    public void reset(){
+    public void reset() {
         super.reset();
         speed = initSpeed;
         frozen = false;
     }
 
     /**
-     * Update the speed of the entity. 
+     * Update the speed of the entity.
+     * 
      * @param newSpeed - How fast the entity will now move.
      */
     public void setSpeed(float newSpeed) {
         speed = newSpeed;
     }
 
-     /**
+    /**
      * @return The speed of the entity.
      */
     public float getSpeed() {
@@ -48,14 +58,18 @@ public class MovingEntity extends AnimatedEntity {
     }
 
     /**
-     * Moves the entity in a given direction provided it wont collide with anything and . 
-     * @param direction The direction as either 'U' 'D' 'L' or'R' 
-     * @param collisionRectangles A list of rectangles which the entity cannot move into.
+     * Moves the entity in a given direction provided it wont collide with anything
+     * and .
+     * 
+     * @param direction           The direction as either 'U' 'D' 'L' or'R'
+     * @param collisionRectangles A list of rectangles which the entity cannot move
+     *                            into.
      */
-    public float move(Character direction){
+    public float move(Character direction) {
         if (!frozen) {
             float delta = Gdx.graphics.getDeltaTime();
-            if (delta > 0.1) delta = 0;
+            if (delta > 0.1)
+                delta = 0;
             float distance = delta * speed;
             float newX = getX();
             float newY = getY();
@@ -67,7 +81,7 @@ public class MovingEntity extends AnimatedEntity {
                     newY -= distance;
                     break;
                 case 'L':
-                    newX-= distance;
+                    newX -= distance;
                     break;
                 case 'R':
                     newX += distance;
@@ -81,7 +95,32 @@ public class MovingEntity extends AnimatedEntity {
         return 0;
     }
 
- 
+    public float dash(Character direction) {
+        if (!frozen) {
+            float newX = getX();
+            float newY = getY();
+            switch (direction) {
+                case 'U':
+                    newY += dash;
+                    break;
+                case 'D':
+                    newY -= dash;
+                    break;
+                case 'L':
+                    newX -= dash;
+                    break;
+                case 'R':
+                    newX += dash;
+                    break;
+            }
+            if (io.github.eng1group9.Main.collisionSystem.safeToMove(newX, newY, getHitbox())) {
+                setPosition(newX, newY);
+                return dash;
+            }
+        }
+        return 0;
+    }
+
     /**
      * Prevent the entity from moving, and pause their animation.
      */

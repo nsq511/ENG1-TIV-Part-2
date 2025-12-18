@@ -3,16 +3,21 @@ package io.github.eng1group9.systems;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
@@ -44,6 +49,11 @@ public class RenderingSystem {
     private static TextField textfield;
     private static boolean firstLeaderBoard = true;
 
+    private boolean darknessActive = false;
+    private float darknessLeft = 0;
+    private ShaderProgram vignette;
+    private Texture whitePixel;
+
     /**
      * Takes and tileset and sets up a renderer to display it.
      * 
@@ -62,6 +72,7 @@ public class RenderingSystem {
         this.worldBatch = new SpriteBatch();
         this.uiBatch = new SpriteBatch();
         this.font = new BitmapFont();
+        this.whitePixel = new Texture("whitePixel.png");
 
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
@@ -70,6 +81,12 @@ public class RenderingSystem {
         textfield.setPosition(960 * 0.1f, 640 / 2f + 20); // Change to not be hardcoded
         textfield.setSize(300, 30);
         stage.addActor(textfield);
+
+        ShaderProgram.pedantic = false;
+        vignette = new ShaderProgram(
+                Gdx.files.internal("shaders/vignette.vert"),
+                Gdx.files.internal("shaders/vignette.frag"));
+
     }
 
     public OrthogonalTiledMapRenderer getMapRenderer() {
@@ -124,9 +141,9 @@ public class RenderingSystem {
      */
     public void draw(Player player, Dean dean, Dean librarian, boolean showCollision, float elapsedTime,
             List<Rectangle> worldCollision) {
+        update();
         ScreenUtils.clear(Color.BLACK);
         viewport.apply();
-
         camera.update();
         mapRenderer.setView(camera);
         int[] belowPlayer = { 0, 1, 2, 3, 4, 5, 6 }; // the layers which should appear below the player
@@ -138,9 +155,37 @@ public class RenderingSystem {
         librarian.draw(worldBatch);
         worldBatch.end();
 
-        int[] abovePlayer = { 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 }; // the layers which should appear above the
-                                                                         // player
+        int[] abovePlayer = { 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 }; // the layers which should appear above
+                                                                                 // the
+        // player
         mapRenderer.render(abovePlayer);
+        if (darknessActive) {
+
+            // player centre in WORLD coords (use hitbox if you have one)
+            Rectangle hb = player.getHitbox();
+            float px = hb.x + hb.width * 0.5f;
+            float py = hb.y + hb.height * 0.5f;
+
+            worldBatch.setShader(vignette);
+            worldBatch.begin();
+
+            vignette.setUniformf("u_playerPos", px, py);
+            vignette.setUniformf("u_radius", 60f); // world units (tile-based)
+            vignette.setUniformf("u_softness", 60f);
+            vignette.setUniformf("u_darkness", 0.98f);
+
+            // draw a LARGE quad that covers the camera view
+            worldBatch.draw(
+                    whitePixel,
+                    camera.position.x - camera.viewportWidth,
+                    camera.position.y - camera.viewportHeight,
+                    camera.viewportWidth * 3,
+                    camera.viewportHeight * 3);
+
+            worldBatch.end();
+            worldBatch.setShader(null);
+        }
+
         uiBatch.begin();
         font.draw(uiBatch, TimerSystem.getClockDisplay(), 10, 640 - 10);
 
@@ -402,4 +447,20 @@ public class RenderingSystem {
         this.camera.translate(x * viewportWidth, y * viewportHeight);
         this.camera.update();
     }
+
+    public void update() {
+        if (!(darknessLeft <= 0)) {
+            darknessLeft -= Gdx.graphics.getDeltaTime();
+            if (darknessLeft <= 0) {
+                ToastSystem.addToast("Your vision returns!");
+                darknessActive = false;
+            }
+        }
+    }
+
+    public void activateDarkness() {
+        darknessActive = true;
+        darknessLeft = 20;
+    }
+
 }
