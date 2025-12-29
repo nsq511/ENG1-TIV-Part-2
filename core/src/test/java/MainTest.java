@@ -1,12 +1,18 @@
+import io.github.eng1group9.Main;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.Test;
+public class MainTest {
+    Main main;
 
-import io.github.eng1group9.*;
+    @BeforeEach
+    void setUp() {
+        main = new Main();
+    }
 
-class MainTest {
     @Test
-    public void testTest() {
-        assertTrue(true, "This test should not fail.");
+    void testTest() {
+        assertFalse(false);
     }
 }

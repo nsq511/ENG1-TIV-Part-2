@@ -4,7 +4,7 @@ eclipse.project.name = appName + '-core'
 dependencies {
   testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-  
+
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
 
   if(enableGraalNative == 'true') {
@@ -19,9 +19,27 @@ test {
 
 jacocoTestReport {
   dependsOn test // tests are required to run before generating the report
+
+  reports {
+    html.required = true // Enable HTML reports
+    xml.required = false // Optional: Disable XML if not needed
+    csv.required = false // Optional: Disable CSV if not needed
+  }
+}
+
+jacocoTestCoverageVerification {
+  violationRules {
+    rule {
+      limit {
+        minimum = 0.7
+      }
+
+      failOnViolation = true
+    }
+  }
 }
 
 jacoco {
-    toolVersion = "0.8.13"
-    reportsDirectory = layout.buildDirectory.dir('jacoco')
+  toolVersion = "0.8.13"
+  //reportsDirectory = layout.buildDirectory.dir('jacoco')
 }

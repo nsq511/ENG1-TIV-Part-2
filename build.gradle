@@ -26,8 +26,9 @@ allprojects {
 }
 
 configure(subprojects) {
-  apply plugin: 'jacoco'
+  apply plugin: 'java'
   apply plugin: 'java-library'
+  apply plugin: 'jacoco'
   sourceCompatibility = 8
 
   // From https://lyze.dev/2021/04/29/libGDX-Internal-Assets-List/
