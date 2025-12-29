@@ -13,6 +13,6 @@ public class MainTest {
 
     @Test
     void testTest() {
-        assertFalse(false);
+        assertTrue(true);
     }
 }
