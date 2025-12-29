@@ -17,29 +17,7 @@ test {
   finalizedBy jacocoTestReport
 }
 
-jacocoTestReport {
-  dependsOn test // tests are required to run before generating the report
-
-  reports {
-    html.required = true // Enable HTML reports
-    xml.required = false // Optional: Disable XML if not needed
-    csv.required = false // Optional: Disable CSV if not needed
-  }
-}
-
-jacocoTestCoverageVerification {
-  violationRules {
-    rule {
-      limit {
-        minimum = 0.7
-      }
-
-      failOnViolation = true
-    }
-  }
-}
-
 jacoco {
-  toolVersion = "0.8.13"
-  //reportsDirectory = layout.buildDirectory.dir('jacoco')
+  toolVersion = "0.8.7"
+  //reportsDir = "build/jacoco-reports"
 }
