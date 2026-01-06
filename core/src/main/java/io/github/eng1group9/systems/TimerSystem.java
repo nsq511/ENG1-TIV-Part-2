@@ -49,9 +49,6 @@ public class TimerSystem {
         if (getTimeLeft() <= 0) {
             Main.LoseGame();
         }
-        if(getTimeLeft() <= 299) {
-            RoomSystem.canUse = true;
-        }
     }
 
     /**

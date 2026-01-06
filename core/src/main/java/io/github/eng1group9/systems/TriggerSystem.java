@@ -19,7 +19,7 @@ import io.github.eng1group9.entities.Player;
  * The Triggers layer on the TileMap contains Rectangles used to denote these areas.
  * The name of the Rectangle is in the form "ID,triggerType"
  * which is used to determine what happens when it is triggered, and how.
- *
+ * <p></p>
  * triggerType must be in the form T or I
  * for Touch or Interact
  */
@@ -31,7 +31,6 @@ public class TriggerSystem {
     static class Trigger {
         private int ID;
         private Rectangle zone;
-        private Rectangle originalZone;
         private boolean activateOnTouch = false;
         private Vector2 roomCoordinates;
 
@@ -39,7 +38,6 @@ public class TriggerSystem {
             this.ID = ID;
             this.activateOnTouch = activateOnTouch;
             this.zone = zone;
-            this.originalZone = new Rectangle(zone);
         }
 
         public int getID() {
@@ -63,7 +61,7 @@ public class TriggerSystem {
         }
 
         public void moveZone(int x,int y){
-            this.zone.setPosition(originalZone.getX()+x,originalZone.getY()+y);
+            this.zone.setPosition(zone.getX()+x,zone.getY()+y);
         }
     }
 
@@ -190,12 +188,11 @@ public class TriggerSystem {
      * @param viewportWidth - The viewport width.
      * @param viewportHeight - The viewport height.
      */
-    public static void loadRoom(int x,int y, int viewportWidth, int viewportHeight){
+    public static void loadRoom(int offsetX, int offsetY){
+        int x = -offsetX;
+        int y = -offsetY;
         for(Trigger trigger : getTriggers()){
-            int posX = -(x*viewportWidth*2);
-            int posY = -(y*viewportHeight*2);
-
-            trigger.moveZone(posX,posY);
+            trigger.moveZone(x,y);
         }
     }
     /**
@@ -257,7 +254,7 @@ public class TriggerSystem {
                 remove(16);
                 break;
             case 17:
-                Main.openPrisonDoor();
+                Main.openDungeonDoor();
                 break;
             case 18:
                 Main.openLockpickRoomDoor();
@@ -292,7 +289,6 @@ public class TriggerSystem {
             case 26:
                 Main.openPNQDoor();
                 break;
-
             default:
                 break;
         }

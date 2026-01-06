@@ -26,6 +26,7 @@ import io.github.eng1group9.Main;
 import io.github.eng1group9.entities.*;
 import io.github.eng1group9.systems.ToastSystem.Toast;
 import io.github.eng1group9.systems.TriggerSystem.Trigger;
+import io.github.eng1group9.systems.RoomSystem.Door;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -181,6 +182,7 @@ public class RenderingSystem {
         if (showCollision && worldCollision != null) { // show collisions for debugging
             renderCollision(uiBatch, worldCollision, player, dean);
             renderTriggers(uiBatch);
+            renderDoors(uiBatch);
         }
 
         uiBatch.end();
@@ -228,6 +230,18 @@ public class RenderingSystem {
         for (Trigger t : TriggerSystem.getTriggers()) {
             Rectangle rectangle = t.getZone();
             uiBatch.setColor(0, 1, 1, 0.75f);
+            uiBatch.draw(missingTexture, rectangle.x, rectangle.y , rectangle.width, rectangle.height);
+        }
+    }
+
+    /**
+     * Render the zones for room transition doors (dev mode).
+     * @param uiBatch - The SpriteBatch used for this (should be the ui batch).
+     */
+    public void renderDoors(SpriteBatch uiBatch) {
+        for (Door door : RoomSystem.getDoors()) {
+            Rectangle rectangle = door.getZone();
+            uiBatch.setColor(1, 1, 1, 0.75f);
             uiBatch.draw(missingTexture, rectangle.x, rectangle.y , rectangle.width, rectangle.height);
         }
     }
@@ -401,10 +415,8 @@ public class RenderingSystem {
      * @param viewportWidth - The viewport width.
      * @param viewportHeight - The viewport height.
      */
-    public void loadRoom(int x,int y, int viewportWidth, int viewportHeight){
-        this.camera = new OrthographicCamera();
-        this.camera.setToOrtho(false, viewportWidth, viewportHeight);
-        this.camera.translate(x*viewportWidth, y*viewportHeight);
+    public void loadRoom(int offsetX, int offsetY){
+        this.camera.translate(offsetX, offsetY);
         this.camera.update();
     }
 

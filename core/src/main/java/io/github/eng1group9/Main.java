@@ -32,7 +32,7 @@ public class Main extends ApplicationAdapter {
     public static boolean exitOpen = false; // Whether the exit is open/
     public static boolean spikesLowered = false; // Whether the spikes in the chest room have been lowered.
     public static boolean scrollUsed = false; // Whether the scroll power up has been collected.
-    public static boolean prisonDoorOpened = false;
+    public static boolean dungeonDoorOpened = false;
     public static boolean lockpickRoomOpened = false;
     public static boolean PNQDoorOpened  = false;
     public static boolean releasedPope = false;
@@ -51,11 +51,16 @@ public class Main extends ApplicationAdapter {
     public static boolean showCollision = false;
 
     private List<Rectangle> worldCollision;
+    private List<Rectangle> doors;
     final static int LONGBOIBONUSAMOUNT = 50;
     final static String TMXPATH = "World/testMap.tmx";
 
     final static Vector2 prisonCoords = new Vector2(3,0);
     final static Vector2 playerPrisonPos = new Vector2(380,200);
+
+    final static float DOORCOOLDOWN = 0.5f;
+    private static int currentRoomX;
+    private static int currentRoomY;
 
     public static Player player;
     private static boolean playerCaught = false; // Whether the player is currently being held by the Dean.
@@ -103,7 +108,7 @@ public class Main extends ApplicationAdapter {
         renderingSystem.initWorld(TMXPATH, VIEWPORTWIDTH, VIEWPORTHEIGHT);
         collisionSystem.init(renderingSystem.getMapRenderer().getMap());
         TriggerSystem.init(TMXPATH, VIEWPORTWIDTH, VIEWPORTHEIGHT);
-        RoomSystem.init(TMXPATH,  VIEWPORTWIDTH, VIEWPORTHEIGHT);
+        RoomSystem.init(TMXPATH,  VIEWPORTWIDTH, VIEWPORTHEIGHT, DOORCOOLDOWN);
         worldCollision = collisionSystem.getWorldCollision();
         player = new Player(PLAYERSTARTPOS, DEFAULTPLAYERSPEED);
         dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEFAULTDEANPATH);
@@ -126,7 +131,7 @@ public class Main extends ApplicationAdapter {
         exitOpen = false;
         spikesLowered = false;
         scrollUsed = false;
-        prisonDoorOpened = false;
+        dungeonDoorOpened = false;
         lockpickRoomOpened = false;
         PNQDoorOpened  = false;
         releasedPope = false;
@@ -138,7 +143,6 @@ public class Main extends ApplicationAdapter {
         negativeEventCounter = 0;
         positiveEventCounter = 0;
         timerSystem.reset();
-        showCollision = false;
         playerCaught = false;
         playerCaughtTime = INITALPLAYERCAUGHTTIME;
         player.reset();
@@ -167,6 +171,7 @@ public class Main extends ApplicationAdapter {
         boss.logic();
         checkProjectiles();
         checkDeanCatch();
+        RoomSystem.checkCooldown();
         TriggerSystem.checkTouchTriggers(player);
         player.update();
     }
@@ -214,7 +219,7 @@ public class Main extends ApplicationAdapter {
      * Remove its hitbox and graphic.
      */
     public static void openChestRoomDoor() {
-        if (player.hasChestRoomKey() && !chestDoorOpen) {
+        if (player.hasChestRoomKey() || player.hasLockpick() && !chestDoorOpen) {
             ToastSystem.addToast("You Opened the Door!", GOOD);
             collisionSystem.removeCollisionByName("chestRoomDoor");
             RenderingSystem.hideLayer("ChestDoorClosed");
@@ -429,6 +434,9 @@ public class Main extends ApplicationAdapter {
         }
     }
 
+    /**
+     * Used to open the door to the room with the chest containing the lockpick
+     */
     public static void openLockpickRoomDoor() {
         if(!lockpickRoomOpened && (player.hasLockpick() || player.hasJanitorKey())){
             collisionSystem.removeCollisionByName("lockpickRoomDoor");
@@ -437,14 +445,20 @@ public class Main extends ApplicationAdapter {
         }
     }
 
-    public static void openPrisonDoor() {
-        if(!prisonDoorOpened && (player.hasLockpick() || player.hasJanitorKey())){
-            collisionSystem.removeCollisionByName("prisonDoor");
-            RenderingSystem.hideLayer("PrisonDoor");
-            prisonDoorOpened = true;
+    /**
+     * Used to open the door to the dungeons from the outside
+     */
+    public static void openDungeonDoor() {
+        if(!dungeonDoorOpened && (player.hasLockpick() || player.hasJanitorKey())){
+            collisionSystem.removeCollisionByName("dungeonDoor");
+            RenderingSystem.hideLayer("dungeonDoor");
+            dungeonDoorOpened = true;
         }
     }
 
+    /**
+     * Used to open the locked door inside the PNQ building
+     */
     public static void openPNQDoor(){
         if(!PNQDoorOpened && (player.hasLockpick() || player.hasJanitorKey())){
             collisionSystem.removeCollisionByName("PNQDoor");
@@ -453,8 +467,11 @@ public class Main extends ApplicationAdapter {
         }
     }
 
+    /**
+     * Used to release the pope from his cell, which reduces the length of the boss fight.
+     */
     public static void releasePope(){
-        if(!releasedPope){
+        if(!releasedPope && player.hasLockpick()){
             releasedPope = true;
             collisionSystem.removeCollisionByName("popeCellDoor");
             RenderingSystem.hideLayer("Pope");
@@ -464,11 +481,17 @@ public class Main extends ApplicationAdapter {
         }
     }
 
+    /**
+     * Used to end the game by turning the boss into a pacifist
+     */
     public static void convertBoss(){
         bossConverted = true;
         winGame();
     }
 
+    /**
+     * Used to release Bob from his cell, which ends the game.
+     */
     public static void releaseBob(){
         if(player.hasLockpick()){
             bobReleased = true;
@@ -487,14 +510,18 @@ public class Main extends ApplicationAdapter {
      */
     public static void loadRoom(int x,int y, Vector2 playerPos){
 
-        RoomSystem.loadRoom(x,y,VIEWPORTWIDTH,VIEWPORTHEIGHT);
-        collisionSystem.loadRoom(x,y,VIEWPORTWIDTH,VIEWPORTHEIGHT);
-        TriggerSystem.loadRoom(x,y,VIEWPORTWIDTH,VIEWPORTHEIGHT);
-        renderingSystem.loadRoom(x,y,VIEWPORTWIDTH,VIEWPORTHEIGHT);
+        int offsetX = (x - currentRoomX)*VIEWPORTWIDTH*2;
+        int offsetY = (y - currentRoomY)*VIEWPORTHEIGHT*2;
+
+        RoomSystem.loadRoom(offsetX,offsetY);
+        collisionSystem.loadRoom(offsetX,offsetY);
+        TriggerSystem.loadRoom(offsetX,offsetY);
+        renderingSystem.loadRoom(offsetX/2,offsetY/2);
         player.setX(playerPos.x);
         player.setY(playerPos.y);
 
         dean.deactivate();
+
         if(x == 0 && y == 0){
             dean.activate();
         }
@@ -549,6 +576,8 @@ public class Main extends ApplicationAdapter {
                 RenderingSystem.hideLayer("Boss");
             }
         }
+        currentRoomX = x;
+        currentRoomY = y;
     }
 
     /**
@@ -556,11 +585,11 @@ public class Main extends ApplicationAdapter {
      * <P>Each coordinate represents one room.</P>
      * <P>The width and height of each room in pixels is equivalent to the viewport width and height.</P>
      *
-     * @param x the x coordinate of the room
+     * @param x the x coordinate of the room TODO
      * @param y The y coordinate of the room
      */
-    public static void loadRoom(int x,int y){
-        loadRoom(x,y,PLAYERSTARTPOS);
+    public static void loadRoom(Vector2 coordinates){
+        loadRoom(coordinates, PLAYERSTARTPOS);
     }
 
     /**

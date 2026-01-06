@@ -2,6 +2,8 @@ package io.github.eng1group9.systems;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
@@ -14,16 +16,27 @@ import com.badlogic.gdx.math.Vector2;
 import io.github.eng1group9.Main;
 import io.github.eng1group9.entities.Player;
 
-
+/**
+ * System used to manage doors to other rooms on the map.
+ * The Doors layer in the tilemap contains rectangles
+ * which are the zones where the player can interact with the door.
+ * If the player is in the zone, they will use the door when 'E' is pressed
+ * and appear in the centre of the zone of the door that it leads to and load the
+ * room that the other door is in.
+ * <p></p>
+ * The name of the rectangle is in the form "ID,transitionID,locked",
+ * where ID is the ID of the door, transitionID is the ID of the door that it
+ * leads to, and locked is either U or L for unlocked or locked respectively.
+ */
 public class RoomSystem {
 
-    public static boolean canUse = true;
-
+    /**
+     * A door on the map that the player can use to traverse through rooms.
+     */
     static class Door{
         private int id;
         private boolean locked;
         private Rectangle zone;
-        private Rectangle originalZone;
         private Vector2 roomCoordinates;
         private int transitionID;
 
@@ -31,17 +44,20 @@ public class RoomSystem {
             this.id = id;
             this.zone = zone;
             this.locked = locked;
-            this.originalZone = new Rectangle(zone);
             this.roomCoordinates = roomCoordinates;
             this.transitionID = transitionID;
         }
 
         public void moveZone(int x,int y){
-            this.zone.setPosition(originalZone.getX()+x,originalZone.getY()+y);
+            this.zone.setPosition(zone.getX()+x,zone.getY()+y);
         }
 
         public int getID() {
             return id;
+        }
+
+        public Rectangle getZone() {
+            return zone;
         }
 
         public void unlock() {
@@ -62,9 +78,13 @@ public class RoomSystem {
         }
     }
 
+    private static float doorCooldown;
+    private static float doorCooldownRemaining;
     private static List<Door> doors = new LinkedList<>();
 
-    public static void init(String tmxPath, int viewportWidth, int viewportHeight){
+    public static void init(String tmxPath, int viewportWidth, int viewportHeight, float doorCooldownLength){
+        doorCooldown = doorCooldownLength;
+        doorCooldownRemaining = doorCooldownLength;
         TiledMap map = new TmxMapLoader().load(tmxPath);
         MapLayer doorLayer = map.getLayers().get("Doors");
         MapObjects doorObjects = doorLayer.getObjects();
@@ -92,7 +112,11 @@ public class RoomSystem {
         }
     }
 
-    private static Door getDoor(int ID){
+    /**
+     * @return the door with that ID
+     * @param ID the ID of the door
+     */
+    public static Door getDoor(int ID){
         Door door = null;
         for (Door d : doors) {
             if (d.id==ID){
@@ -102,36 +126,68 @@ public class RoomSystem {
         return door;
     }
 
-    public static void loadRoom(int x,int y, int viewportWidth, int viewportHeight){
-        for(Door door : doors){
-            int posX = -(x*viewportWidth*2);
-            int posY = -(y*viewportHeight*2);
-
-            door.moveZone(posX,posY);
-        }
-        //canUse = true;
+    /**
+     * @return A list of all doors in the system.
+     */
+    public static List<Door> getDoors(){
+        return doors;
     }
 
-    public static void checkDoor(Player player){
+    /**
+     * Moves the door
+     * @param offsetX
+     * @param offsetY
+     */
+    public static void loadRoom(int offsetX, int offsetY){
+        int x = -offsetX;
+        int y = -offsetY;
         for(Door door : doors){
-            if(door.playerInZone(player) && canUse){
+            door.moveZone(x,y);
+        }
+    }
+
+    /**
+     * Checks if the player is standing in front of a door and can therefore interact with it.
+     * @param player The player which is being checked.
+     */
+    public static void checkDoors(Player player){
+        for(Door door : doors){
+            if(door.playerInZone(player)){
                 useDoor(door,player);
             }
         }
     }
 
+    /**
+     * Decrements the cooldown to use doors.
+     */
+    public static void checkCooldown(){
+        float delta = Gdx.graphics.getDeltaTime();
+        doorCooldownRemaining -= delta;
+    }
+
+    /**
+     * Uses the door in question if it is unlocked or if the player has a key/lockpick.
+     * Will teleport the player to the other door connected to the door in question.
+     * @param door The door in question.
+     * @param player The player.
+     */
     private static void useDoor(Door door, Player player){
-        canUse = false;
         Door transitionDoor =  getDoor(door.transitionID);
-        int ID = door.getID();
-
-        float playerPosX = transitionDoor.originalZone.getX()-(transitionDoor.getRoomX()*RenderingSystem.getViewportWidth()*2);
-        float playerPosY = transitionDoor.originalZone.getY()-(transitionDoor.getRoomY()*RenderingSystem.getViewportHeight()*2);
-
-        Vector2 playerPosition = new Vector2(playerPosX, playerPosY);
 
         if(player.hasLockpick()){
-            Main.loadRoom(transitionDoor.roomCoordinates, playerPosition);
+            System.out.println("a");
+
+            if(doorCooldownRemaining <= 0){
+                doorCooldownRemaining = doorCooldown;
+                System.out.println(transitionDoor.roomCoordinates);
+                Main.loadRoom(transitionDoor.roomCoordinates);
+                float playerPosX = transitionDoor.zone.getX();
+                float playerPosY = transitionDoor.zone.getY();
+                player.setPosition(playerPosX,playerPosY);
+            }
+
         }
     }
+
 }

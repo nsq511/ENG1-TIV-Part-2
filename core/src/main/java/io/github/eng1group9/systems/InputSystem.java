@@ -32,7 +32,7 @@ public class InputSystem {
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
             TriggerSystem.checkInteractTriggers(player);
-            RoomSystem.checkDoor(player);
+            RoomSystem.checkDoors(player);
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             Main.startGame();

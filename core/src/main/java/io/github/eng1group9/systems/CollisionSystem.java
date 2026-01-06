@@ -10,13 +10,13 @@ import com.badlogic.gdx.math.Rectangle;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Handles player collision.
  */
 public class CollisionSystem {
     private List<Rectangle> worldCollision;
-    private List<Rectangle> worldCollisionOriginal;
     private TiledMap map;
     private List<Rectangle> removedCollisions; // used for resetting
 
@@ -28,13 +28,11 @@ public class CollisionSystem {
         this.map = map;
         MapLayer collisionLayer = map.getLayers().get("Collision");
         MapObjects collisionObjects = collisionLayer.getObjects();
-        worldCollisionOriginal = new LinkedList<>();
         worldCollision = new LinkedList<>();
         removedCollisions = new ArrayList<>();
         for (MapObject mapObject : collisionObjects) {
             Rectangle nextRectangle = ((RectangleMapObject) mapObject).getRectangle();
             nextRectangle.set(nextRectangle.x * 2,nextRectangle.y * 2, nextRectangle.width * 2, nextRectangle.height * 2);
-            worldCollisionOriginal.add(nextRectangle);
             worldCollision.add(new Rectangle(nextRectangle));
         }
     }
@@ -50,9 +48,9 @@ public class CollisionSystem {
      * @param name - The name of the rectangle.
      */
     public void removeCollisionByName(String name) {
+        System.out.println("Removing collision by name: " + name);
         MapLayer collisionLayer = map.getLayers().get("Collision");
         MapObjects collisionObjects = collisionLayer.getObjects();
-
         for (MapObject m : collisionObjects) {
 
             if (m.getName() == null) {
@@ -62,10 +60,9 @@ public class CollisionSystem {
             if (!m.getName().equals(name)) {
                 continue;
             }
-
-            Rectangle r = ((RectangleMapObject) m).getRectangle();
-            worldCollision.remove(r);
+            Rectangle r = worldCollision.remove(collisionObjects.getIndex(m));
             removedCollisions.add(r);
+            collisionObjects.remove(m);
         }
     }
 
@@ -98,15 +95,10 @@ public class CollisionSystem {
      * @param viewportWidth - The viewport width.
      * @param viewportHeight - The viewport height.
      */
-    public void loadRoom(int x, int y, int viewportWidth, int viewportHeight){
-        worldCollision = new LinkedList<>();
-        for (Rectangle originalRectangle : worldCollisionOriginal){
-            float posX = originalRectangle.getX()-(x*viewportWidth*2);
-            float posY = originalRectangle.getY()-(y*viewportHeight*2);
 
-            Rectangle rectangle = new Rectangle(originalRectangle);
-            rectangle.setPosition(posX, posY);
-            worldCollision.add(rectangle);
+    public void loadRoom(int offsetX, int offsetY){
+        for(Rectangle rectangle : worldCollision){
+            rectangle.setPosition(rectangle.getX() - offsetX, rectangle.getY() - offsetY);
         }
     }
 }

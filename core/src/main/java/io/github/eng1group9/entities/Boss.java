@@ -29,11 +29,18 @@ public class Boss extends MovingEntity {
         this.spacing = spacing;
     }
 
+    /**
+     * Spawns the boss in the room and starts the boss fight
+     * @param fightLength
+     */
     public void start(float fightLength){
         timeLeft = fightLength;
         activate();
     }
 
+    /**
+     * Logic for the boss, should be called in the main logic loop.
+     */
     public void logic(){
         if(isActive()){
             float delta = Gdx.graphics.getDeltaTime();
@@ -49,6 +56,9 @@ public class Boss extends MovingEntity {
         }
     }
 
+    /**
+     * Uses a random attack once the cooldown has expired.
+     */
     public void nextAttack() {
         float delta = Gdx.graphics.getDeltaTime();
         attackCooldown -= delta;
@@ -90,6 +100,17 @@ public class Boss extends MovingEntity {
         }
     }
 
+    /**
+     * Spawns projectiles across a fixed area in a certain direction.
+     *
+     * @param moveDirection The direction that the projectile will travel.
+     *                      'U' for up, 'D' for down, 'L' for left, 'R' for right.
+     *                      Projectiles travelling up or down will be spawned along the X axis.
+     *                      Projectiles travelling left or right will be spawned along the Y axis.
+     * @param from The starting coordinate for where the projectiles should be spawned
+     * @param to The last coordinate for where the projectiles should be spawned/
+     * @param spacing How many pixels there should be between each projectile.
+     */
     private void spawnProjectiles(Character moveDirection,int from, int to,int spacing){
 
         int width = (int)RenderingSystem.getViewportWidth()*2;
@@ -112,6 +133,7 @@ public class Boss extends MovingEntity {
             }
         }
     }
+
 
     public boolean isDefeated(){
         return defeated;
