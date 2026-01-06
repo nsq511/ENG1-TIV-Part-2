@@ -1,12 +1,16 @@
 package io.github.eng1group9.entities;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
 import io.github.eng1group9.Main;
 import io.github.eng1group9.systems.RenderingSystem;
 import io.github.eng1group9.systems.ToastSystem;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Handles everything connected to the player.
@@ -15,16 +19,19 @@ import io.github.eng1group9.systems.ToastSystem;
  */
 public class Player extends MovingEntity {
 
+    final static Color BAD = new Color(1,1,0,1);
+    final static Color GOOD = new Color(0,1,1,1);
+
     private boolean hasExitKey = false;
     private boolean hasChestRoomKey = false;
     private boolean hasRedPotion = false;
-    private boolean hasLockpick = true;
+    private boolean hasLockpick = false;
     private boolean defeatedBoss = false;
     private boolean hasFirestarter = false;
     private boolean hasMoney = false;
     private boolean hasStaff = false;
     private boolean hasJanitorKey = false;
-    private int booksRead = 0;
+    private List<Integer> booksRead = new LinkedList<>();
     private float invisibilityLeft = 0;
     private float invincibilityLeft = 0;
     private boolean invisibilityWarningGiven = true;
@@ -44,7 +51,7 @@ public class Player extends MovingEntity {
     }
 
     public int booksRead(){
-        return booksRead;
+        return booksRead.size();
     }
 
     public boolean hasStaff(){
@@ -56,27 +63,59 @@ public class Player extends MovingEntity {
     }
 
     public void giveLockpick(){
-        hasLockpick = true;
+        if(!hasLockpick){
+            ToastSystem.addToast("You found a lockpick!",GOOD);
+            hasLockpick = true;
+        }
     }
 
     public void giveFirestarter(){
-        hasFirestarter = true;
+        if(!hasFirestarter){
+            if(hasMoney){
+                ToastSystem.addToast("You bought a firestarter!",GOOD);
+                ToastSystem.addToast("'Thank you for your purchase!'");
+                hasFirestarter = true;
+            }
+            else{
+                ToastSystem.addToast("You see a firestarter for sale, but you don't have any money!");
+            }
+
+        }
     }
 
     public void giveJanitorKey(){
-        hasJanitorKey = true;
+        if(!hasJanitorKey){
+            ToastSystem.addToast("You found the janitor's key!",GOOD);
+            hasJanitorKey = true;
+        }
+
     }
 
     public void giveStaff(){
-        hasStaff = true;
+        if(!hasStaff){
+            int books = booksRead.size();
+
+            ToastSystem.addToast("You picked up the staff...", GOOD);
+            hasStaff = true;
+
+            if(books < 3){
+                ToastSystem.addToast("But you don't know how to use it!",BAD);
+            }
+            else if(books < 7){
+                ToastSystem.addToast("If you finish your studies, you might be able to use it!",GOOD);
+            }
+            else{
+                ToastSystem.addToast("It seems your studying has paid off! You can now use it on the boss!",GOOD);
+            }
+        }
     }
 
     public void giveMoney(){
-        hasMoney = true;
-    }
-
-    public void readBook(){
-        booksRead++;
+        if(!hasMoney){
+            ToastSystem.addToast("You found a dinar in the bush!", GOOD);
+            RenderingSystem.hideLayer("Coin");
+            hasMoney = true;
+        }
     }
 
     /**
@@ -85,12 +124,19 @@ public class Player extends MovingEntity {
     public void reset(){
         super.reset();
         health = 5;
-        hasChestRoomKey = false;
         hasExitKey = false;
+        hasChestRoomKey = false;
         hasRedPotion = false;
+        hasLockpick = false;
+        defeatedBoss = false;
+        hasFirestarter = false;
+        hasMoney = false;
+        hasStaff = false;
+        hasJanitorKey = false;
+        booksRead = new LinkedList<>();
         invisibilityLeft = 0;
-        invisibilityWarningGiven = true;
         invincibilityLeft = 0;
+        invisibilityWarningGiven = true;
 
     }
 
@@ -125,6 +171,7 @@ public class Player extends MovingEntity {
     public void giveExitKey() {
         if (!hasExitKey) {
             hasExitKey = true;
+            RenderingSystem.hideLayer("ExitKey");
             ToastSystem.addToast("You found the Exit Key!");
         }
     }
@@ -171,6 +218,65 @@ public class Player extends MovingEntity {
     public void becomeInvisible() {
         invisibilityLeft = 15;
         invisibilityWarningGiven = false;
+    }
+
+    /**
+     *
+     */
+    public void readBook(int id){
+        if(!booksRead.contains(id)){
+            booksRead.add(id);
+            ToastSystem.addToast("You read the book!");
+
+            switch (id){
+                case 1:
+                    ToastSystem.addToast("It contains hastily written lecture notes left behind by a student.");
+                    break;
+                case 2:
+                    ToastSystem.addToast("It is a study of celestial storms, annotated by a student.");
+                    break;
+                case 3:
+                    ToastSystem.addToast("It is an anatomical treatise on evil pacifist magic users.");
+                    break;
+                case 4:
+                    ToastSystem.addToast("It is a heretical prayerbook with seemingly random annotations.");
+                    break;
+                case 5:
+                    ToastSystem.addToast("It describes how to extract and store souls using evil pacifist magic.");
+                    break;
+                case 6:
+                    ToastSystem.addToast("It describes how to enchant coffee using evil pacifist magic.");
+                    break;
+                case 7:
+                    ToastSystem.addToast("It describes how to turn lead into gold using evil pacifist magic.");
+                    break;
+            }
+
+            switch(booksRead.size()){
+                case 1:
+                case 2:
+                    ToastSystem.addToast("You don't understand what you are reading at all.", BAD);
+                    break;
+                case 3:
+                    ToastSystem.addToast("It still doesn't make any sense to you.",BAD);
+                    break;
+                case 4:
+                    ToastSystem.addToast("You can only understand a little bit of what you are reading.",BAD);
+                    break;
+                case 5:
+                    ToastSystem.addToast("Some of the topics covered actually make a bit of sense.",GOOD);
+                    break;
+                case 6:
+                    ToastSystem.addToast("For once, you feel as though you understand most of what you are reading.",GOOD);
+                    break;
+                case 7:
+                    ToastSystem.addToast("After reading the book, you finally have a basic understanding of evil pacifist magic!",GOOD);
+                    if(hasStaff){
+                        ToastSystem.addToast("You can now use your staff on the boss!",GOOD);
+                    }
+                    break;
+            }
+        }
     }
 
     /**

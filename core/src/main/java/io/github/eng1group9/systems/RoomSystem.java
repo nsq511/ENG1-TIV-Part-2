@@ -60,9 +60,12 @@ public class RoomSystem {
             return zone;
         }
 
+        public void lock(){
+            locked = true;
+        }
+
         public void unlock() {
             locked = false;
-            getDoor(this.transitionID).unlock();
         }
 
         public int getRoomX(){
@@ -113,8 +116,9 @@ public class RoomSystem {
     }
 
     /**
-     * @return the door with that ID
-     * @param ID the ID of the door
+     * Returns a door object with the specified ID.
+     * @return The door with that ID
+     * @param ID The ID of the door
      */
     public static Door getDoor(int ID){
         Door door = null;
@@ -124,6 +128,30 @@ public class RoomSystem {
             }
         }
         return door;
+    }
+
+    /**
+     * Unlocks the specified door
+     * @param ID the ID of the door
+     */
+    public static void unlockDoor(int ID){
+        for (Door d : doors) {
+            if (d.id==ID){
+                d.unlock();
+            }
+        }
+    }
+
+    /**
+     * Locks the specified door
+     * @param ID the ID of the door
+     */
+    public static void lockDoor(int ID){
+        for (Door d : doors) {
+            if (d.id==ID){
+                d.lock();
+            }
+        }
     }
 
     /**
@@ -174,17 +202,33 @@ public class RoomSystem {
      */
     private static void useDoor(Door door, Player player){
         Door transitionDoor =  getDoor(door.transitionID);
+        boolean locked = door.locked;
 
-        if(player.hasLockpick()){
-            System.out.println("a");
+        if(locked){
+            if(door.id == 7 && player.hasExitKey()){
+                ToastSystem.addToast("You unlocked the door!");
+                door.unlock();
+            }
+            else if(player.hasLockpick() && door.id != 20){
+                ToastSystem.addToast("You picked the lock!");
+                door.unlock();
+            }
+            else{
+                ToastSystem.addToast("The door is locked!");
+            }
+        }
 
+        if(!locked){
             if(doorCooldownRemaining <= 0){
                 doorCooldownRemaining = doorCooldown;
-                System.out.println(transitionDoor.roomCoordinates);
+                System.out.println("Entering room with coordinates: " + transitionDoor.roomCoordinates);
                 Main.loadRoom(transitionDoor.roomCoordinates);
                 float playerPosX = transitionDoor.zone.getX();
                 float playerPosY = transitionDoor.zone.getY();
                 player.setPosition(playerPosX,playerPosY);
+                if(transitionDoor.id != 20){
+                    transitionDoor.unlock();
+                }
             }
 
         }

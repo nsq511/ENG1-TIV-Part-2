@@ -250,8 +250,7 @@ public class TriggerSystem {
                 Main.convertBoss();
                 break;
             case 16:
-                player.readBook();
-                remove(16);
+                Main.openPNQDoor();
                 break;
             case 17:
                 Main.openDungeonDoor();
@@ -263,31 +262,25 @@ public class TriggerSystem {
                 player.giveMoney();
                 break;
             case 20:
-                player.readBook();
-                remove(20);
+                player.readBook(1);
                 break;
             case 21:
-                player.readBook();
-                remove(21);
+                player.readBook(2);
                 break;
             case 22:
-                player.readBook();
-                remove(22);
+                player.readBook(3);
                 break;
             case 23:
-                player.readBook();
-                remove(23);
+                player.readBook(4);
                 break;
             case 24:
-                player.readBook();
-                remove(24);
+                player.readBook(5);
                 break;
             case 25:
-                player.readBook();
-                remove(25);
+                player.readBook(6);
                 break;
             case 26:
-                Main.openPNQDoor();
+                player.readBook(7);
                 break;
             default:
                 break;

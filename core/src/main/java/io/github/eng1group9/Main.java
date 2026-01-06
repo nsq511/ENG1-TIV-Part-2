@@ -39,7 +39,7 @@ public class Main extends ApplicationAdapter {
     public static boolean bossConverted = false;
     public static boolean bobReleased  = false;
     public static boolean defeatedBoss = true;
-    public static int longboiBonus = 0; // the bonus to add based on wether LongBoi was found.
+    public static int longboiBonus = 0; // the bonus to add based on whether LongBoi was found.
     public static int hiddenEventCounter = 0;
     public static int negativeEventCounter = 0;
     public static int positiveEventCounter = 0;
@@ -231,6 +231,7 @@ public class Main extends ApplicationAdapter {
         if(!defeatedBoss){
             defeatedBoss = true;
             collisionSystem.removeCollisionByName("BossBarrier");
+            RoomSystem.unlockDoor(20);
             RenderingSystem.showLayer("Boss");
             RenderingSystem.hideLayer("Flames");
             RenderingSystem.hideLayer("LibraryBookshelves1");
@@ -451,7 +452,7 @@ public class Main extends ApplicationAdapter {
     public static void openDungeonDoor() {
         if(!dungeonDoorOpened && (player.hasLockpick() || player.hasJanitorKey())){
             collisionSystem.removeCollisionByName("dungeonDoor");
-            RenderingSystem.hideLayer("dungeonDoor");
+            RenderingSystem.hideLayer("DungeonDoor");
             dungeonDoorOpened = true;
         }
     }
@@ -485,8 +486,15 @@ public class Main extends ApplicationAdapter {
      * Used to end the game by turning the boss into a pacifist
      */
     public static void convertBoss(){
-        bossConverted = true;
-        winGame();
+        if(player.hasStaff()){
+            if(player.booksRead() >= 7){
+                bossConverted = true;
+                winGame();
+            }
+            else{
+                ToastSystem.addToast("If you knew how to use the staff, you could use it on him.", BAD);
+            }
+        }
     }
 
     /**
@@ -574,6 +582,7 @@ public class Main extends ApplicationAdapter {
                 }
                 boss.start(BOSSFIGHTLENGTH-timeModifier);
                 RenderingSystem.hideLayer("Boss");
+                RenderingSystem.hideLayer("Staff");
             }
         }
         currentRoomX = x;
