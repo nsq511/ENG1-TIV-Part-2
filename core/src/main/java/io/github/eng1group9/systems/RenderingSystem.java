@@ -84,8 +84,8 @@ public class RenderingSystem {
 
         ShaderProgram.pedantic = false;
         vignette = new ShaderProgram(
-                Gdx.files.internal("shaders/vignette.vert"),
-                Gdx.files.internal("shaders/vignette.frag"));
+                Gdx.files.internal("Shaders/vignette.vert"),
+                Gdx.files.internal("Shaders/vignette.frag"));
 
     }
 
