@@ -37,7 +37,7 @@ public class Main extends ApplicationAdapter {
     public static boolean exitOpen = false; // Whether the exit is open/
     public static boolean spikesLowered = false; // Whether the spikes in the chest room have been lowered.
     public static boolean scrollUsed = false; // Whether the scroll power up has been collected.
-    public static int longboiBonus = 0; // the bonus to add based on wether LongBoi was found.
+    public static int longboiBonus = 0; // the bonus to add based on whether LongBoi was found.
     public static int hiddenEventCounter = 0;
     public static int negativeEventCounter = 0;
     public static int positiveEventCounter = 0;
@@ -278,7 +278,7 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Calculate the players score based on how much time was left and wether they found Long Boi.
+     * Calculate the players score based on how much time was left and whether they found Long Boi.
      * @return The score.
      */
     public static int calculateScore() {
@@ -288,7 +288,7 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Toggle wether the window should be in Windowed or Fullcreen mode.
+     * Toggle whether the window should be in Windowed or Fullcreen mode.
      */
     public void toggleFullscreen() {
         if (isFullscreen) {
@@ -301,7 +301,7 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Toggle wether the game should be paused.
+     * Toggle whether the game should be paused.
      * This will freeze the player/dean, stop all game logic and display the pause overlay.
      */
     public static void togglePause() {
