@@ -8,11 +8,12 @@ import io.github.eng1group9.Main;
 import io.github.eng1group9.entities.Player;
 
 /**
-* Handles user input, both for movement and misc inputs.
-*/
+ * Handles user input, both for movement and misc inputs.
+ */
 public class InputSystem {
     /**
      * Processes user input, both for movement and misc inputs.
+     * 
      * @param player - the player to move based on input.
      */
     public void handle(Player player) {
@@ -34,20 +35,35 @@ public class InputSystem {
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             Main.startGame();
         }
-        
 
         if (!player.isFrozen()) {
             if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
                 player.move('U');
+                if (Gdx.input.isKeyPressed(Input.Keys.Q) && player.getDashes() > 0 && player.hasDashed() == false) {
+                    player.dash('U');
+
+                }
             }
             if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
                 player.move('L');
+                if (Gdx.input.isKeyPressed(Input.Keys.Q) && player.getDashes() > 0 && player.hasDashed() == false) {
+                    player.dash('L');
+
+                }
             }
             if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
                 player.move('D');
+                if (Gdx.input.isKeyPressed(Input.Keys.Q) && player.getDashes() > 0 && player.hasDashed() == false) {
+                    player.dash('D');
+
+                }
             }
             if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 player.move('R');
+                if (Gdx.input.isKeyPressed(Input.Keys.Q) && player.getDashes() > 0 && player.hasDashed() == false) {
+                    player.dash('R');
+
+                }
             }
         }
     }
