@@ -301,7 +301,7 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Toggle wether the game should be paused.
+     * Toggle whether the game should be paused.
      * This will freeze the player/dean, stop all game logic and display the pause overlay.
      */
     public static void togglePause() {
