@@ -5,6 +5,7 @@ import java.util.List;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -18,7 +19,10 @@ import io.github.eng1group9.systems.ToastSystem;
 import io.github.eng1group9.systems.TriggerSystem;
 import io.github.eng1group9.systems.TimerSystem;
 
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
+/**
+ * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all
+ * platforms.
+ */
 public class Main extends ApplicationAdapter {
 
     final static int VIEWPORTWIDTH = 480;
@@ -34,13 +38,20 @@ public class Main extends ApplicationAdapter {
 
     public static float TIMERSTARTVALUE = 300f;
     public static boolean chestDoorOpen = false; // Whether the door to the chest room has been opened.
+    public static boolean outsideDoorOpen = false; // Whether the door to the outside room has been opened.
     public static boolean exitOpen = false; // Whether the exit is open/
     public static boolean spikesLowered = false; // Whether the spikes in the chest room have been lowered.
     public static boolean scrollUsed = false; // Whether the scroll power up has been collected.
+    public static boolean bookUsed = false; // Whether the book power up has been collected.
+    public static boolean potionAch = false;
+    public static String[] potions = { "speed", "slow", "dark" };
     public static int longboiBonus = 0; // the bonus to add based on wether LongBoi was found.
     public static int hiddenEventCounter = 0;
     public static int negativeEventCounter = 0;
     public static int positiveEventCounter = 0;
+    public static int speedCounter = 0;
+    public static int slowCounter = 0;
+    public static int darknessCounter = 0;
     public static final String leaderBoardFilePath = "leaderboard.txt";
 
     public static LeaderBoard leaderBoard = LeaderBoard.loadFromFile(leaderBoardFilePath, 5);
@@ -50,46 +61,61 @@ public class Main extends ApplicationAdapter {
 
     private List<Rectangle> worldCollision;
     final static String TMXPATH = "World/testMap.tmx";
-    
+
     public static Player player;
     private static boolean playerCaught = false; // Whether the player is currently being held by the Dean.
+    private static boolean playerCaughtByLibrarian = false;
     final static float INITALPLAYERCAUGHTTIME = 1.2f;
-    private static float playerCaughtTime = INITALPLAYERCAUGHTTIME; // how many seconds the Dean will hold the player when caught.
-    final static Vector2 PLAYERSTARTPOS = new Vector2(16, 516); // Where the player begins the game, and returns to when caught.
+    private static float playerCaughtTime = INITALPLAYERCAUGHTTIME; // how many seconds the Dean will hold the player
+                                                                    // when caught.
+    final static Vector2 PLAYERSTARTPOS = new Vector2(16, 516); // Where the player begins the game, and returns to when
+                                                                // caught.
     final float DEFAULTPLAYERSPEED = 100; // The players speed.
 
     private static Dean dean;
-    final static Vector2 DEANSTARTPOS = new Vector2(32, 352); // Where the Dean begins the game, and returns to after catching the player.
+    final static Vector2 DEANSTARTPOS = new Vector2(32, 352); // Where the Dean begins the game, and returns to after
+                                                              // catching the player.
     final float DEFAULTDEANSPEED = 100;
     final int DEAN_TIME_PUNISHMENT = 30; // The number of seconds the Dean adds to the timer.
-    final static Character[] DEANPATH = { // The path the dean will take in the first room (D = Down, U = Up, L = Left, R = Right). The path will loop.
-        'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
-        'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D',
-        'R', 'R', 'R',
-        'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U',
-        'L', 'L', 'L',
-        'D', 'D', 'D', 'D',
-        'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L'
+    final static Character[] DEANPATH = { // The path the dean will take in the first room (D = Down, U = Up, L = Left,
+                                          // R = Right). The path will loop.
+            'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
+            'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D',
+            'R', 'R', 'R',
+            'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U',
+            'L', 'L', 'L',
+            'D', 'D', 'D', 'D',
+            'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L'
     };
-    
-    final static Color BAD = new Color(1f,1f,0f,1f);
-    final static Color GOOD = new Color(0f,1f,1f,1f);
+
+    private static Dean librarian;
+    final static Vector2 LIBRARIANSTARTPOS = new Vector2(224, 15);
+    final static float DEFAULTLIBRARIANSPEED = 150;
+    final static Character[] LIBRARIANPATH = { 'R', 'R', 'R', 'R', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U',
+            'U', 'U', 'U', 'U', 'U', 'U', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D',
+            'D', 'D', 'L', 'L', 'L', 'L' };
+
+    final static Color BAD = new Color(1f, 1f, 0f, 1f);
+    final static Color GOOD = new Color(0f, 1f, 1f, 1f);
     final static Color ACHIEVEMENT = new Color(1f, 0.7f, 0.1f, 1f);
-    
+
     public static Main instance;
     public static RenderingSystem renderingSystem = new RenderingSystem();
     public static CollisionSystem collisionSystem = new CollisionSystem();
     public static InputSystem inputSystem = new InputSystem();
-    
+
     // Achievement names
     public static final String ACH_LONGBOI = "Bird Spotter";
     public final static int LONGBOIBONUSAMOUNT = 50;
     public static final String ACH_DEAN_CAPTURES = "Troublemaker";
-    public static final int ACH_DEAN_CAPTURE_POINT_PUNISHMENT = -20;      // The points lost for getting the dean capture achievement
+    public static final int ACH_DEAN_CAPTURE_POINT_PUNISHMENT = -20; // The points lost for getting the dean capture
+                                                                     // achievement
     public static final String ACH_INVIS = "Now you see me...";
     public static final String ACH_LOST = "Detour Champion";
     public static boolean achTriggered = false;
     public static final String ACH_QUICK = "Fancy a Quickie?";
+    public static final String ACH_BOOK = "Thief";
+    public static final String ACH_POTION = "A true Witch";
 
     @Override
     public void create() {
@@ -99,6 +125,8 @@ public class Main extends ApplicationAdapter {
         worldCollision = collisionSystem.getWorldCollision();
         player = new Player(PLAYERSTARTPOS, DEFAULTPLAYERSPEED);
         dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEANPATH);
+        librarian = new Dean(LIBRARIANSTARTPOS, DEFAULTLIBRARIANSPEED, LIBRARIANPATH,
+                "Characters/librarianAnimations.png");
         togglePause();
         instance = this;
 
@@ -106,28 +134,38 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Initialises variables such as game states and entity positions. Used on initialisation and reset
+     * Initialises variables such as game states and entity positions. Used on
+     * initialisation and reset
      */
-    public static void initSystem(){
+    public static void initSystem() {
         gameState = 0; // Not started
 
         chestDoorOpen = false;
+        outsideDoorOpen = false;
         exitOpen = false;
         spikesLowered = false;
         scrollUsed = false;
+        bookUsed = false;
         longboiBonus = 0;
         hiddenEventCounter = 0;
         negativeEventCounter = 0;
         positiveEventCounter = 0;
+        speedCounter = 0;
+        slowCounter = 0;
+        darknessCounter = 0;
+        potionAch = false;
         timerSystem.reset();
         showCollision = false;
         playerCaught = false;
         playerCaughtTime = INITALPLAYERCAUGHTTIME;
         player.reset();
         dean.reset();
+        librarian.reset();
         RenderingSystem.reset();
         collisionSystem.reset();
-        loadRoom(0,0, PLAYERSTARTPOS, DEANSTARTPOS, DEANPATH);
+        TriggerSystem.init(TMXPATH);
+        loadRoom(0, 0, PLAYERSTARTPOS, DEANSTARTPOS, DEANPATH, LIBRARIANSTARTPOS, LIBRARIANPATH);
+        librarian.freeze();
         AchievementSystem.reset();
         achTriggered = false;
     }
@@ -135,7 +173,8 @@ public class Main extends ApplicationAdapter {
     @Override
     public void render() {
         inputSystem.handle(player);
-        if (gameState == 1) logic();
+        if (gameState == 1)
+            logic();
         draw();
     }
 
@@ -145,56 +184,60 @@ public class Main extends ApplicationAdapter {
      * If not, tell the player they must find the potion.
      */
     public static void checkForLongboi() {
-        Color messageColour = new Color(0.2f, 1, 0.2f ,1);
+        Color messageColour = new Color(0.2f, 1, 0.2f, 1);
         if (longboiBonus == 0 && !player.hasRedPotion()) {
-            ToastSystem.addToast("Hello There! I seem to have misplaced my Red Potion, could you get it for me?", messageColour);
-        }
-        else if (longboiBonus == 0 && player.hasRedPotion()){
+            ToastSystem.addToast("Hello There! I seem to have misplaced my Red Potion, could you get it for me?",
+                    messageColour);
+        } else if (longboiBonus == 0 && player.hasRedPotion()) {
             ToastSystem.addToast("You found my potion! Thank you!", messageColour);
             RenderingSystem.showLayer("LONGBOI");
             hiddenEventCounter++;
-            incAchievement(ACH_LONGBOI);    // Trigger longboi achievement
+            incAchievement(ACH_LONGBOI); // Trigger longboi achievement
         }
     }
 
     /**
      * Adds an achievement toast
      * 
-     * @param text The 
+     * @param text The
      */
-    private static void achNotif(String achievementName){
+    private static void achNotif(String achievementName) {
         ToastSystem.addToast("Achievement: " + achievementName, ACHIEVEMENT);
     }
-    
+
     /**
-     * Increments an achievement and adds a toast message if this increment acquired the achievement
+     * Increments an achievement and adds a toast message if this increment acquired
+     * the achievement
      * 
      * @param achievement_name The name of the achievment to increment
      * 
      * @return Whether the achievement was acquired in this increment
      */
-    private static boolean incAchievement(String achievement_name){
+    private static boolean incAchievement(String achievement_name) {
         boolean ach_achieved = AchievementSystem.incAchievement(achievement_name);
-        if(ach_achieved){
+        if (ach_achieved) {
             achNotif(achievement_name);
         }
         return ach_achieved;
     }
 
     public void draw() {
-        renderingSystem.draw(player, dean, showCollision, TimerSystem.elapsedTime, worldCollision);
+        renderingSystem.draw(player, dean, librarian, showCollision, TimerSystem.elapsedTime, worldCollision);
         switch (gameState) {
             case 0:
                 renderingSystem.renderStartOverlay(960, 640);
                 break;
             case 2:
-                renderingSystem.renderPauseOverlay(960, 640, positiveEventCounter, negativeEventCounter, hiddenEventCounter);
+                renderingSystem.renderPauseOverlay(960, 640, positiveEventCounter, negativeEventCounter,
+                        hiddenEventCounter);
                 break;
             case 3:
-                renderingSystem.renderWinOverlay(960, 640, TimerSystem.getTimeLeft(), calculateScore(), positiveEventCounter, negativeEventCounter, hiddenEventCounter);
+                renderingSystem.renderWinOverlay(960, 640, TimerSystem.getTimeLeft(), calculateScore(),
+                        positiveEventCounter, negativeEventCounter, hiddenEventCounter);
                 break;
             case 4:
-                renderingSystem.renderLoseOverlay(960, 640, positiveEventCounter, negativeEventCounter, hiddenEventCounter);
+                renderingSystem.renderLoseOverlay(960, 640, positiveEventCounter, negativeEventCounter,
+                        hiddenEventCounter);
                 break;
             default:
                 break;
@@ -211,6 +254,15 @@ public class Main extends ApplicationAdapter {
             collisionSystem.removeCollisionByName("chestRoomDoor");
             RenderingSystem.hideLayer("ChestDoorClosed");
             chestDoorOpen = true;
+        }
+    }
+
+    public static void openOutsideRoomDoor() {
+        if (!outsideDoorOpen) {
+            ToastSystem.addToast("You Opened the Door!", GOOD);
+            collisionSystem.removeCollisionByName("outsideRoomDoor");
+            RenderingSystem.hideLayer("OutsideDoorClosed");
+            outsideDoorOpen = true;
         }
     }
 
@@ -233,13 +285,58 @@ public class Main extends ApplicationAdapter {
      */
     public static void getScroll() {
         if (!scrollUsed) {
-            incAchievement(ACH_INVIS);      // Trigger invisible scroll achievement
+            incAchievement(ACH_INVIS); // Trigger invisible scroll achievement
             player.becomeInvisible();
             RenderingSystem.hideLayer("Scroll");
             scrollUsed = true;
             ToastSystem.addToast("You got the Scroll!", GOOD);
             ToastSystem.addToast("You are invisible for 15s", GOOD);
             positiveEventCounter++;
+        }
+    }
+
+    public static void getBook() {
+        if (!bookUsed) {
+            librarian.unfreeze();
+            RenderingSystem.hideLayer("Book");
+            bookUsed = true;
+            ToastSystem.addToast("You stole a book...", BAD);
+            ToastSystem.addToast("RUN!!!!", BAD);
+            negativeEventCounter++;
+            incAchievement(ACH_BOOK);
+
+        }
+    }
+
+    public static void getPotion() {
+        String effect = potions[MathUtils.random(potions.length - 1)];
+
+        if (effect == "speed") {
+            player.speedPotion();
+            ToastSystem.addToast("SPEED POTION ACTIVATED", GOOD);
+            ToastSystem.addToast("Press Q to Dash", GOOD);
+            positiveEventCounter++;
+            speedCounter++;
+
+        }
+        if (effect == "slow") {
+            player.slownessPotion();
+            ToastSystem.addToast("SLOW POTION ACTIVATED", BAD);
+            negativeEventCounter++;
+            slowCounter++;
+
+        }
+        if (effect == "dark") {
+            renderingSystem.activateDarkness();
+            ToastSystem.addToast("DARKNESS POTION ACTIVATED", BAD);
+            ToastSystem.addToast("Who turned off the lights...?", BAD);
+            negativeEventCounter++;
+            darknessCounter++;
+
+        }
+
+        if (!potionAch && speedCounter >= 1 && slowCounter >= 1 && darknessCounter >= 1) {
+            incAchievement(ACH_POTION);
         }
     }
 
@@ -251,8 +348,7 @@ public class Main extends ApplicationAdapter {
         if (gameState == 0) {
             gameState = 2;
             togglePause();
-        }
-        else if(gameState == 3 || gameState == 4){
+        } else if (gameState == 3 || gameState == 4) {
             initSystem();
             gameState = 1;
         }
@@ -263,8 +359,8 @@ public class Main extends ApplicationAdapter {
      */
     public static void winGame() {
         togglePause();
-        if(TimerSystem.elapsedTime <= 60){
-            incAchievement(ACH_QUICK);      // Trigger quick finish achievement
+        if (TimerSystem.elapsedTime <= 60) {
+            incAchievement(ACH_QUICK); // Trigger quick finish achievement
         }
         gameState = 3;
     }
@@ -278,12 +374,14 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Calculate the players score based on how much time was left and wether they found Long Boi.
+     * Calculate the players score based on how much time was left and wether they
+     * found Long Boi.
+     * 
      * @return The score.
      */
     public static int calculateScore() {
         int score = TimerSystem.getTimeLeft();
-        score = (int)AchievementSystem.modifyScore(score);
+        score = (int) AchievementSystem.modifyScore(score);
         return score;
     }
 
@@ -292,30 +390,34 @@ public class Main extends ApplicationAdapter {
      */
     public void toggleFullscreen() {
         if (isFullscreen) {
-                Gdx.graphics.setWindowedMode(960, 640);
-            }
-            else {
-                Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
-            }
-            isFullscreen = !isFullscreen;
+            Gdx.graphics.setWindowedMode(960, 640);
+        } else {
+            Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+        }
+        isFullscreen = !isFullscreen;
     }
 
     /**
-     * Toggle whether the game should be paused.
-     * This will freeze the player/dean, stop all game logic and display the pause overlay.
+     * Toggle wether the game should be paused.
+     * This will freeze the player/dean, stop all game logic and display the pause
+     * overlay.
      */
     public static void togglePause() {
         if (gameState == 2) {
             if (!playerCaught) {
                 player.unfreeze();
                 dean.unfreeze();
+                if (bookUsed) {
+                    librarian.unfreeze();
+                }
             }
             gameState = 1;
-        }
-        else {
+        } else {
             player.freeze();
             dean.freeze();
-            if (gameState == 1) gameState = 2;
+            librarian.freeze();
+            if (gameState == 1)
+                gameState = 2;
         }
     }
 
@@ -325,31 +427,35 @@ public class Main extends ApplicationAdapter {
      */
     public void logic() {
         timerSystem.tick();
-        
-        if(!achTriggered && TimerSystem.elapsedTime > 4 * 60){
-            achTriggered = incAchievement(ACH_LOST);         // Trigger slow finish achievement
+
+        if (!achTriggered && TimerSystem.elapsedTime > 4 * 60) {
+            achTriggered = incAchievement(ACH_LOST); // Trigger slow finish achievement
         }
 
         dean.nextMove();
+        librarian.nextMove();
         checkDeanCatch();
         TriggerSystem.checkTouchTriggers(player);
         player.update();
     }
 
     /**
-     * Checks if the dean has caught the player, and punishes them if he has by removing 50s from time left.
+     * Checks if the dean has caught the player, and punishes them if he has by
+     * removing 50s from time left.
      */
     public void checkDeanCatch() {
         if (dean.canReach(player) && !playerCaught) {
-            incAchievement(ACH_DEAN_CAPTURES);      // Increment count for Dean capture achievment
+            incAchievement(ACH_DEAN_CAPTURES); // Increment count for Dean capture achievment
             startPlayerCatch();
-        }
-        else if (playerCaught) {
+        } else if (librarian.canReach(player) && !playerCaught) {
+            incAchievement(ACH_DEAN_CAPTURES); // Increment count for Dean capture achievment
+            playerCaughtByLibrarian = true;
+            startPlayerCatch();
+        } else if (playerCaught) {
             if (playerCaughtTime <= 0) {
                 endPlayerCatch();
                 playerCaughtTime = INITALPLAYERCAUGHTTIME;
-            }
-            else {
+            } else {
                 float delta = Gdx.graphics.getDeltaTime();
                 playerCaughtTime -= delta;
             }
@@ -358,33 +464,53 @@ public class Main extends ApplicationAdapter {
 
     /**
      * Run when the player is first caught by the Dean.
-     * This will begin the sequence where the player is held in detention while the timer goes down.
+     * This will begin the sequence where the player is held in detention while the
+     * timer goes down.
      * This will freeze the player and dean.
      */
     private void startPlayerCatch() {
         playerCaught = true;
         player.freeze();
         player.setPosition(PLAYERSTARTPOS);
-        dean.freeze();
-        dean.changeAnimation(3);
-        dean.setPosition(PLAYERSTARTPOS.x + 32, PLAYERSTARTPOS.y);
-        timerSystem.addGradually(DEAN_TIME_PUNISHMENT - INITALPLAYERCAUGHTTIME);
-        ToastSystem.addToast("You were caught by the Dean!", BAD);
-        ToastSystem.addToast("You were stuck being lectured for " + Integer.toString(DEAN_TIME_PUNISHMENT) + "s!", BAD);
+        if (playerCaughtByLibrarian) {
+            librarian.freeze();
+            librarian.changeAnimation(3);
+            librarian.setPosition(PLAYERSTARTPOS.x + 32, PLAYERSTARTPOS.y);
+            timerSystem.addGradually(DEAN_TIME_PUNISHMENT - INITALPLAYERCAUGHTTIME);
+            ToastSystem.addToast("Librarian took his book back", BAD);
+            ToastSystem.addToast(
+                    "You were stuck being his assistant for " + Integer.toString(DEAN_TIME_PUNISHMENT) + "s!", BAD);
+        } else {
+            dean.freeze();
+            dean.changeAnimation(3);
+            dean.setPosition(PLAYERSTARTPOS.x + 32, PLAYERSTARTPOS.y);
+            timerSystem.addGradually(DEAN_TIME_PUNISHMENT - INITALPLAYERCAUGHTTIME);
+            ToastSystem.addToast("You were caught by the Dean!", BAD);
+            ToastSystem.addToast("You were stuck being lectured for " + Integer.toString(DEAN_TIME_PUNISHMENT) + "s!",
+                    BAD);
+        }
         negativeEventCounter++;
     }
 
     /**
-     * This will end the sequence where the player is held in detention while the timer goes down.
+     * This will end the sequence where the player is held in detention while the
+     * timer goes down.
      * This will unfreeze the player and dean.
      * It will rest the dean to the start of its patrol.
      */
     private void endPlayerCatch() {
-        dean.setPosition(DEANSTARTPOS);
-        dean.restartPath();
-        dean.unfreeze();
+        if (playerCaughtByLibrarian) {
+            librarian.setPosition(LIBRARIANSTARTPOS);
+            librarian.restartPath();
+            librarian.unfreeze();
+        } else {
+            dean.setPosition(DEANSTARTPOS);
+            dean.restartPath();
+            dean.unfreeze();
+        }
         player.unfreeze();
         playerCaught = false;
+        playerCaughtByLibrarian = false;
     }
 
     /**
@@ -401,52 +527,79 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * <P>Teleports the player to a room on the tiled map based on the coordinates passed.</P>
-     * <P>Each coordinate represents one room.</P>
-     * <P>The width and height of each room in pixels is equivalent to the viewport width and height.</P>
+     * <P>
+     * Teleports the player to a room on the tiled map based on the coordinates
+     * passed.
+     * </P>
+     * <P>
+     * Each coordinate represents one room.
+     * </P>
+     * <P>
+     * The width and height of each room in pixels is equivalent to the viewport
+     * width and height.
+     * </P>
      *
-     * @param x the x coordinate of the room
-     * @param y The y coordinate of the room
+     * @param x         the x coordinate of the room
+     * @param y         The y coordinate of the room
      * @param playerPos The coordinates of the player after they enter the room
-     * @param deanPos Where the dean starts in this room
-     * @param deanPath The path the dean takes in this room
+     * @param deanPos   Where the dean starts in this room
+     * @param deanPath  The path the dean takes in this room
      */
-    public static void loadRoom(int x,int y, Vector2 playerPos, Vector2 deanPos, Character[] deanPath){
-        collisionSystem.loadRoom(x,y,VIEWPORTWIDTH,VIEWPORTHEIGHT);
-        TriggerSystem.loadRoom(x,y,VIEWPORTWIDTH,VIEWPORTHEIGHT);
-        renderingSystem.loadRoom(x,y,VIEWPORTWIDTH,VIEWPORTHEIGHT);
+    public static void loadRoom(int x, int y, Vector2 playerPos, Vector2 deanPos, Character[] deanPath,
+            Vector2 librarianPos, Character[] librarianPath) {
+        collisionSystem.loadRoom(x, y, VIEWPORTWIDTH, VIEWPORTHEIGHT);
+        TriggerSystem.loadRoom(x, y, VIEWPORTWIDTH, VIEWPORTHEIGHT);
+        renderingSystem.loadRoom(x, y, VIEWPORTWIDTH, VIEWPORTHEIGHT);
         player.setX(playerPos.x);
         player.setY(playerPos.y);
         dean.setX(deanPos.x);
         dean.setY(deanPos.y);
         dean.setPath(deanPath);
+        librarian.setX(librarianPos.x);
+        librarian.setY(librarianPos.y);
+        librarian.setPath(librarianPath);
     }
 
     /**
-     * <P>Teleports the player to a room on the tiled map based on the coordinates passed.</P>
-     * <P>Each coordinate represents one room.</P>
-     * <P>The width and height of each room in pixels is equivalent to the viewport width and height.</P>
+     * <P>
+     * Teleports the player to a room on the tiled map based on the coordinates
+     * passed.
+     * </P>
+     * <P>
+     * Each coordinate represents one room.
+     * </P>
+     * <P>
+     * The width and height of each room in pixels is equivalent to the viewport
+     * width and height.
+     * </P>
      *
      * @param x the x coordinate of the room
      * @param y The y coordinate of the room
      */
-    public static void loadRoom(int x,int y){
-        loadRoom(x,y,PLAYERSTARTPOS,DEANSTARTPOS,DEANPATH);
+    public static void loadRoom(int x, int y) {
+        loadRoom(x, y, PLAYERSTARTPOS, DEANSTARTPOS, DEANPATH, LIBRARIANSTARTPOS, LIBRARIANPATH);
     }
 
     /**
-     * <P>Teleports the player to a room on the tiled map based on the coordinates passed.</P>
-     * <P>Each coordinate represents one room.</P>
-     * <P>The width and height of each room in pixels is equivalent to the viewport width and height.</P>
+     * <P>
+     * Teleports the player to a room on the tiled map based on the coordinates
+     * passed.
+     * </P>
+     * <P>
+     * Each coordinate represents one room.
+     * </P>
+     * <P>
+     * The width and height of each room in pixels is equivalent to the viewport
+     * width and height.
+     * </P>
      *
-     * @param x the x coordinate of the room
-     * @param y The y coordinate of the room
+     * @param x         the x coordinate of the room
+     * @param y         The y coordinate of the room
      * @param playerPos The coordinates of the player after they enter the room
      */
-    public static void loadRoom(int x,int y, Vector2 playerPos){
-        loadRoom(x,y,playerPos,DEANSTARTPOS,DEANPATH);
+    public static void loadRoom(int x, int y, Vector2 playerPos) {
+        loadRoom(x, y, playerPos, DEANSTARTPOS, DEANPATH, LIBRARIANSTARTPOS, LIBRARIANPATH);
     }
-
 
     @Override
     public void resize(int width, int height) {
@@ -464,7 +617,7 @@ public class Main extends ApplicationAdapter {
     }
 
     @Override
-    public void dispose(){
+    public void dispose() {
         leaderBoard.saveToFile(Main.leaderBoardFilePath);
     }
 }
