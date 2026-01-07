@@ -2,6 +2,8 @@ package io.github.eng1group9.systems;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Input.TextInputListener;
+
 import io.github.eng1group9.Main;
 import io.github.eng1group9.entities.Player;
 

@@ -21,9 +21,20 @@ public class Player extends MovingEntity {
     private boolean invisibilityWarningGiven = true;
 
     public Player(Vector2 startPos, float speed) {
-        super(new Texture("Characters/playerAnimations.png"), new int[] {4, 4, 4, 4, 4, 4, 4, 4} , 32, 32, speed);
-        setPosition(startPos);
+        super(new Texture("Characters/playerAnimations.png"), new int[] {4, 4, 4, 4, 4, 4, 4, 4} , 32, 32, speed, startPos, new Vector2(16, 0));
         setScale(2);
+    }
+
+    /**
+     * Resets the Player to its original state
+     */
+    public void reset(){
+        super.reset();
+        hasChestRoomKey = false;
+        hasExitKey = false;
+        hasRedPotion = false;
+        invisibilityLeft = 0;
+        invisibilityWarningGiven = true;
     }
 
     /**
@@ -96,19 +107,19 @@ public class Player extends MovingEntity {
         int animationOffset = 0;
         if (!isVisible()) animationOffset = 4;
         switch (direction) {
-                case 'U':
-                    changeAnimation(1 + animationOffset);
-                    break;
-                case 'D':
-                    changeAnimation(0 + animationOffset);
-                    break;
-                case 'L':
-                    changeAnimation(3 + animationOffset);
-                    break;
-                case 'R':
-                    changeAnimation(2 + animationOffset);
-                    break;
-            }
+            case 'U':
+                changeAnimation(1 + animationOffset);
+                break;
+            case 'D':
+                changeAnimation(0 + animationOffset);
+                break;
+            case 'L':
+                changeAnimation(3 + animationOffset);
+                break;
+            case 'R':
+                changeAnimation(2 + animationOffset);
+                break;
+        }
         return super.move(direction);
     }
 
