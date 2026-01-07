@@ -157,7 +157,6 @@ public class Player extends MovingEntity {
         System.out.println("Hitbox Size: " + Float.toString(getHitbox().getWidth()) + ", "
                 + Float.toString(getHitbox().getHeight()));
         return super.move(direction);
-
     }
 
     public float dash(Character direction) {

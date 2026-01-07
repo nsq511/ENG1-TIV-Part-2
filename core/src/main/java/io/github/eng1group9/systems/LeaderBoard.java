@@ -188,6 +188,7 @@ public class LeaderBoard {
         catch(Exception e){
             e.printStackTrace();
             System.err.println("Error parsing leaderboard JSON. Using empty leaderboard");
+            return new LeaderBoard(new HashMap<>(), maxLength);
         }
         return new LeaderBoard(newEntries, maxLength);
     }
