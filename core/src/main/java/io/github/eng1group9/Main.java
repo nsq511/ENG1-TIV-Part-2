@@ -386,7 +386,7 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Toggle wether the window should be in Windowed or Fullcreen mode.
+     * Toggle whether the window should be in Windowed or Fullcreen mode.
      */
     public void toggleFullscreen() {
         if (isFullscreen) {
