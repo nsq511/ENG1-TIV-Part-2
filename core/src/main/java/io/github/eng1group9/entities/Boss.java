@@ -7,7 +7,6 @@ import io.github.eng1group9.Main;
 import io.github.eng1group9.systems.RenderingSystem;
 
 import java.util.Random;
-import java.util.Stack;
 
 public class Boss extends MovingEntity {
 

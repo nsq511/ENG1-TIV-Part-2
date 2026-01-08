@@ -10,7 +10,6 @@ import com.badlogic.gdx.math.Rectangle;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Handles player collision.

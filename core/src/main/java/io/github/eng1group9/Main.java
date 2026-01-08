@@ -6,7 +6,7 @@ import java.util.List;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Sprite;
+//import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -51,7 +51,7 @@ public class Main extends ApplicationAdapter {
     public static boolean showCollision = false;
 
     private List<Rectangle> worldCollision;
-    private List<Rectangle> doors;
+    //private List<Rectangle> doors;
     final static int LONGBOIBONUSAMOUNT = 50;
     final static String TMXPATH = "World/testMap.tmx";
 
@@ -150,7 +150,7 @@ public class Main extends ApplicationAdapter {
         boss.reset();
         RenderingSystem.reset();
         collisionSystem.reset();
-        renderingSystem.hideLayer("PopeSeraph");
+        RenderingSystem.hideLayer("PopeSeraph");
         loadRoom(0, 0, PLAYERSTARTPOS);
     }
 
@@ -195,7 +195,7 @@ public class Main extends ApplicationAdapter {
     }
 
     public void draw() {
-        renderingSystem.draw(player, dean, boss, showCollision, timerSystem.elapsedTime, worldCollision, projectiles, projectileWarnings);
+        renderingSystem.draw(player, dean, boss, showCollision, TimerSystem.elapsedTime, worldCollision, projectiles, projectileWarnings);
         switch (gameState) {
             case 0:
                 renderingSystem.renderStartOverlay(960, 640);
@@ -204,7 +204,7 @@ public class Main extends ApplicationAdapter {
                 renderingSystem.renderPauseOverlay(960, 640, positiveEventCounter, negativeEventCounter, hiddenEventCounter);
                 break;
             case 3:
-                renderingSystem.renderWinOverlay(960, 640, timerSystem.getTimeLeft(), calculateScore(), positiveEventCounter, negativeEventCounter, hiddenEventCounter);
+                renderingSystem.renderWinOverlay(960, 640, TimerSystem.getTimeLeft(), calculateScore(), positiveEventCounter, negativeEventCounter, hiddenEventCounter);
                 break;
             case 4:
                 renderingSystem.renderLoseOverlay(960, 640, positiveEventCounter, negativeEventCounter, hiddenEventCounter);
@@ -415,7 +415,7 @@ public class Main extends ApplicationAdapter {
 
     public static void spawnProjectile(Vector2 position, Character direction){
         float warningLength = PROJECTILEWARNINGLENGTH;
-        float delta = Gdx.graphics.getDeltaTime();
+        //float delta = Gdx.graphics.getDeltaTime();
         ProjectileWarning warning = new  ProjectileWarning(position, direction, warningLength);
         BossProjectile projectile = new BossProjectile(position, direction, PROJECTILESPEED, PROJECTILEWARNINGLENGTH);
         projectileWarnings.add(warning);

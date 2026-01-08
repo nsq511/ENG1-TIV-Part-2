@@ -2,12 +2,9 @@ package io.github.eng1group9.systems;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Input.TextInputListener;
 
 import io.github.eng1group9.Main;
 import io.github.eng1group9.entities.Player;
-
-import java.util.concurrent.TimeUnit;
 
 /**
 * Handles user input, both for movement and misc inputs.
@@ -28,7 +25,7 @@ public class InputSystem {
             Main.togglePause();
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.F2)) {
-            Main.instance.showCollision = !Main.instance.showCollision;
+            Main.showCollision = !Main.showCollision;
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
             TriggerSystem.checkInteractTriggers(player);

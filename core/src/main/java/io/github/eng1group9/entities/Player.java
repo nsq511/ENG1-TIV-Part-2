@@ -26,6 +26,7 @@ public class Player extends MovingEntity {
     private boolean hasChestRoomKey = false;
     private boolean hasRedPotion = false;
     private boolean hasLockpick = false;
+    // I am getting a warning on the next line but an error if I remove it...
     private boolean defeatedBoss = false;
     private boolean hasFirestarter = false;
     private boolean hasMoney = false;

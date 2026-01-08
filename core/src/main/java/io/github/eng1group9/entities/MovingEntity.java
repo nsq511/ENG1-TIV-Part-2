@@ -20,7 +20,6 @@ public class MovingEntity extends AnimatedEntity {
     private boolean initActive = true;
     private boolean active = true;
     private boolean canCollide = true;
-    private boolean initCollide = true;
 
     public MovingEntity(Texture spriteSheetTexture, int[] frameNumbers, int tileWidth, int tileHeight, float speed, Vector2 startPos) {
         super(spriteSheetTexture, frameNumbers, tileWidth, tileHeight, startPos);
@@ -37,7 +36,6 @@ public class MovingEntity extends AnimatedEntity {
         initSpeed = speed;
         initActive = active;
         this.active = active;
-        canCollide = canCollide;
         this.canCollide = canCollide;
     }
 

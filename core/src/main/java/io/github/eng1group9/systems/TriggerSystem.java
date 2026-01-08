@@ -10,7 +10,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Rectangle;
 
-import com.badlogic.gdx.math.Vector2;
+//import com.badlogic.gdx.math.Vector2;
 import io.github.eng1group9.Main;
 import io.github.eng1group9.entities.Player;
 
@@ -32,7 +32,7 @@ public class TriggerSystem {
         private int ID;
         private Rectangle zone;
         private boolean activateOnTouch = false;
-        private Vector2 roomCoordinates;
+        //private Vector2 roomCoordinates;
 
         public Trigger(int ID, boolean activateOnTouch, Rectangle zone) {
             this.ID = ID;
