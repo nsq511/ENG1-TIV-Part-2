@@ -27,10 +27,10 @@ public class LeaderBoard {
         maxLen = maxLength;
     }
     /**
-     * Creates an empty leaderboard with 10 spaces
+     * Creates an empty leaderboard with 5 spaces
      */
     public LeaderBoard(){
-        this(new HashMap<>(), 10);
+        this(new HashMap<>(), 5);
     }
 
     public int getLength(){
@@ -140,6 +140,8 @@ public class LeaderBoard {
         String rankedList = "LEADERBOARD\n";
         int i = 1;
         for(Entry<String, Integer> e : getSortedList()){
+            if(i > maxLen) break;
+
             rankedList += Integer.toString(i++) + ". " + e.getKey() + "    " + e.getValue().toString() + "\n";
         }
         while(i <= maxLen){
@@ -173,13 +175,20 @@ public class LeaderBoard {
     private static LeaderBoard fromJson(String json, int maxLength){
         HashMap<String, Integer> newEntries = new HashMap<>();
 
-        json = json.replaceAll("[{}\n]", "");
-        String[] lines = json.split(",");
-        for(String line : lines){
-            String[] parts = line.split(": ");
-            String key = parts[0].replace("\"", "");
-            Integer value =  Integer.parseInt(parts[1]);
-            newEntries.put(key, value);
+        try{
+            json = json.replaceAll("[{}\n]", "");
+            String[] lines = json.split(",");
+            for(String line : lines){
+                String[] parts = line.split(": ");
+                String key = parts[0].replace("\"", "");
+                Integer value =  Integer.parseInt(parts[1]);
+                newEntries.put(key, value);
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            System.err.println("Error parsing leaderboard JSON. Using empty leaderboard");
+            return new LeaderBoard(new HashMap<>(), maxLength);
         }
         return new LeaderBoard(newEntries, maxLength);
     }

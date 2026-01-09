@@ -3041,8 +3041,8 @@
  </layer>
  <objectgroup id="37" name="Projectiles"/>
  <objectgroup color="#ff0000" id="9" name="Collision">
-  <object id="3" x="16" y="1047.75" width="36.8864" height="23.1875"/>
-  <object id="6" x="75.1136" y="1047.63" width="51.4071" height="23.3125"/>
+  <object id="3" x="16" y="1042.25" width="36.8864" height="28.6875"/>
+  <object id="6" x="75.1136" y="1040.63" width="51.4071" height="30.3125"/>
   <object id="7" x="80.5" y="988.125" width="32" height="16"/>
   <object id="9" x="112.333" y="960.333" width="5.66667" height="97.875"/>
   <object id="13" x="169.545" y="960" width="6.18182" height="97.4091"/>
@@ -3053,7 +3053,13 @@
   <object id="20" x="256.455" y="1071.91" width="30.7272" height="12.0909"/>
   <object id="21" x="203.182" y="1048.5" width="115.863" height="23.75"/>
   <object id="22" x="145.185" y="1048" width="35.4743" height="23.25"/>
-  <object id="24" x="145.977" y="1124.25" width="180.023" height="27"/>
+  <object id="24" x="205.8" y="1115.25" width="120.2" height="36"/>
+  <object id="161" x="257.8" y="1185.25" width="29.2" height="10.25"/>
+  <object id="162" x="257.55" y="1216.5" width="29.2" height="10.75"/>
+  <object id="163" x="306.3" y="1123" width="13.7" height="118"/>
+  <object id="160" x="224.55" y="1150.75" width="95.2" height="10.75"/>
+  <object id="156" x="145.977" y="1124.25" width="28.8483" height="27"/>
+  <object id="157" name="outsideRoomDoor" x="175.889" y="1123.44" width="28.8483" height="27"/>
   <object id="25" x="320" y="1136" width="5.66667" height="128.5"/>
   <object id="26" x="320.5" y="1256" width="159.75" height="24.75"/>
   <object id="27" x="416.25" y="1199.75" width="63.5" height="16"/>
@@ -3070,7 +3076,7 @@
   <object id="37" x="162" y="1168.73" width="8.72727" height="30.5455"/>
   <object id="38" x="152.364" y="1153.09" width="22.9091" height="14.5455"/>
   <object id="39" x="144.727" y="1183.27" width="18.1818" height="16.3636"/>
-  <object id="41" x="0.727273" y="1224.25" width="174.909" height="23.0227"/>
+  <object id="41" x="-11.2727" y="1224.25" width="186.909" height="23.0227"/>
   <object id="43" x="59.4545" y="1204.36" width="14.7273" height="27.0909"/>
   <object id="44" x="32" y="1216.91" width="32" height="14.7273"/>
   <object id="45" x="113.273" y="1217.64" width="61.6363" height="13.2727"/>
@@ -3331,7 +3337,7 @@
  </objectgroup>
  <objectgroup color="#0000ff" id="21" name="Triggers">
   <object id="131" name="1,T" x="12.3637" y="1151.64" width="19.4545" height="20.7272"/>
-  <object id="132" name="2,T" x="84.3864" y="1168.36" width="7.82962" height="16.6023"/>
+  <object id="132" name="2,T" x="81.3864" y="1168.36" width="16.3296" height="16.6023"/>
   <object id="134" name="3,I" x="432.083" y="1215.56" width="16.25" height="16.25"/>
   <object id="135" name="4,I" x="193.5" y="974.5" width="13" height="14.5"/>
   <object id="136" name="5,I" x="127.875" y="991" width="32" height="23.5568"/>
@@ -3358,4 +3364,5 @@
   <object id="463" name="23,I" x="920.386" y="537.83" width="33.2273" height="33.3409"/>
   <object id="464" name="22,I" x="1328.39" y="1021" width="47.2273" height="50.3409"/>
  </objectgroup>
+ <objectgroup id="7" name="Entities"/>
 </map>

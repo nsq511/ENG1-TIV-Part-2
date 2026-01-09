@@ -27,21 +27,25 @@ public class Entity {
     private float width;
     private float height;
     private Vector2 initPos;
+    private Vector2 hitboxOffset;
 
-    public Entity(Texture texture, Vector2 startPosition, float width, float height) {
+    public Entity(Texture texture, Vector2 startPosition, float width, float height, Vector2 hitboxOffset) {
         sprite.setTexture(texture);
         this.width = width;
         this.height = height;
         sprite.setSize(width, height);
         sprite.setPosition(startPosition.x , startPosition.y);
-        hitbox.set(startPosition.x + width, startPosition.y + height, width,    16);
+        this.hitboxOffset = hitboxOffset;
+
+        hitbox.set(startPosition.x + hitboxOffset.x, startPosition.y + hitboxOffset.y, width, height * 0.5f); // Height halved so only feet are the hitbox. Allows head to pass over things
         initPos = startPosition.cpy();
     }
 
-    public Entity(Vector2 startPosition, float width, float height) {
+    public Entity(Vector2 startPosition, float width, float height, Vector2 hitboxOffset) {
         sprite.setSize(width, height);
         sprite.setPosition(startPosition.x, startPosition.y);
-        hitbox.set(startPosition.x  + 16, startPosition.y  + 16, width, 16);
+        hitbox.set(startPosition.x + hitboxOffset.x, startPosition.y + hitboxOffset.y, width, height * 0.5f); // Height halved so only feet are the hitbox. Allows head to pass over things
+        this.hitboxOffset = hitboxOffset;
         initPos = startPosition.cpy(); 
     }
 
@@ -60,7 +64,7 @@ public class Entity {
      */
     public void setPosition(Vector2 newPosition) {
         sprite.setPosition(newPosition.x, newPosition.y);
-        hitbox.setPosition(newPosition.x, newPosition.y);  
+        hitbox.setPosition(newPosition.x + hitboxOffset.x, newPosition.y + hitboxOffset.y);  
     }
 
     /**
@@ -70,7 +74,7 @@ public class Entity {
      */
     public void setPosition(float x, float y) {
         sprite.setPosition(x, y);
-        hitbox.setPosition(x, y);
+        hitbox.setPosition(x + hitboxOffset.x, y + hitboxOffset.y);
     }
 
     /**
@@ -86,7 +90,7 @@ public class Entity {
      */
     public void setX(float x) {
         sprite.setX(x);
-        hitbox.setX(x + (0.5f * width));
+        hitbox.setX(x + hitboxOffset.x);
     }
 
     /**
@@ -95,7 +99,7 @@ public class Entity {
      */
     public void setY(float y) {
         sprite.setY(y);
-        hitbox.setY(y + (0.5f * height));
+        hitbox.setY(y + hitboxOffset.y);
     }
 
     /**

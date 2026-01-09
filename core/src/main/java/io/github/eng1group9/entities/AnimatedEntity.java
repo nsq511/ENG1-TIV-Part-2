@@ -28,8 +28,8 @@ public class AnimatedEntity extends Entity{
     private float animationPlayTime = 0f;
     
 
-    public AnimatedEntity(Texture spriteSheetTexture, int[] frameNumbers, int tileWidth, int tileHeight, Vector2 startPos) {
-        super(startPos, tileWidth, tileHeight);
+    public AnimatedEntity(Texture spriteSheetTexture, int[] frameNumbers, int tileWidth, int tileHeight, Vector2 startPos, Vector2 hitboxOffset) {
+        super(startPos, tileWidth, tileHeight, hitboxOffset);
         TextureRegion[][] tmp = TextureRegion.split(spriteSheetTexture, tileWidth, tileHeight);
         for (int i = 0; i < frameNumbers.length; i++) {
             Animation<TextureRegion> nextAnimation = new Animation<>(frameInterval, tmp[i]);
