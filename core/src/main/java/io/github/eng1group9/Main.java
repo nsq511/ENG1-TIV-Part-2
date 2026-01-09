@@ -320,6 +320,9 @@ public class Main extends ApplicationAdapter {
             RenderingSystem.hideLayer("Pyre");
             RenderingSystem.showLayer("Staff");
             RenderingSystem.showLayer("ExitKey");
+        }
+    }
+        
           
     public static void openOutsideRoomDoor() {
         if (!outsideDoorOpen) {
