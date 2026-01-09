@@ -11,7 +11,7 @@ public class BossProjectile extends MovingEntity{
     public float warningLength;
 
     public BossProjectile(Vector2 position, Character direction, float speed, float warningLength) {
-        super(new Texture("Projectile/projectile.png"), new int[] {1} , 32, 32, speed, position, false, false);
+        super(new Texture("Projectile/projectile.png"), new int[] {1} , 32, 32, speed, new Vector2(0,0), position, false, false);
         this.direction = direction;
         setHitbox(new Rectangle());
         this.warningLength = warningLength;

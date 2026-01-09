@@ -23,24 +23,38 @@ public class MovingEntity extends AnimatedEntity {
     private boolean canCollide = true;
     private float dash = 75;
 
-    public MovingEntity(Texture spriteSheetTexture, int[] frameNumbers, int tileWidth, int tileHeight, float speed,
-            Vector2 startPos, Vector2 hitboxOffset) {
+    public MovingEntity(
+            Texture spriteSheetTexture, int[] frameNumbers,
+            int tileWidth, int tileHeight, 
+            float speed, Vector2 startPos,
+            Vector2 hitboxOffset, boolean active, boolean canCollide
+        ) {
         super(spriteSheetTexture, frameNumbers, tileWidth, tileHeight, startPos, hitboxOffset);
         this.speed = speed;
         initSpeed = speed;
         initActive = true;
         active = true;
         frozen = false;
-    }
-
-    public MovingEntity(Texture spriteSheetTexture, int[] frameNumbers, int tileWidth, int tileHeight, float speed, Vector2 startPos, boolean active, boolean canCollide) {
-        super(spriteSheetTexture, frameNumbers, tileWidth, tileHeight, startPos);
-        this.speed = speed;
-        initSpeed = speed;
-        initActive = active;
         this.active = active;
         this.canCollide = canCollide;
     }
+
+    public MovingEntity(
+            Texture spriteSheetTexture, int[] frameNumbers,
+            int tileWidth, int tileHeight, 
+            float speed, Vector2 startPos,
+            Vector2 hitboxOffset
+        ) {
+        this(spriteSheetTexture, frameNumbers, tileWidth, tileHeight, speed, startPos, hitboxOffset, true, true);
+
+    }
+
+    // public MovingEntity(Texture spriteSheetTexture, int[] frameNumbers, int tileWidth, int tileHeight, float speed, Vector2 startPos, boolean active, boolean canCollide) {
+    //     super(spriteSheetTexture, frameNumbers, tileWidth, tileHeight, startPos);
+    //     this.speed = speed;
+    //     initSpeed = speed;
+    //     initActive = active;
+    // }
 
 
     /**

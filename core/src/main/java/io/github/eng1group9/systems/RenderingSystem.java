@@ -3,7 +3,6 @@ package io.github.eng1group9.systems;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -13,11 +12,8 @@ import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
@@ -147,7 +143,7 @@ public class RenderingSystem {
      * @param elapsedTime    - How much time has passed since the game began.
      * @param worldCollision - A list of rectangles representing the games collison.
      */
-    public void draw(Player player, Dean dean, Boss boss, boolean showCollision, float elapsedTime, List<Rectangle> worldCollision, ArrayList<BossProjectile> projectiles, ArrayList<ProjectileWarning> projectileWarnings) {
+    public void draw(Player player, Dean dean, Boss boss, Dean librarian, boolean showCollision, float elapsedTime, List<Rectangle> worldCollision, ArrayList<BossProjectile> projectiles, ArrayList<ProjectileWarning> projectileWarnings) {
         update();
         ScreenUtils.clear(Color.BLACK);
         viewport.apply();

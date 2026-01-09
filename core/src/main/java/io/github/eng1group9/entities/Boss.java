@@ -19,7 +19,7 @@ public class Boss extends MovingEntity {
     private final int spacing;
 
     public Boss(Vector2 startPos, float speed, boolean active, float attackCooldownLength, int spacing) {
-        super(new Texture("Characters/bossAnimations.png"), new int[]{1}, 64, 80, speed, startPos, active, true);
+        super(new Texture("Characters/bossAnimations.png"), new int[]{1}, 64, 80, speed, startPos, new Vector2(0,0), active, true);
         setScale(2);
         defeated = false;
         random = new Random();

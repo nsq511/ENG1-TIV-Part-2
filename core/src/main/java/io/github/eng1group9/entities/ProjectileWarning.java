@@ -9,7 +9,7 @@ public class ProjectileWarning extends Entity {
     private float warningLength;
 
     public ProjectileWarning(Vector2 position, Character moveDirection, float warningLength) {
-        super(position, 32,32);
+        super(position, 32, 32, new Vector2(0,0));
 
         setTexture(new Texture(Gdx.files.internal("Projectile/warning.png")));
         float width = RenderingSystem.getViewportWidth()*2;

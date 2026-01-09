@@ -10,6 +10,7 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
 //import com.badlogic.gdx.math.Vector2;
 import io.github.eng1group9.Main;
@@ -244,7 +245,7 @@ public class TriggerSystem {
                 Main.openExit();
                 break;
             case 8: // Pickup red potion.
-                player.giveRedPotion();
+                player.giveRedPotion(); 
                 break;
             
             // TODO: THIS BREAKS BUT I NEED TILE TO FIX IT
@@ -281,7 +282,7 @@ public class TriggerSystem {
             case 19:
                 player.giveMoney();
                 break;
-            case 20:
+            case 26:
                 player.readBook(1);
                 break;
             case 21:
@@ -299,31 +300,26 @@ public class TriggerSystem {
             case 25:
                 player.readBook(6);
                 break;
-            case 26:
+            case 20:
                 player.readBook(7);
-            
-            case 9:
-                Main.loadRoom(0, 1, new Vector2(30, 30), new Vector2(50, 50), new Character[] { 'U', 'D' },
-                        new Vector2(50, 50), new Character[] { 'U', 'D' });
+            case 27:
+                Main.loadRoom(0, 1, new Vector2(30, 30), new Vector2(50, 50), new Character[] { 'U', 'D' });
                 break;
-            case 10:
-                Main.loadRoom(0, 0);
-                break;
-            case 11:
+            case 29:
                 Main.openOutsideRoomDoor();
                 break;
-            case 12:
+            case 30:
                 Main.getBook();
                 break;
-            case 13:
+            case 31:
                 RenderingSystem.hideLayer("Potion1");
                 Main.getPotion();
                 break;
-            case 14:
+            case 32:
                 RenderingSystem.hideLayer("Potion2");
                 Main.getPotion();
                 break;
-            case 15:
+            case 33:
                 RenderingSystem.hideLayer("Potion3");
                 Main.getPotion();
                 break;

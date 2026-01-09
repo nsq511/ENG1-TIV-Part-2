@@ -30,7 +30,7 @@ public class Dean extends MovingEntity {
 
     public Dean(Vector2 startPos, float speed, Character[] path) {
         super(new Texture("Characters/deanAnimations.png"), new int[] { 4, 4, 4, 4 }, 32, 32, speed, startPos,
-                new Vector2(16, 0));
+                new Vector2(16, 0), true, true);
         setScale(2);
 
         reachRectangle = new Rectangle();
@@ -96,12 +96,12 @@ public class Dean extends MovingEntity {
             updateAnimation(direction);
         reachRectangle.setPosition(getX() - reachOffsetX, getY() - reachOffsetY);
 
-        System.out.println("Sprite Pos: " + Float.toString(getX()) + ", " + Float.toString(getY()));
-        System.out.println("Sprite Size: " + Float.toString(getWidth()) + ", " + Float.toString(getHeight()));
-        System.out.println(
-                "Reach Pos: " + Float.toString(reachRectangle.getX()) + ", " + Float.toString(reachRectangle.getY()));
-        System.out.println("Reach Size: " + Float.toString(reachRectangle.getWidth()) + ", "
-                + Float.toString(reachRectangle.getHeight()));
+        // System.out.println("Sprite Pos: " + Float.toString(getX()) + ", " + Float.toString(getY()));
+        // System.out.println("Sprite Size: " + Float.toString(getWidth()) + ", " + Float.toString(getHeight()));
+        // System.out.println(
+        //         "Reach Pos: " + Float.toString(reachRectangle.getX()) + ", " + Float.toString(reachRectangle.getY()));
+        // System.out.println("Reach Size: " + Float.toString(reachRectangle.getWidth()) + ", "
+        //         + Float.toString(reachRectangle.getHeight()));
 
         haveIMovedOneTile();
     }
