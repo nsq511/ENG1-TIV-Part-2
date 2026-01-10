@@ -320,14 +320,14 @@ public class TriggerSystem {
                 break;
             case 32:
                 RenderingSystem.hideLayer("Potion2");
-                if (player.getPotionDelay() == 0) {
+                if (player.getPotionDelay() < 1) {
                     player.potionTriggered();
                     Main.getPotion();
                 }
                 break;
             case 33:
                 RenderingSystem.hideLayer("Potion3");
-                if (player.getPotionDelay() == 0) {
+                if (player.getPotionDelay() < 1) {
                     player.potionTriggered();
                     Main.getPotion();
                 }

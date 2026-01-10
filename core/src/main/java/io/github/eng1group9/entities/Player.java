@@ -431,7 +431,7 @@ public class Player extends MovingEntity {
             }
         }
 
-        if (potionDelay > 0) {
+        if (potionDelay != 0) {
             potionDelay -= Gdx.graphics.getDeltaTime();
         }
     }
