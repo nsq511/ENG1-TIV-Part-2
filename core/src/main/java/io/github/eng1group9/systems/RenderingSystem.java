@@ -3,7 +3,6 @@ package io.github.eng1group9.systems;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -13,11 +12,8 @@ import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
@@ -26,11 +22,12 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import io.github.eng1group9.Main;
-import io.github.eng1group9.entities.Dean;
-import io.github.eng1group9.entities.Player;
+import io.github.eng1group9.entities.*;
 import io.github.eng1group9.systems.ToastSystem.Toast;
 import io.github.eng1group9.systems.TriggerSystem.Trigger;
+import io.github.eng1group9.systems.RoomSystem.Door;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,6 +36,7 @@ import java.util.List;
 public class RenderingSystem {
     private Texture missingTexture;
     private SpriteBatch worldBatch;
+    private SpriteBatch projectileBatch;
     private SpriteBatch uiBatch;
     private BitmapFont font;
     private OrthographicCamera camera;
@@ -48,6 +46,8 @@ public class RenderingSystem {
     private Stage stage;
     private static TextField textfield;
     private static boolean firstLeaderBoard = true;
+    private static int viewportWidth;
+    private static int viewportHeight;
 
     private boolean darknessActive = false;
     private float darknessLeft = 0;
@@ -56,7 +56,7 @@ public class RenderingSystem {
 
     /**
      * Takes and tileset and sets up a renderer to display it.
-     * 
+     *
      * @param tmxPath        - The path to the tileset (.tmx file).
      * @param viewportWidth  - how many pixels wide the world is.
      * @param viewportHeight - how many pixels high the world is.
@@ -70,6 +70,7 @@ public class RenderingSystem {
         this.mapRenderer = new OrthogonalTiledMapRenderer(map);
         this.missingTexture = new Texture("missingTexture.png");
         this.worldBatch = new SpriteBatch();
+        this.projectileBatch = new SpriteBatch();
         this.uiBatch = new SpriteBatch();
         this.font = new BitmapFont();
         this.whitePixel = new Texture("whitePixel.png");
@@ -81,6 +82,9 @@ public class RenderingSystem {
         textfield.setPosition(960 * 0.1f, 640 / 2f + 20); // Change to not be hardcoded
         textfield.setSize(300, 30);
         stage.addActor(textfield);
+
+        setViewportWidth(viewportWidth);
+        setViewportHeight(viewportHeight);
 
         ShaderProgram.pedantic = false;
         vignette = new ShaderProgram(
@@ -95,7 +99,7 @@ public class RenderingSystem {
 
     /**
      * Hide a layer so that tiles on it are NOT rendered.
-     * 
+     *
      * @param name - The name of the layer.
      */
     public static void hideLayer(String name) {
@@ -122,7 +126,7 @@ public class RenderingSystem {
 
     /**
      * Show a layer so that tiles on it are rendered.
-     * 
+     *
      * @param name - The name of the layer.
      */
     public static void showLayer(String name) {
@@ -131,7 +135,7 @@ public class RenderingSystem {
 
     /**
      * Draw a frame to display.
-     * 
+     *
      * @param player         - The current player object.
      * @param dean           - The dean object.
      * @param showCollision  - Wether to render the zones for collision / triggers
@@ -139,26 +143,48 @@ public class RenderingSystem {
      * @param elapsedTime    - How much time has passed since the game began.
      * @param worldCollision - A list of rectangles representing the games collison.
      */
-    public void draw(Player player, Dean dean, Dean librarian, boolean showCollision, float elapsedTime,
-            List<Rectangle> worldCollision) {
+    public void draw(Player player, Dean dean, Boss boss, Dean librarian, boolean showCollision, float elapsedTime, List<Rectangle> worldCollision, ArrayList<BossProjectile> projectiles, ArrayList<ProjectileWarning> projectileWarnings) {
         update();
         ScreenUtils.clear(Color.BLACK);
         viewport.apply();
         camera.update();
         mapRenderer.setView(camera);
-        int[] belowPlayer = { 0, 1, 2, 3, 4, 5, 6 }; // the layers which should appear below the player
+        // THESE ARE IN CONFLICT: We Need To Fix It
+        //int[] belowPlayer = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11,12,13,14}; // the layers which should appear below the player
+        //int[] belowPlayer = { 0, 1, 2, 3, 4, 5, 6 }; // the layers which should appear below the player
+        // For now, I will do the union and wait for ARI's patch so that everything still runs
+        int[] belowPlayer = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
         mapRenderer.render(belowPlayer);
 
         worldBatch.begin();
-        player.draw(worldBatch);
-        dean.draw(worldBatch);
-        librarian.draw(worldBatch);
+
+        if(player.isActive()){
+            player.draw(worldBatch);
+        }
+
+        if(dean.isActive()){
+            dean.draw(worldBatch);
+        }
+
+        if(boss.isActive()){
+            boss.draw(worldBatch);
+        }
+
+        if(librarian.isActive()) {
+            librarian.draw(worldBatch);
+        }
+
         worldBatch.end();
 
-        int[] abovePlayer = { 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 }; // the layers which should appear above
-                                                                                 // the
-        // player
+        // THESE CONFLICT TOO: See "belowPlayer"
+        //int[] abovePlayer = {15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,27,28,29,30,31,32,33,34,35,36,27}; // the layers which should appear above the player
+        //int[] abovePlayer = { 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 }; // the layers which should appear above
+        // This is the union, but there is some intersection between belowPlayer and abovePlayer.
+        // RESOLUTION: Keep the below layers below. If that fails, remove said from below and put back in above.
+        //int[] abovePlayer = {7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36};
+        int[] abovePlayer = {17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
         mapRenderer.render(abovePlayer);
+
         if (darknessActive) {
 
             // player centre in WORLD coords (use hitbox if you have one)
@@ -186,22 +212,44 @@ public class RenderingSystem {
             worldBatch.setShader(null);
         }
 
+        projectileBatch.begin();
+
+        for(BossProjectile projectile : projectiles){
+            if(projectile.isActive()){
+                projectile.draw(projectileBatch);
+            }
+        }
+
+        for(ProjectileWarning warning : projectileWarnings){
+            warning.draw(projectileBatch);
+        }
+
+        projectileBatch.end();
+
         uiBatch.begin();
         font.draw(uiBatch, TimerSystem.getClockDisplay(), 10, 640 - 10);
 
+        if(boss.isActive()){
+            font.draw(uiBatch, "Health: " + player.getHealth(), 10, 640 - 30);
+        }
+
         renderToasts(font, uiBatch);
+
+
 
         if (showCollision && worldCollision != null) { // show collisions for debugging
             renderCollision(uiBatch, worldCollision, player, dean, librarian);
             renderTriggers(uiBatch);
+            renderDoors(uiBatch);
         }
+
         uiBatch.end();
     }
 
     /**
      * Render the toast display on the top left of the screen.
      * This is used to display text messages to the user for 5s.
-     * 
+     *
      * @param font    The BitmapFont which used to render the text.
      * @param uiBatch - The SpriteBatch used for this (should be the ui batch).
      */
@@ -220,12 +268,11 @@ public class RenderingSystem {
 
     /**
      * Render the zones for collision / triggers (dev mode).
-     * 
+     *
      * @param uiBatch        - The SpriteBatch used for this (should be the ui
      *                       batch).
      * @param worldCollision - A list of rectangles representing the games collison.
      * @param player
-     * @param dean
      */
     public void renderCollision(SpriteBatch uiBatch, List<Rectangle> worldCollision, Player player, Dean dean,
             Dean librarian) {
@@ -243,7 +290,7 @@ public class RenderingSystem {
 
     /**
      * Render the zones for triggers (dev mode).
-     * 
+     *
      * @param uiBatch - The SpriteBatch used for this (should be the ui batch).
      */
     public void renderTriggers(SpriteBatch uiBatch) {
@@ -254,13 +301,25 @@ public class RenderingSystem {
         }
     }
 
+    /**
+     * Render the zones for room transition doors (dev mode).
+     * @param uiBatch - The SpriteBatch used for this (should be the ui batch).
+     */
+    public void renderDoors(SpriteBatch uiBatch) {
+        for (Door door : RoomSystem.getDoors()) {
+            Rectangle rectangle = door.getZone();
+            uiBatch.setColor(1, 1, 1, 0.75f);
+            uiBatch.draw(missingTexture, rectangle.x, rectangle.y , rectangle.width, rectangle.height);
+        }
+    }
+
     public void resize(int width, int height) {
         viewport.update(width, height);
     }
 
     /**
      * Display the pause overlay, with instructions and controls.
-     * 
+     *
      * @param screenWidth          - how many pixels wide the screen is.
      * @param screenHeight         - how many pixels high the screen is.
      * @param positiveEventCounter - Number of PowerUps collected.
@@ -288,7 +347,7 @@ public class RenderingSystem {
     /**
      * Display the start overlay, with instructions, controls and how to start the
      * game.
-     * 
+     *
      * @param screenWidth  - how many pixels wide the screen is.
      * @param screenHeight - how many pixels high the screen is.
      */
@@ -315,7 +374,7 @@ public class RenderingSystem {
 
     /**
      * Render the controls list, tellign you all the buttons and what they do.
-     * 
+     *
      * @param screenWidth  - how many pixels wide the screen is.
      * @param screenHeight - how many pixels high the screen is.
      */
@@ -331,7 +390,7 @@ public class RenderingSystem {
     /**
      * Render the Stats at the bottom of the overlay, showing PowerUps collected,
      * times caught and secrets found.
-     * 
+     *
      * @param screenWidth          - how many pixels wide the screen is.
      * @param screenHeight         - how many pixels high the screen is.
      * @param positiveEventCounter - Number of PowerUps collected.
@@ -347,7 +406,7 @@ public class RenderingSystem {
 
     /**
      * Display the win overlay, with your score and how much time was left.
-     * 
+     *
      * @param screenWidth          - How many pixels wide the screen is.
      * @param screenHeight         - How many pixels high the screen is.
      * @param timeLeft             - How much time was left when the player escaped.
@@ -402,7 +461,7 @@ public class RenderingSystem {
 
     /**
      * Display the lose overlay, for when you run out of time.
-     * 
+     *
      * @param screenWidth          - How many pixels wide the screen is.
      * @param screenHeight         - How many pixels high the screen is.
      * @param positiveEventCounter - Number of PowerUps collected.
@@ -441,11 +500,25 @@ public class RenderingSystem {
      * @param viewportWidth  - The viewport width.
      * @param viewportHeight - The viewport height.
      */
-    public void loadRoom(int x, int y, int viewportWidth, int viewportHeight) {
-        this.camera = new OrthographicCamera();
-        this.camera.setToOrtho(false, viewportWidth, viewportHeight);
-        this.camera.translate(x * viewportWidth, y * viewportHeight);
+    public void loadRoom(int offsetX, int offsetY){
+        this.camera.translate(offsetX, offsetY);
         this.camera.update();
+    }
+
+    public static void setViewportWidth(int width){
+        viewportWidth = width;
+    }
+
+    public static void setViewportHeight(int height){
+        viewportHeight = height;
+    }
+
+    public static int getViewportWidth() {
+        return viewportWidth;
+    }
+
+    public static int getViewportHeight() {
+        return viewportHeight;
     }
 
     public void update() {

@@ -1,23 +1,18 @@
 package io.github.eng1group9;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+//import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import io.github.eng1group9.entities.*;
-import io.github.eng1group9.systems.InputSystem;
-import io.github.eng1group9.systems.LeaderBoard;
-import io.github.eng1group9.systems.RenderingSystem;
-import io.github.eng1group9.systems.AchievementSystem;
-import io.github.eng1group9.systems.CollisionSystem;
-import io.github.eng1group9.systems.ToastSystem;
-import io.github.eng1group9.systems.TriggerSystem;
-import io.github.eng1group9.systems.TimerSystem;
+import io.github.eng1group9.systems.*;
 
 /**
  * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all
@@ -42,10 +37,17 @@ public class Main extends ApplicationAdapter {
     public static boolean exitOpen = false; // Whether the exit is open/
     public static boolean spikesLowered = false; // Whether the spikes in the chest room have been lowered.
     public static boolean scrollUsed = false; // Whether the scroll power up has been collected.
+    public static boolean dungeonDoorOpened = false;
+    public static boolean lockpickRoomOpened = false;
+    public static boolean PNQDoorOpened = false;
+    public static boolean releasedPope = false;
+    public static boolean bossConverted = false;
+    public static boolean bobReleased = false;
+    public static boolean defeatedBoss = true;
+    public static int longboiBonus = 0; // the bonus to add based on whether LongBoi was found.
     public static boolean bookUsed = false; // Whether the book power up has been collected.
     public static boolean potionAch = false;
     public static String[] potions = { "speed", "slow", "dark" };
-    public static int longboiBonus = 0; // the bonus to add based on wether LongBoi was found.
     public static int hiddenEventCounter = 0;
     public static int negativeEventCounter = 0;
     public static int positiveEventCounter = 0;
@@ -60,7 +62,15 @@ public class Main extends ApplicationAdapter {
     public static boolean showCollision = false;
 
     private List<Rectangle> worldCollision;
+    // private List<Rectangle> doors;
     final static String TMXPATH = "World/testMap.tmx";
+
+    final static Vector2 PRISONCOORDS = new Vector2(3, 0);
+    final static Vector2 PLAYERPRISONPOS = new Vector2(380, 200);
+
+    final static float DOORCOOLDOWN = 0.5f;
+    private static int currentRoomX;
+    private static int currentRoomY;
 
     public static Player player;
     private static boolean playerCaught = false; // Whether the player is currently being held by the Dean.
@@ -68,17 +78,17 @@ public class Main extends ApplicationAdapter {
     final static float INITALPLAYERCAUGHTTIME = 1.2f;
     private static float playerCaughtTime = INITALPLAYERCAUGHTTIME; // how many seconds the Dean will hold the player
                                                                     // when caught.
-    final static Vector2 PLAYERSTARTPOS = new Vector2(16, 516); // Where the player begins the game, and returns to when
-                                                                // caught.
-    final float DEFAULTPLAYERSPEED = 100; // The players speed.
+    final static Vector2 PLAYERSTARTPOS = new Vector2(730, 500); // Where the player begins the game, and returns to
+                                                                 // when caught.
+    final static float DEFAULTPLAYERSPEED = 200; // The players speed.
 
     private static Dean dean;
     final static Vector2 DEANSTARTPOS = new Vector2(32, 352); // Where the Dean begins the game, and returns to after
                                                               // catching the player.
-    final float DEFAULTDEANSPEED = 100;
-    final int DEAN_TIME_PUNISHMENT = 30; // The number of seconds the Dean adds to the timer.
-    final static Character[] DEANPATH = { // The path the dean will take in the first room (D = Down, U = Up, L = Left,
-                                          // R = Right). The path will loop.
+    static final float DEFAULTDEANSPEED = 100;
+    final int DEANPUNISHMENT = 30; // The number of seconds the Dean adds to the timer.
+    final static Character[] DEFAULTDEANPATH = { // The path the dean will take in the first room (D = Down, U = Up, L =
+                                                 // Left, R = Right). The path will loop.
             'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
             'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D',
             'R', 'R', 'R',
@@ -104,6 +114,17 @@ public class Main extends ApplicationAdapter {
     public static CollisionSystem collisionSystem = new CollisionSystem();
     public static InputSystem inputSystem = new InputSystem();
 
+    private static Boss boss;
+    final static float BOSSSPEED = 0;
+    final static Vector2 BOSSSTARTPOS = new Vector2(450, 255);
+    private static float BOSSATTACKCOOLDOWN = 2.5f;
+    final static float BOSSFIGHTLENGTH = 60f;
+
+    private static ArrayList<BossProjectile> projectiles;
+    private static ArrayList<ProjectileWarning> projectileWarnings;
+    private static float PROJECTILESPEED = 1000f;
+    private static final float PROJECTILEWARNINGLENGTH = 2.5f;
+    private static final int PROJECTILESPACING = 96;
     // Achievement names
     public static final String ACH_LONGBOI = "Bird Spotter";
     public final static int LONGBOIBONUSAMOUNT = 50;
@@ -121,12 +142,17 @@ public class Main extends ApplicationAdapter {
     public void create() {
         renderingSystem.initWorld(TMXPATH, VIEWPORTWIDTH, VIEWPORTHEIGHT);
         collisionSystem.init(renderingSystem.getMapRenderer().getMap());
-        TriggerSystem.init(TMXPATH);
+        TriggerSystem.init(TMXPATH, VIEWPORTWIDTH, VIEWPORTHEIGHT);
+        RoomSystem.init(TMXPATH, VIEWPORTWIDTH, VIEWPORTHEIGHT, DOORCOOLDOWN);
         worldCollision = collisionSystem.getWorldCollision();
         player = new Player(PLAYERSTARTPOS, DEFAULTPLAYERSPEED);
-        dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEANPATH);
+        dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEFAULTDEANPATH);
+        boss = new Boss(BOSSSTARTPOS, BOSSSPEED, false, BOSSATTACKCOOLDOWN, PROJECTILESPACING);
         librarian = new Dean(LIBRARIANSTARTPOS, DEFAULTLIBRARIANSPEED, LIBRARIANPATH,
                 "Characters/librarianAnimations.png");
+        projectiles = new ArrayList<>();
+        projectileWarnings = new ArrayList<>();
+        loadRoom(0, 0, PLAYERSTARTPOS, LIBRARIANSTARTPOS, LIBRARIANPATH);
         togglePause();
         instance = this;
 
@@ -139,12 +165,20 @@ public class Main extends ApplicationAdapter {
      */
     public static void initSystem() {
         gameState = 0; // Not started
-
+        projectiles = new ArrayList<>();
+        projectileWarnings = new ArrayList<>();
         chestDoorOpen = false;
         outsideDoorOpen = false;
         exitOpen = false;
         spikesLowered = false;
         scrollUsed = false;
+        dungeonDoorOpened = false;
+        lockpickRoomOpened = false;
+        PNQDoorOpened = false;
+        releasedPope = false;
+        bossConverted = false;
+        bobReleased = false;
+        defeatedBoss = false;
         bookUsed = false;
         longboiBonus = 0;
         hiddenEventCounter = 0;
@@ -155,17 +189,18 @@ public class Main extends ApplicationAdapter {
         darknessCounter = 0;
         potionAch = false;
         timerSystem.reset();
-        showCollision = false;
         playerCaught = false;
         playerCaughtTime = INITALPLAYERCAUGHTTIME;
         player.reset();
         dean.reset();
+        boss.reset();
         librarian.reset();
+        librarian.freeze();
         RenderingSystem.reset();
         collisionSystem.reset();
-        TriggerSystem.init(TMXPATH);
-        loadRoom(0, 0, PLAYERSTARTPOS, DEANSTARTPOS, DEANPATH, LIBRARIANSTARTPOS, LIBRARIANPATH);
-        librarian.freeze();
+        RenderingSystem.hideLayer("PopeSeraph");
+        loadRoom(0, 0, PLAYERSTARTPOS, LIBRARIANSTARTPOS, LIBRARIANPATH);
+        TriggerSystem.init(TMXPATH, VIEWPORTWIDTH, VIEWPORTHEIGHT);
         AchievementSystem.reset();
         achTriggered = false;
     }
@@ -198,7 +233,7 @@ public class Main extends ApplicationAdapter {
 
     /**
      * Adds an achievement toast
-     * 
+     *
      * @param text The
      */
     private static void achNotif(String achievementName) {
@@ -208,9 +243,9 @@ public class Main extends ApplicationAdapter {
     /**
      * Increments an achievement and adds a toast message if this increment acquired
      * the achievement
-     * 
+     *
      * @param achievement_name The name of the achievment to increment
-     * 
+     *
      * @return Whether the achievement was acquired in this increment
      */
     private static boolean incAchievement(String achievement_name) {
@@ -222,7 +257,8 @@ public class Main extends ApplicationAdapter {
     }
 
     public void draw() {
-        renderingSystem.draw(player, dean, librarian, showCollision, TimerSystem.elapsedTime, worldCollision);
+        renderingSystem.draw(player, dean, boss, librarian, showCollision, TimerSystem.elapsedTime, worldCollision,
+                projectiles, projectileWarnings);
         switch (gameState) {
             case 0:
                 renderingSystem.renderStartOverlay(960, 640);
@@ -249,11 +285,31 @@ public class Main extends ApplicationAdapter {
      * Remove its hitbox and graphic.
      */
     public static void openChestRoomDoor() {
-        if (player.hasChestRoomKey() && !chestDoorOpen) {
+        if (player.hasChestRoomKey() || player.hasLockpick() && !chestDoorOpen) {
             ToastSystem.addToast("You Opened the Door!", GOOD);
             collisionSystem.removeCollisionByName("chestRoomDoor");
             RenderingSystem.hideLayer("ChestDoorClosed");
             chestDoorOpen = true;
+        }
+    }
+
+    // TODO: CHECK THERE ARE NO CONFLICTS HERE BETWEEN "defeatBoss" and
+    // "openOutsideRoomDoor".
+    // I have a feeling the wrong door will give the toast.
+
+    public static void defeatBoss() {
+        if (!defeatedBoss) {
+            defeatedBoss = true;
+            collisionSystem.removeCollisionByName("BossBarrier");
+            RoomSystem.unlockDoor(20);
+            RenderingSystem.showLayer("Boss");
+            RenderingSystem.hideLayer("Flames");
+
+            RenderingSystem.hideLayer("LibraryBookshelves2");
+            RenderingSystem.hideLayer("LibraryBookshelves3");
+            RenderingSystem.hideLayer("Pyre");
+            RenderingSystem.showLayer("Staff");
+            RenderingSystem.showLayer("ExitKey");
         }
     }
 
@@ -265,6 +321,8 @@ public class Main extends ApplicationAdapter {
             outsideDoorOpen = true;
         }
     }
+
+    // END OF todo
 
     /**
      * Open the exit.
@@ -346,6 +404,7 @@ public class Main extends ApplicationAdapter {
      */
     public static void startGame() {
         if (gameState == 0) {
+            initSystem();
             gameState = 2;
             togglePause();
         } else if (gameState == 3 || gameState == 4) {
@@ -376,7 +435,7 @@ public class Main extends ApplicationAdapter {
     /**
      * Calculate the players score based on how much time was left and wether they
      * found Long Boi.
-     * 
+     *
      * @return The score.
      */
     public static int calculateScore() {
@@ -433,10 +492,17 @@ public class Main extends ApplicationAdapter {
         }
 
         dean.nextMove();
-        librarian.nextMove();
         checkDeanCatch();
+
+        librarian.nextMove();
+
+        boss.logic();
+        checkProjectiles();
+
         TriggerSystem.checkTouchTriggers(player);
+        RoomSystem.checkCooldown();
         player.update();
+
     }
 
     /**
@@ -470,24 +536,37 @@ public class Main extends ApplicationAdapter {
      */
     private void startPlayerCatch() {
         playerCaught = true;
+        loadRoom(PRISONCOORDS, PLAYERPRISONPOS);
         player.freeze();
-        player.setPosition(PLAYERSTARTPOS);
+
         if (playerCaughtByLibrarian) {
             librarian.freeze();
             librarian.changeAnimation(3);
             librarian.setPosition(PLAYERSTARTPOS.x + 32, PLAYERSTARTPOS.y);
-            timerSystem.addGradually(DEAN_TIME_PUNISHMENT - INITALPLAYERCAUGHTTIME);
+            timerSystem.addGradually(DEANPUNISHMENT - INITALPLAYERCAUGHTTIME);
             ToastSystem.addToast("Librarian took his book back", BAD);
             ToastSystem.addToast(
-                    "You were stuck being his assistant for " + Integer.toString(DEAN_TIME_PUNISHMENT) + "s!", BAD);
+                    "You were stuck being his assistant for " + Integer.toString(DEANPUNISHMENT) + "s!", BAD);
         } else {
-            dean.freeze();
-            dean.changeAnimation(3);
-            dean.setPosition(PLAYERSTARTPOS.x + 32, PLAYERSTARTPOS.y);
-            timerSystem.addGradually(DEAN_TIME_PUNISHMENT - INITALPLAYERCAUGHTTIME);
-            ToastSystem.addToast("You were caught by the Dean!", BAD);
-            ToastSystem.addToast("You were stuck being lectured for " + Integer.toString(DEAN_TIME_PUNISHMENT) + "s!",
-                    BAD);
+            // THE PREVIOUS DEAN CAPTURE BEHAVIOUR
+            /**
+             * dean.freeze();
+             * dean.changeAnimation(3);
+             * dean.setPosition(PLAYERSTARTPOS.x + 32, PLAYERSTARTPOS.y);
+             * timerSystem.addGradually(DEANPUNISHMENT - INITALPLAYERCAUGHTTIME);
+             * ToastSystem.addToast("You were caught by the Dean!", BAD);
+             * ToastSystem.addToast("You were stuck being lectured for " +
+             * Integer.toString(DEANPUNISHMENT) + "s!",
+             * BAD);
+             * ToastSystem.addToast("Luckily for you the door isn't very sturdy, it only
+             * takes you " + Integer.toString(DEANPUNISHMENT) + "s to break it down", BAD);
+             */
+
+            timerSystem.addGradually(DEANPUNISHMENT - INITALPLAYERCAUGHTTIME);
+            ToastSystem.addToast("You were thrown in the dungeon by the Dean!", BAD);
+            ToastSystem.addToast("Luckily for you the door isn't very sturdy, it only takes you "
+                    + Integer.toString(DEANPUNISHMENT) + "s to break it down", BAD);
+            player.setPosition(PLAYERPRISONPOS);
         }
         negativeEventCounter++;
     }
@@ -513,6 +592,37 @@ public class Main extends ApplicationAdapter {
         playerCaughtByLibrarian = false;
     }
 
+    public static void checkProjectiles() {
+        for (int i = projectileWarnings.size() - 1; i >= 0; i--) {
+            ProjectileWarning warning = projectileWarnings.get(i);
+            if (warning.getWarningLength() <= 0) {
+                projectileWarnings.remove(i);
+            }
+        }
+        for (int i = projectiles.size() - 1; i >= 0; i--) {
+            BossProjectile projectile = projectiles.get(i);
+            projectile.nextMove();
+            if (projectile.hittingPlayer(player)) {
+                player.damage();
+            }
+            int removeOffset = 100; // how far off the screen in pixels the projectile is before it is removed
+
+            if (projectile.getX() < 0 - removeOffset || projectile.getX() > VIEWPORTWIDTH * 2 + removeOffset ||
+                    projectile.getY() < 0 - removeOffset || projectile.getY() > VIEWPORTHEIGHT * 2 + removeOffset) {
+                projectiles.remove(projectile);
+            }
+        }
+    }
+
+    public static void spawnProjectile(Vector2 position, Character direction) {
+        float warningLength = PROJECTILEWARNINGLENGTH;
+        // float delta = Gdx.graphics.getDeltaTime();
+        ProjectileWarning warning = new ProjectileWarning(position, direction, warningLength);
+        BossProjectile projectile = new BossProjectile(position, direction, PROJECTILESPEED, PROJECTILEWARNINGLENGTH);
+        projectileWarnings.add(warning);
+        projectiles.add(projectile);
+    }
+
     /**
      * Use to drop remove the spikes in the chest room when the switch is pressed.
      */
@@ -523,6 +633,78 @@ public class Main extends ApplicationAdapter {
             RenderingSystem.hideLayer("Spikes");
             RenderingSystem.hideLayer("Switch");
             spikesLowered = true;
+        }
+    }
+
+    /**
+     * Used to open the door to the room with the chest containing the lockpick
+     */
+    public static void openLockpickRoomDoor() {
+        if (!lockpickRoomOpened && (player.hasLockpick() || player.hasJanitorKey())) {
+            collisionSystem.removeCollisionByName("lockpickRoomDoor");
+            RenderingSystem.hideLayer("LockpickRoomDoor");
+            lockpickRoomOpened = true;
+        }
+    }
+
+    /**
+     * Used to open the door to the dungeons from the outside
+     */
+    public static void openDungeonDoor() {
+        if (!dungeonDoorOpened && (player.hasLockpick() || player.hasJanitorKey())) {
+            collisionSystem.removeCollisionByName("dungeonDoor");
+            RenderingSystem.hideLayer("DungeonDoor");
+            dungeonDoorOpened = true;
+        }
+    }
+
+    /**
+     * Used to open the locked door inside the PNQ building
+     */
+    public static void openPNQDoor() {
+        if (!PNQDoorOpened && (player.hasLockpick() || player.hasJanitorKey())) {
+            collisionSystem.removeCollisionByName("PNQDoor");
+            RenderingSystem.hideLayer("PNQDoor");
+            PNQDoorOpened = true;
+        }
+    }
+
+    /**
+     * Used to release the pope from his cell, which reduces the length of the boss
+     * fight.
+     */
+    public static void releasePope() {
+        if (!releasedPope && player.hasLockpick()) {
+            releasedPope = true;
+            collisionSystem.removeCollisionByName("popeCellDoor");
+            RenderingSystem.hideLayer("Pope");
+            RenderingSystem.hideLayer("PopeCellDoor");
+            RenderingSystem.showLayer("PopeSeraph");
+            ToastSystem.addToast("\"GSZMP BLF UIRVMW! R DROO KIZB ULI BLFI ERXGLIB!\"");
+        }
+    }
+
+    /**
+     * Used to end the game by turning the boss into a pacifist
+     */
+    public static void convertBoss() {
+        if (player.hasStaff()) {
+            if (player.booksRead() >= 7) {
+                bossConverted = true;
+                winGame();
+            } else {
+                ToastSystem.addToast("If you knew how to use the staff, you could use it on him.", BAD);
+            }
+        }
+    }
+
+    /**
+     * Used to release Bob from his cell, which ends the game.
+     */
+    public static void releaseBob() {
+        if (player.hasLockpick()) {
+            bobReleased = true;
+            LoseGame();
         }
     }
 
@@ -538,26 +720,115 @@ public class Main extends ApplicationAdapter {
      * The width and height of each room in pixels is equivalent to the viewport
      * width and height.
      * </P>
+     * <P>
+     * Teleports the player to a room on the tiled map based on the coordinates
+     * passed.
+     * </P>
+     * <P>
+     * Each coordinate represents one room.
+     * </P>
+     * <P>
+     * The width and height of each room in pixels is equivalent to the viewport
+     * width and height.
+     * </P>
      *
      * @param x         the x coordinate of the room
      * @param y         The y coordinate of the room
      * @param playerPos The coordinates of the player after they enter the room
-     * @param deanPos   Where the dean starts in this room
-     * @param deanPath  The path the dean takes in this room
      */
-    public static void loadRoom(int x, int y, Vector2 playerPos, Vector2 deanPos, Character[] deanPath,
-            Vector2 librarianPos, Character[] librarianPath) {
-        collisionSystem.loadRoom(x, y, VIEWPORTWIDTH, VIEWPORTHEIGHT);
-        TriggerSystem.loadRoom(x, y, VIEWPORTWIDTH, VIEWPORTHEIGHT);
-        renderingSystem.loadRoom(x, y, VIEWPORTWIDTH, VIEWPORTHEIGHT);
+    public static void loadRoom(int x, int y, Vector2 playerPos, Vector2 librarianPos, Character[] librarianPath) {
+
+        int offsetX = (x - currentRoomX) * VIEWPORTWIDTH * 2;
+        int offsetY = (y - currentRoomY) * VIEWPORTHEIGHT * 2;
+
+        RoomSystem.loadRoom(offsetX, offsetY);
+        collisionSystem.loadRoom(offsetX, offsetY);
+        TriggerSystem.loadRoom(offsetX, offsetY);
+        renderingSystem.loadRoom(offsetX / 2, offsetY / 2);
         player.setX(playerPos.x);
         player.setY(playerPos.y);
-        dean.setX(deanPos.x);
-        dean.setY(deanPos.y);
-        dean.setPath(deanPath);
-        librarian.setX(librarianPos.x);
-        librarian.setY(librarianPos.y);
-        librarian.setPath(librarianPath);
+
+        dean.deactivate();
+        librarian.deactivate();
+
+        // Spawn Room
+        if (x == 0 && y == 0) {
+            dean.activate();
+            librarian.setX(librarianPos.x);
+            librarian.setY(librarianPos.y);
+            librarian.setPath(librarianPath);
+            librarian.activate();
+            if (!bookUsed) {
+                librarian.freeze();
+            }
+
+        }
+
+        // Coridoor Patrolling Room
+        else if (x == 1 && y == 0) {
+            dean.activate();
+            Vector2 pos = new Vector2(80, 64);
+            Character[] path = {
+                    'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
+                    'R', 'R', 'R', 'R',
+                    'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L',
+                    'L', 'L', 'L', 'L'
+            };
+
+            dean = new Dean(pos, DEFAULTDEANSPEED, path);
+        }
+
+        // Speed Buff Room
+        else if (x == 2 && y == 1) {
+            dean.activate();
+            Vector2 pos = new Vector2(250, 400);
+            Character[] path = {
+                    'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
+                    'D', 'D', 'D', 'D', 'D', 'D',
+                    'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L',
+                    'U', 'U', 'U', 'U', 'U', 'U'
+            };
+
+            dean = new Dean(pos, 2000, path);
+        }
+
+        // Guard Room
+        else if (x == 1 && y == 2) {
+            dean.activate();
+            Vector2 pos = new Vector2(16, 490);
+            Character[] path = {
+                    'R',
+                    'L'
+            };
+
+            dean = new Dean(pos, DEFAULTDEANSPEED, path);
+        }
+
+        // Bridge Room
+        else if (x == 2 && y == 2) {
+            if (!boss.isDefeated()) {
+                ToastSystem.addToast("You sense an evil presence at the end of this hallway...", BAD);
+            }
+        }
+
+        // Boss Room
+        else if (x == 3 && y == 2) {
+            if (!boss.isDefeated()) {
+                RenderingSystem.showLayer("Flames");
+                float timeModifier = 0f;
+                if (releasedPope) {
+                    timeModifier += 30f;
+                }
+                if (player.hasFirestarter()) {
+                    timeModifier += 20f;
+                }
+                boss.start(BOSSFIGHTLENGTH - timeModifier);
+                RenderingSystem.hideLayer("Boss");
+                RenderingSystem.hideLayer("Staff");
+            }
+        }
+        currentRoomX = x;
+        currentRoomY = y;
     }
 
     /**
@@ -576,8 +847,9 @@ public class Main extends ApplicationAdapter {
      * @param x the x coordinate of the room
      * @param y The y coordinate of the room
      */
-    public static void loadRoom(int x, int y) {
-        loadRoom(x, y, PLAYERSTARTPOS, DEANSTARTPOS, DEANPATH, LIBRARIANSTARTPOS, LIBRARIANPATH);
+    public static void loadRoom(Vector2 coordinates) {
+        // loadRoom(coordinates, PLAYERSTARTPOS, LIBRARIANSTARTPOS, LIBRARIANPATH);
+        loadRoom(coordinates, PLAYERSTARTPOS);
     }
 
     /**
@@ -593,12 +865,12 @@ public class Main extends ApplicationAdapter {
      * width and height.
      * </P>
      *
-     * @param x         the x coordinate of the room
-     * @param y         The y coordinate of the room
-     * @param playerPos The coordinates of the player after they enter the room
+     * @param coordinates the coordinates of the room
      */
-    public static void loadRoom(int x, int y, Vector2 playerPos) {
-        loadRoom(x, y, playerPos, DEANSTARTPOS, DEANPATH, LIBRARIANSTARTPOS, LIBRARIANPATH);
+    public static void loadRoom(Vector2 coordinates, Vector2 playerPos) {
+        int x = (int) coordinates.x;
+        int y = (int) coordinates.y;
+        loadRoom(x, y, playerPos, LIBRARIANSTARTPOS, LIBRARIANPATH);
     }
 
     @Override

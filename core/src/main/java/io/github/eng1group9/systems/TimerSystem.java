@@ -1,7 +1,5 @@
 package io.github.eng1group9.systems;
 
-import java.sql.Date;
-
 import com.badlogic.gdx.Gdx;
 
 import io.github.eng1group9.Main;
@@ -52,7 +50,7 @@ public class TimerSystem {
     }
 
     /**
-     * @return How much time should be added to the timer as a result of the addGradually method. 
+     * @return How much time should be added to the timer as a result of the addGradually method.
      */
     private float getExtraTime(float delta) {
         if (timeToAdd <= 0) return 0;
@@ -74,9 +72,9 @@ public class TimerSystem {
         String mins = getMinsDisplay(timeLeft);
         String secs = getSecsDisplay(timeLeft);
         return "Time Left: " + mins + ":" + secs;
-        
+
     }
-    
+
     private static String getMinsDisplay(int seconds) {
         return Integer.toString(getMins(seconds));
     }
