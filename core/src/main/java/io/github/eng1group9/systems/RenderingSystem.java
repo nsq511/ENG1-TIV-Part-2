@@ -143,46 +143,58 @@ public class RenderingSystem {
      * @param elapsedTime    - How much time has passed since the game began.
      * @param worldCollision - A list of rectangles representing the games collison.
      */
-    public void draw(Player player, Dean dean, Boss boss, Dean librarian, boolean showCollision, float elapsedTime, List<Rectangle> worldCollision, ArrayList<BossProjectile> projectiles, ArrayList<ProjectileWarning> projectileWarnings) {
+    public void draw(Player player, Dean dean, Boss boss, Dean librarian, boolean showCollision, float elapsedTime,
+            List<Rectangle> worldCollision, ArrayList<BossProjectile> projectiles,
+            ArrayList<ProjectileWarning> projectileWarnings) {
         update();
         ScreenUtils.clear(Color.BLACK);
         viewport.apply();
         camera.update();
         mapRenderer.setView(camera);
         // THESE ARE IN CONFLICT: We Need To Fix It
-        //int[] belowPlayer = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11,12,13,14}; // the layers which should appear below the player
-        //int[] belowPlayer = { 0, 1, 2, 3, 4, 5, 6 }; // the layers which should appear below the player
-        // For now, I will do the union and wait for ARI's patch so that everything still runs
-        int[] belowPlayer = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+        // int[] belowPlayer = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11,12,13,14}; // the
+        // layers which should appear below the player
+        // int[] belowPlayer = { 0, 1, 2, 3, 4, 5, 6 }; // the layers which should
+        // appear below the player
+        // For now, I will do the union and wait for ARI's patch so that everything
+        // still runs
+        int[] belowPlayer = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
         mapRenderer.render(belowPlayer);
 
         worldBatch.begin();
 
-        if(player.isActive()){
+        if (player.isActive()) {
             player.draw(worldBatch);
         }
 
-        if(dean.isActive()){
+        if (dean.isActive()) {
             dean.draw(worldBatch);
         }
 
-        if(boss.isActive()){
+        if (boss.isActive()) {
             boss.draw(worldBatch);
         }
 
-        if(librarian.isActive()) {
+        if (librarian.isActive()) {
             librarian.draw(worldBatch);
         }
 
         worldBatch.end();
 
         // THESE CONFLICT TOO: See "belowPlayer"
-        //int[] abovePlayer = {15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,27,28,29,30,31,32,33,34,35,36,27}; // the layers which should appear above the player
-        //int[] abovePlayer = { 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 }; // the layers which should appear above
-        // This is the union, but there is some intersection between belowPlayer and abovePlayer.
-        // RESOLUTION: Keep the below layers below. If that fails, remove said from below and put back in above.
-        //int[] abovePlayer = {7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36};
-        int[] abovePlayer = {17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
+        // int[] abovePlayer = {15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
+        // 26,27,28,29,30,31,32,33,34,35,36,27}; // the layers which should appear above
+        // the player
+        // int[] abovePlayer = { 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 }; //
+        // the layers which should appear above
+        // This is the union, but there is some intersection between belowPlayer and
+        // abovePlayer.
+        // RESOLUTION: Keep the below layers below. If that fails, remove said from
+        // below and put back in above.
+        // int[] abovePlayer = {7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+        // 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36};
+        int[] abovePlayer = { 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38,
+                39 };
         mapRenderer.render(abovePlayer);
 
         if (darknessActive) {
@@ -191,6 +203,7 @@ public class RenderingSystem {
             Rectangle hb = player.getHitbox();
             float px = hb.x + hb.width * 0.5f;
             float py = hb.y + hb.height * 0.5f;
+            float quadSize = 10_000f;
 
             worldBatch.setShader(vignette);
             worldBatch.begin();
@@ -203,24 +216,23 @@ public class RenderingSystem {
             // draw a LARGE quad that covers the camera view
             worldBatch.draw(
                     whitePixel,
-                    camera.position.x - camera.viewportWidth,
-                    camera.position.y - camera.viewportHeight,
-                    camera.viewportWidth * 3,
-                    camera.viewportHeight * 3);
-
+                    camera.position.x - quadSize / 2f,
+                    camera.position.y - quadSize / 2f,
+                    quadSize,
+                    quadSize);
             worldBatch.end();
             worldBatch.setShader(null);
         }
 
         projectileBatch.begin();
 
-        for(BossProjectile projectile : projectiles){
-            if(projectile.isActive()){
+        for (BossProjectile projectile : projectiles) {
+            if (projectile.isActive()) {
                 projectile.draw(projectileBatch);
             }
         }
 
-        for(ProjectileWarning warning : projectileWarnings){
+        for (ProjectileWarning warning : projectileWarnings) {
             warning.draw(projectileBatch);
         }
 
@@ -229,13 +241,11 @@ public class RenderingSystem {
         uiBatch.begin();
         font.draw(uiBatch, TimerSystem.getClockDisplay(), 10, 640 - 10);
 
-        if(boss.isActive()){
+        if (boss.isActive()) {
             font.draw(uiBatch, "Health: " + player.getHealth(), 10, 640 - 30);
         }
 
         renderToasts(font, uiBatch);
-
-
 
         if (showCollision && worldCollision != null) { // show collisions for debugging
             renderCollision(uiBatch, worldCollision, player, dean, librarian);
@@ -303,13 +313,14 @@ public class RenderingSystem {
 
     /**
      * Render the zones for room transition doors (dev mode).
+     * 
      * @param uiBatch - The SpriteBatch used for this (should be the ui batch).
      */
     public void renderDoors(SpriteBatch uiBatch) {
         for (Door door : RoomSystem.getDoors()) {
             Rectangle rectangle = door.getZone();
             uiBatch.setColor(1, 1, 1, 0.75f);
-            uiBatch.draw(missingTexture, rectangle.x, rectangle.y , rectangle.width, rectangle.height);
+            uiBatch.draw(missingTexture, rectangle.x, rectangle.y, rectangle.width, rectangle.height);
         }
     }
 
@@ -502,16 +513,16 @@ public class RenderingSystem {
      * @param viewportWidth  - The viewport width.
      * @param viewportHeight - The viewport height.
      */
-    public void loadRoom(int offsetX, int offsetY){
+    public void loadRoom(int offsetX, int offsetY) {
         this.camera.translate(offsetX, offsetY);
         this.camera.update();
     }
 
-    public static void setViewportWidth(int width){
+    public static void setViewportWidth(int width) {
         viewportWidth = width;
     }
 
-    public static void setViewportHeight(int height){
+    public static void setViewportHeight(int height) {
         viewportHeight = height;
     }
 

@@ -34,7 +34,7 @@ public class Player extends MovingEntity {
     private boolean hasStaff = false;
     private boolean hasJanitorKey = false;
     private List<Integer> booksRead = new LinkedList<>();
-    private float invisibilityLeft = 0;
+    private boolean visibility = true;
     private float invincibilityLeft = 0;
     private float potionDelay = 0;
     private float slownessLeft = 0;
@@ -42,7 +42,6 @@ public class Player extends MovingEntity {
     private float dashCooldown = 3;
     private boolean dashed = false;
 
-    private boolean invisibilityWarningGiven = true;
     private int health;
 
     public Player(Vector2 startPos, float speed) {
@@ -141,13 +140,12 @@ public class Player extends MovingEntity {
         hasStaff = false;
         hasJanitorKey = false;
         booksRead = new LinkedList<>();
-        invisibilityLeft = 0;
+        visibility = true;
         invincibilityLeft = 0;
         slownessLeft = 0;
         dashesLeft = 0;
         dashCooldown = 3;
         potionDelay = 0;
-        invisibilityWarningGiven = true;
 
     }
 
@@ -229,8 +227,7 @@ public class Player extends MovingEntity {
      * Make the player invisible for 15s, so they cannot be spotted by the Dean.
      */
     public void becomeInvisible() {
-        invisibilityLeft = 15;
-        invisibilityWarningGiven = false;
+        visibility = false;
     }
 
     public void potionTriggered() {
@@ -374,7 +371,7 @@ public class Player extends MovingEntity {
      * @return Wether the player is visible (to the Dean).
      */
     public boolean isVisible() {
-        return invisibilityLeft <= 0;
+        return visibility;
     }
 
     /**
@@ -389,21 +386,6 @@ public class Player extends MovingEntity {
      * Used to update the players invisiblity timer (could be used for more).
      */
     public void update() {
-
-        // Invisibility Check
-        if (!isVisible()) {
-            invisibilityLeft -= Gdx.graphics.getDeltaTime();
-            if (isVisible()) {
-                ToastSystem.addToast("Your invisibility has run out!");
-                changeAnimation(1);
-            }
-
-            if (invisibilityLeft <= 5 && !invisibilityWarningGiven) {
-                ToastSystem.addToast("Your invisibility is about to run out!");
-                invisibilityWarningGiven = true;
-            }
-
-        }
 
         // Invincible Check
         if (isInvincible()) {
