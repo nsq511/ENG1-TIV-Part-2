@@ -36,7 +36,7 @@ public class Main extends ApplicationAdapter {
     public static boolean outsideDoorOpen = false; // Whether the door to the outside room has been opened.
     public static boolean exitOpen = false; // Whether the exit is open/
     public static boolean spikesLowered = false; // Whether the spikes in the chest room have been lowered.
-    public static boolean scrollUsed = false; // Whether the scroll power up has been collected.
+    public static boolean cloakUsed = false; // Whether the cloak power up has been collected.
     public static boolean dungeonDoorOpened = false;
     public static boolean lockpickRoomOpened = false;
     public static boolean PNQDoorOpened = false;
@@ -171,7 +171,7 @@ public class Main extends ApplicationAdapter {
         outsideDoorOpen = false;
         exitOpen = false;
         spikesLowered = false;
-        scrollUsed = false;
+        cloakUsed = false;
         dungeonDoorOpened = false;
         lockpickRoomOpened = false;
         PNQDoorOpened = false;
@@ -341,14 +341,12 @@ public class Main extends ApplicationAdapter {
      * Give the scroll powerup to the player, making the player invisible for 15s.
      * Hide the scroll graphic.
      */
-    public static void getScroll() {
-        if (!scrollUsed) {
+    public static void getcloak() {
+        if (!cloakUsed) {
             incAchievement(ACH_INVIS); // Trigger invisible scroll achievement
             player.becomeInvisible();
-            RenderingSystem.hideLayer("Scroll");
-            scrollUsed = true;
-            ToastSystem.addToast("You got the Scroll!", GOOD);
-            ToastSystem.addToast("You are invisible for 15s", GOOD);
+            cloakUsed = true;
+            ToastSystem.addToast("You found the invisibility cloak!", GOOD);
             positiveEventCounter++;
         }
     }
