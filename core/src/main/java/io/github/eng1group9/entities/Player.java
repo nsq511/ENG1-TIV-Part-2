@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * Handles everything connected to the player.
- * 
+ *
  * @param startPos - The players start positon.
  * @param speed    - How fast the player will move.
  */
@@ -101,6 +101,7 @@ public class Player extends MovingEntity {
 
     public void giveStaff(){
         if(!hasStaff){
+            RenderingSystem.hideLayer("Staff");
             int books = booksRead.size();
 
             ToastSystem.addToast("You picked up the staff...", GOOD);
@@ -313,7 +314,7 @@ public class Player extends MovingEntity {
 
     /**
      * Move the player in the given direction
-     * 
+     *
      * @param direction The direction to move (D = Down, U = Up, L = Left, R =
      *                  Right).
      */

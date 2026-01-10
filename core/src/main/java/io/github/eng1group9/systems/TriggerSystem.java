@@ -85,7 +85,7 @@ public class TriggerSystem {
     /**
      * Return a list of all triggers in a tileset.
      * This should only be used when first loading the tileset.
-     * 
+     *
      * @param tmxPath - The path to the tileset (.tmx file).
      * @return A list of all Triggers.
      */
@@ -126,7 +126,7 @@ public class TriggerSystem {
 
     /**
      * Remove a trigger from the system.
-     * 
+     *
      * @param ID - The ID of the trigger which should be removed.
      * @return True if it was successful.
      */
@@ -161,7 +161,7 @@ public class TriggerSystem {
     /**
      * Will check if the given player is staninding in any triggers, and trigger
      * them if so.
-     * 
+     *
      * @param player The player which is being checked.
      *               This is run each time the player presses E.
      */
@@ -177,7 +177,7 @@ public class TriggerSystem {
     /**
      * Will check if the given player is staninding in any triggers, and trigger
      * them if so.
-     * 
+     *
      * @param player The player which is being checked.
      *               This is run each frame.
      */
@@ -215,7 +215,7 @@ public class TriggerSystem {
 
     /**
      * Will act based on which trigger has been activated
-     * 
+     *
      * @param ID the trigger that has been activated
      */
     public static void trigger(int ID, Player player) {
@@ -245,10 +245,8 @@ public class TriggerSystem {
                 Main.openExit();
                 break;
             case 8: // Pickup red potion.
-                player.giveRedPotion(); 
+                player.giveRedPotion();
                 break;
-            
-            // TODO: THIS BREAKS BUT I NEED TILE TO FIX IT
             case 9:
                 player.giveExitKey();
                 break;
@@ -323,8 +321,6 @@ public class TriggerSystem {
                 RenderingSystem.hideLayer("Potion3");
                 Main.getPotion();
                 break;
-            // THE ABOVE BREAKS
-            
             default:
                 break;
         }

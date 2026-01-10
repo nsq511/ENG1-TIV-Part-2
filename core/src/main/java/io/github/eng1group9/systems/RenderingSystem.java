@@ -56,7 +56,7 @@ public class RenderingSystem {
 
     /**
      * Takes and tileset and sets up a renderer to display it.
-     * 
+     *
      * @param tmxPath        - The path to the tileset (.tmx file).
      * @param viewportWidth  - how many pixels wide the world is.
      * @param viewportHeight - how many pixels high the world is.
@@ -85,7 +85,7 @@ public class RenderingSystem {
 
         setViewportWidth(viewportWidth);
         setViewportHeight(viewportHeight);
-      
+
         ShaderProgram.pedantic = false;
         vignette = new ShaderProgram(
                 Gdx.files.internal("Shaders/vignette.vert"),
@@ -99,7 +99,7 @@ public class RenderingSystem {
 
     /**
      * Hide a layer so that tiles on it are NOT rendered.
-     * 
+     *
      * @param name - The name of the layer.
      */
     public static void hideLayer(String name) {
@@ -126,7 +126,7 @@ public class RenderingSystem {
 
     /**
      * Show a layer so that tiles on it are rendered.
-     * 
+     *
      * @param name - The name of the layer.
      */
     public static void showLayer(String name) {
@@ -135,7 +135,7 @@ public class RenderingSystem {
 
     /**
      * Draw a frame to display.
-     * 
+     *
      * @param player         - The current player object.
      * @param dean           - The dean object.
      * @param showCollision  - Wether to render the zones for collision / triggers
@@ -153,7 +153,7 @@ public class RenderingSystem {
         //int[] belowPlayer = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11,12,13,14}; // the layers which should appear below the player
         //int[] belowPlayer = { 0, 1, 2, 3, 4, 5, 6 }; // the layers which should appear below the player
         // For now, I will do the union and wait for ARI's patch so that everything still runs
-        int[] belowPlayer = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14};
+        int[] belowPlayer = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
         mapRenderer.render(belowPlayer);
 
         worldBatch.begin();
@@ -169,9 +169,9 @@ public class RenderingSystem {
         if(boss.isActive()){
             boss.draw(worldBatch);
         }
-      
+
         if(librarian.isActive()) {
-            librarian.draw(worldBatch); 
+            librarian.draw(worldBatch);
         }
 
         worldBatch.end();
@@ -182,7 +182,7 @@ public class RenderingSystem {
         // This is the union, but there is some intersection between belowPlayer and abovePlayer.
         // RESOLUTION: Keep the below layers below. If that fails, remove said from below and put back in above.
         //int[] abovePlayer = {7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36};
-        int[] abovePlayer = {15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36};
+        int[] abovePlayer = {17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
         mapRenderer.render(abovePlayer);
 
         if (darknessActive) {
@@ -211,7 +211,7 @@ public class RenderingSystem {
             worldBatch.end();
             worldBatch.setShader(null);
         }
-      
+
         projectileBatch.begin();
 
         for(BossProjectile projectile : projectiles){
@@ -249,7 +249,7 @@ public class RenderingSystem {
     /**
      * Render the toast display on the top left of the screen.
      * This is used to display text messages to the user for 5s.
-     * 
+     *
      * @param font    The BitmapFont which used to render the text.
      * @param uiBatch - The SpriteBatch used for this (should be the ui batch).
      */
@@ -268,7 +268,7 @@ public class RenderingSystem {
 
     /**
      * Render the zones for collision / triggers (dev mode).
-     * 
+     *
      * @param uiBatch        - The SpriteBatch used for this (should be the ui
      *                       batch).
      * @param worldCollision - A list of rectangles representing the games collison.
@@ -290,7 +290,7 @@ public class RenderingSystem {
 
     /**
      * Render the zones for triggers (dev mode).
-     * 
+     *
      * @param uiBatch - The SpriteBatch used for this (should be the ui batch).
      */
     public void renderTriggers(SpriteBatch uiBatch) {
@@ -319,7 +319,7 @@ public class RenderingSystem {
 
     /**
      * Display the pause overlay, with instructions and controls.
-     * 
+     *
      * @param screenWidth          - how many pixels wide the screen is.
      * @param screenHeight         - how many pixels high the screen is.
      * @param positiveEventCounter - Number of PowerUps collected.
@@ -347,7 +347,7 @@ public class RenderingSystem {
     /**
      * Display the start overlay, with instructions, controls and how to start the
      * game.
-     * 
+     *
      * @param screenWidth  - how many pixels wide the screen is.
      * @param screenHeight - how many pixels high the screen is.
      */
@@ -374,7 +374,7 @@ public class RenderingSystem {
 
     /**
      * Render the controls list, tellign you all the buttons and what they do.
-     * 
+     *
      * @param screenWidth  - how many pixels wide the screen is.
      * @param screenHeight - how many pixels high the screen is.
      */
@@ -390,7 +390,7 @@ public class RenderingSystem {
     /**
      * Render the Stats at the bottom of the overlay, showing PowerUps collected,
      * times caught and secrets found.
-     * 
+     *
      * @param screenWidth          - how many pixels wide the screen is.
      * @param screenHeight         - how many pixels high the screen is.
      * @param positiveEventCounter - Number of PowerUps collected.
@@ -406,7 +406,7 @@ public class RenderingSystem {
 
     /**
      * Display the win overlay, with your score and how much time was left.
-     * 
+     *
      * @param screenWidth          - How many pixels wide the screen is.
      * @param screenHeight         - How many pixels high the screen is.
      * @param timeLeft             - How much time was left when the player escaped.
@@ -461,7 +461,7 @@ public class RenderingSystem {
 
     /**
      * Display the lose overlay, for when you run out of time.
-     * 
+     *
      * @param screenWidth          - How many pixels wide the screen is.
      * @param screenHeight         - How many pixels high the screen is.
      * @param positiveEventCounter - Number of PowerUps collected.

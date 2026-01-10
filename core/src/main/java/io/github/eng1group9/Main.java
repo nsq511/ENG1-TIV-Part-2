@@ -65,8 +65,8 @@ public class Main extends ApplicationAdapter {
     //private List<Rectangle> doors;
     final static String TMXPATH = "World/testMap.tmx";
 
-    final static Vector2 prisonCoords = new Vector2(3,0);
-    final static Vector2 playerPrisonPos = new Vector2(380,200);
+    final static Vector2 PRISONCOORDS = new Vector2(3,0);
+    final static Vector2 PLAYERPRISONPOS = new Vector2(380,200);
 
     final static float DOORCOOLDOWN = 0.5f;
     private static int currentRoomX;
@@ -492,7 +492,7 @@ public class Main extends ApplicationAdapter {
 
         boss.logic();
         checkProjectiles();
-        
+
         TriggerSystem.checkTouchTriggers(player);
         RoomSystem.checkCooldown();
         player.update();
@@ -530,7 +530,7 @@ public class Main extends ApplicationAdapter {
      */
     private void startPlayerCatch() {
         playerCaught = true;
-        loadRoom(prisonCoords, playerPrisonPos);
+        loadRoom(PRISONCOORDS, PLAYERPRISONPOS);
         player.freeze();
 
         if (playerCaughtByLibrarian) {
@@ -557,7 +557,7 @@ public class Main extends ApplicationAdapter {
             timerSystem.addGradually(DEANPUNISHMENT - INITALPLAYERCAUGHTTIME);
             ToastSystem.addToast("You were thrown in the dungeon by the Dean!", BAD);
             ToastSystem.addToast("Luckily for you the door isn't very sturdy, it only takes you " + Integer.toString(DEANPUNISHMENT) + "s to break it down", BAD);
-            player.setPosition(PLAYERSTARTPOS);
+            player.setPosition(PLAYERPRISONPOS);
         }
         negativeEventCounter++;
     }
@@ -822,7 +822,7 @@ public class Main extends ApplicationAdapter {
      * width and height.
      * </P>
      *
-     * @param x the x coordinate of the room 
+     * @param x the x coordinate of the room
      * @param y The y coordinate of the room
      */
     public static void loadRoom(Vector2 coordinates){
