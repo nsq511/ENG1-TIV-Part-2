@@ -22,7 +22,8 @@ import io.github.eng1group9.entities.Player;
  * areas.
  * The name of the Rectangle is in the form "ID,triggerType"
  * which is used to determine what happens when it is triggered, and how.
- * <p></p>
+ * <p>
+ * </p>
  * triggerType must be in the form T or I
  * for Touch or Interact
  */
@@ -35,7 +36,7 @@ public class TriggerSystem {
         private int ID;
         private Rectangle zone;
         private boolean activateOnTouch = false;
-        //private Vector2 roomCoordinates;
+        // private Vector2 roomCoordinates;
 
         public Trigger(int ID, boolean activateOnTouch, Rectangle zone) {
             this.ID = ID;
@@ -63,8 +64,8 @@ public class TriggerSystem {
             return player.isColliding(zone);
         }
 
-        public void moveZone(int x,int y){
-            this.zone.setPosition(zone.getX() + x,zone.getY() + y);
+        public void moveZone(int x, int y) {
+            this.zone.setPosition(zone.getX() + x, zone.getY() + y);
         }
     }
 
@@ -205,11 +206,11 @@ public class TriggerSystem {
      * @param viewportWidth  - The viewport width.
      * @param viewportHeight - The viewport height.
      */
-    public static void loadRoom(int offsetX, int offsetY){
+    public static void loadRoom(int offsetX, int offsetY) {
         int x = -offsetX;
         int y = -offsetY;
-        for(Trigger trigger : getTriggers()){
-            trigger.moveZone(x,y);
+        for (Trigger trigger : getTriggers()) {
+            trigger.moveZone(x, y);
         }
     }
 
@@ -300,6 +301,7 @@ public class TriggerSystem {
                 break;
             case 20:
                 player.readBook(7);
+                break;
             case 27:
                 Main.loadRoom(0, 1, new Vector2(30, 30), new Vector2(50, 50), new Character[] { 'U', 'D' });
                 break;
@@ -311,15 +313,24 @@ public class TriggerSystem {
                 break;
             case 31:
                 RenderingSystem.hideLayer("Potion1");
-                Main.getPotion();
+                if (player.getPotionDelay() == 0) {
+                    player.potionTriggered();
+                    Main.getPotion();
+                }
                 break;
             case 32:
                 RenderingSystem.hideLayer("Potion2");
-                Main.getPotion();
+                if (player.getPotionDelay() == 0) {
+                    player.potionTriggered();
+                    Main.getPotion();
+                }
                 break;
             case 33:
                 RenderingSystem.hideLayer("Potion3");
-                Main.getPotion();
+                if (player.getPotionDelay() == 0) {
+                    player.potionTriggered();
+                    Main.getPotion();
+                }
                 break;
             default:
                 break;
