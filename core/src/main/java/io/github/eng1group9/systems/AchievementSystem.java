@@ -68,11 +68,73 @@ public class AchievementSystem {
                 1,
                 50,
                 "ach_potion.png");
+
+        AchievementSystem.addAchievement(
+                Main.ACH_ARSONIST,
+                "Burn the library to the ground",
+                1,
+                100,
+                "ach_arsonist.png"
+        );
+
+        AchievementSystem.addAchievement(
+            Main.ACH_WORLD_ENDER,
+            "WHAT HAVE YOU DONE?!",
+            1
+            -100000,
+            "ach_world_ender.png"
+        );
+
+        AchievementSystem.addAchievement(
+            Main.ACH_COWARD,
+            "Escape without completing any of your missions",
+            1,
+            -50,
+            "ach_coward.png"
+        );
+
+        AchievementSystem.addAchievement(
+            Main.ACH_ERUDITE,
+            "Learn the basics of evil pacifist magic",
+            1,
+            50,
+            "ach_erudite.png"
+        );
+
+        AchievementSystem.addAchievement(
+            Main.ACH_PAPAL_AUTHORITY,
+            "Personally free the Pope from his cell",
+            1,
+            50,
+            "ach_papal_authority.png"
+        );
+
+        AchievementSystem.addAchievement(
+            Main.ACH_PROSELYTISER,
+            "Convert the boss using evil pacifist magic",
+            1,
+            100,
+            "ach_proselytiser.png"
+        );
+
+        AchievementSystem.addAchievement(
+            Main.ACH_SELF_SERVING,
+            "Seize the staff and knowledge of evil pacifist magic for yourself",
+            100,
+            "ach_self_serving.png"
+        );
+
+        AchievementSystem.addAchievement(
+            Main.ACH_TRUE_AND_PERFECT_KNIGHT,
+            "Complete both of your missions",
+            100,
+            "ach_true_and_perfect_knight.png"
+        );
     }
 
     /**
      * Gets the specified achievement
-     * 
+     *
      * @param title The title of the achievement
      * @return The achievement with the given title or null if it does not exist
      */
@@ -82,7 +144,7 @@ public class AchievementSystem {
 
     /**
      * Adds an achievement to the system
-     * 
+     *
      * @param title                    The name of the achievment
      * @param description              What the achievement is for
      * @param requiredConditionsAmount The number of conditions that must be met to
@@ -106,7 +168,7 @@ public class AchievementSystem {
 
     /**
      * Adds an achievement to the system with defualt missing texture for the logo
-     * 
+     *
      * @param title                    The name of the achievment
      * @param description              What the achievement is for
      * @param requiredConditionsAmount The number of conditions that must be met to
@@ -122,7 +184,7 @@ public class AchievementSystem {
     /**
      * Adds an achievement to the system with defualt missing texture for the logo
      * and no score modifier
-     * 
+     *
      * @param title                    The name of the achievment
      * @param description              What the achievement is for
      * @param requiredConditionsAmount The number of conditions that must be met to
@@ -134,7 +196,7 @@ public class AchievementSystem {
 
     /**
      * Adds an achievement to the system with no score modifier
-     * 
+     *
      * @param title                    The name of the achievment
      * @param description              What the achievement is for
      * @param requiredConditionsAmount The number of conditions that must be met to
@@ -149,9 +211,9 @@ public class AchievementSystem {
     /**
      * Increments the number of conditions that have been completed for the given
      * achievment
-     * 
+     *
      * @param achievementTitle The title of the achievement to increment
-     * 
+     *
      * @return Whether the achievment has met all conditions to be completed
      */
     public static boolean incAchievement(String achievementTitle) {
@@ -180,7 +242,7 @@ public class AchievementSystem {
     /**
      * Draws the given achievements in a grid if they have been achieved
      * Must be called within a batch begin/end
-     * 
+     *
      * @param pos   The position to draw the grid at. Anchored at the top left
      * @param cols  The number of columns in the grid. The rows will be determined
      *              based on the size of achievements
@@ -224,7 +286,7 @@ class Achievement {
 
     /**
      * Creates an achievement
-     * 
+     *
      * @param title                    The name of the achievment
      * @param description              What the achievement is for
      * @param requiredConditionsAmount The number of conditions that must be met to
@@ -248,7 +310,7 @@ class Achievement {
 
     /**
      * Creates an achievement with no score modifier
-     * 
+     *
      * @param title                    The name of the achievment
      * @param description              What the achievement is for
      * @param requiredConditionsAmount The number of conditions that must be met to
@@ -269,7 +331,7 @@ class Achievement {
 
     /**
      * Creates an achievement with no texture
-     * 
+     *
      * @param title                    The name of the achievment
      * @param description              What the achievement is for
      * @param requiredConditionsAmount The number of conditions that must be met to
@@ -291,7 +353,7 @@ class Achievement {
 
     /**
      * Creates an achievement with no texture and no score modifier
-     * 
+     *
      * @param title                    The name of the achievment
      * @param description              What the achievement is for
      * @param requiredConditionsAmount The number of conditions that must be met to
@@ -319,7 +381,7 @@ class Achievement {
 
     /**
      * Increments the number of conditions that have been completed
-     * 
+     *
      * @return Whether the achievment has been achieved on this increment call
      */
     public boolean incConditions() {
@@ -336,7 +398,7 @@ class Achievement {
 
     /**
      * Whether the achievement has been completed
-     * 
+     *
      * @return Whether the achievement has been completed
      */
     public boolean isAchieved() {
@@ -353,7 +415,7 @@ class Achievement {
 
     /**
      * Modifies the score
-     * 
+     *
      * @param score The score to modify
      * @return The modified score
      */
@@ -364,7 +426,7 @@ class Achievement {
     /**
      * Draws the logo with its title and desctiption.
      * Must be called within a batch begin/end
-     * 
+     *
      * @param pos   The position to draw the achievement. Anchored at the bottom
      *              left
      * @param batch The sprite batch to use to draw the logo

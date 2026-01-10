@@ -16,6 +16,9 @@ public class BossProjectile extends MovingEntity{
         setHitbox(new Rectangle());
         this.warningLength = warningLength;
         setScale(1);
+        setX(position.x);
+        setY(position.y);
+        System.out.println("Projectile spawned at: " + position);
     }
 
     public void nextMove(){

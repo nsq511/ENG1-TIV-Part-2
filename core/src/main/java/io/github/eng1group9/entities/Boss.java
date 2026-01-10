@@ -10,7 +10,7 @@ import java.util.Random;
 
 public class Boss extends MovingEntity {
 
-    private float timeLeft;
+    private float timeLeft = 1000f;
     private boolean defeated;
     final private float attackCooldownLength;
     private float attackCooldown;
@@ -18,9 +18,10 @@ public class Boss extends MovingEntity {
     private final Random random;
     private final int spacing;
 
-    public Boss(Vector2 startPos, float speed, boolean active, float attackCooldownLength, int spacing) {
-        super(new Texture("Characters/bossAnimations.png"), new int[]{1}, 64, 80, speed, startPos, new Vector2(0,0), active, true);
+    public Boss(Vector2 startPos, float attackCooldownLength, int spacing) {
+        super(new Texture("Characters/bossAnimations.png"), new int[]{1}, 64, 80, 0f, startPos, new Vector2(0,0), false, true);
         setScale(2);
+        System.out.println(timeLeft);
         defeated = false;
         random = new Random();
         this.attackCooldownLength = attackCooldownLength;
@@ -33,6 +34,8 @@ public class Boss extends MovingEntity {
      * @param fightLength
      */
     public void start(float fightLength){
+        System.out.println("Began boss fight!");
+        defeated = false;
         timeLeft = fightLength;
         activate();
     }
@@ -115,6 +118,8 @@ public class Boss extends MovingEntity {
         int width = (int)RenderingSystem.getViewportWidth()*2;
         int height = (int)RenderingSystem.getViewportHeight()*2;
 
+        System.out.println("Spawning projectiles from " +  from + " to " + to);
+
         for(int i = from; i <= to; i = i + spacing){
             switch(moveDirection){
                 case 'L':
@@ -132,7 +137,6 @@ public class Boss extends MovingEntity {
             }
         }
     }
-
 
     public boolean isDefeated(){
         return defeated;

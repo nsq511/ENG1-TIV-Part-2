@@ -358,16 +358,18 @@ public class RenderingSystem {
         uiBatch.setColor(1, 1, 1, 1);
 
         font.getData().setScale(2f);
-        font.draw(uiBatch, "Escape from Uni", screenWidth / 2f, (screenHeight / 2f) + 40);
-        font.draw(uiBatch, "Instructions", screenWidth / 2f, (screenHeight / 2f) - 120);
-
-        font.setColor(0, 1, 1, 1);
-        font.draw(uiBatch, "Press Space to Start!", screenWidth / 2f, (screenHeight / 2f) - 200);
-        font.setColor(1, 1, 1, 1);
+        font.draw(uiBatch, "Escape from Uni", screenWidth / 8f, (screenHeight / 2f) + 40);
+        font.draw(uiBatch, "Instructions", screenWidth / 8f, (screenHeight / 2f) - 120);
 
         font.getData().setScale(1f);
         renderControls(screenWidth, screenHeight);
-        font.draw(uiBatch, "Avoid the dean and escape the maze in time!", screenWidth / 2f, (screenHeight / 2f) - 160);
+        font.draw(uiBatch, "The evil pacifist wizards have kidnapped the pope, and are plotting something nefarious here at their university.", screenWidth / 8f, (screenHeight / 2f) - 160);
+        font.draw(uiBatch, "You have been sent on a mission to free the pope and burn down their evil pacifist spells before their plans come into fruition.", screenWidth / 8f, (screenHeight / 2f) - 180);
+        font.draw(uiBatch, "Be careful! They have a dean patrolling their halls, who will not hesitate to punish any trespassers.", screenWidth / 8f, (screenHeight / 2f) - 200);
+
+        font.setColor(0, 1, 1, 1);
+        font.draw(uiBatch, "Press Space to Start!", screenWidth / 8f, (screenHeight / 2f) - 240);
+        font.setColor(1, 1, 1, 1);
 
         uiBatch.end();
     }
@@ -379,12 +381,12 @@ public class RenderingSystem {
      * @param screenHeight - how many pixels high the screen is.
      */
     private void renderControls(int screenWidth, int screenHeight) {
-        font.draw(uiBatch, "Press P to pause / resume!", screenWidth / 2f, screenHeight / 2f);
-        font.draw(uiBatch, "Press ESC to quit.", screenWidth / 2f, (screenHeight / 2f) - 20);
-        font.draw(uiBatch, "Press E to interact.", screenWidth / 2f, (screenHeight / 2f) - 40);
-        font.draw(uiBatch, "Use WASD or arrow keys to move.", screenWidth / 2f, (screenHeight / 2f) - 60);
-        font.draw(uiBatch, "Press P to pause!", screenWidth / 2f, screenHeight / 2f);
-        font.draw(uiBatch, "Press F11 to Fullscreen.", screenWidth / 2f, (screenHeight / 2f) - 80);
+        font.draw(uiBatch, "Press P to pause / resume!", screenWidth / 8f, screenHeight / 2f);
+        font.draw(uiBatch, "Press ESC to quit.", screenWidth / 8f, (screenHeight / 2f) - 20);
+        font.draw(uiBatch, "Press E to interact.", screenWidth / 8f, (screenHeight / 2f) - 40);
+        font.draw(uiBatch, "Use WASD or arrow keys to move.", screenWidth / 8f, (screenHeight / 2f) - 60);
+        font.draw(uiBatch, "Press P to pause!", screenWidth / 8f, screenHeight / 2f);
+        font.draw(uiBatch, "Press F11 to Fullscreen.", screenWidth / 8f, (screenHeight / 2f) - 80);
     }
 
     /**
