@@ -304,7 +304,7 @@ public class Main extends ApplicationAdapter {
             RoomSystem.unlockDoor(20);
             RenderingSystem.showLayer("Boss");
             RenderingSystem.hideLayer("Flames");
-            RenderingSystem.hideLayer("LibraryBookshelves1");
+
             RenderingSystem.hideLayer("LibraryBookshelves2");
             RenderingSystem.hideLayer("LibraryBookshelves3");
             RenderingSystem.hideLayer("Pyre");
@@ -758,6 +758,10 @@ public class Main extends ApplicationAdapter {
             librarian.setY(librarianPos.y);
             librarian.setPath(librarianPath);
             librarian.activate();
+            if (!bookUsed) {
+                librarian.freeze();
+            }
+
         }
 
         // Coridoor Patrolling Room
