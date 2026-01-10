@@ -20,8 +20,8 @@ import java.util.List;
  */
 public class Player extends MovingEntity {
 
-    final static Color BAD = new Color(1,1,0,1);
-    final static Color GOOD = new Color(0,1,1,1);
+    final static Color BAD = new Color(1, 1, 0, 1);
+    final static Color GOOD = new Color(0, 1, 1, 1);
 
     private boolean hasExitKey = false;
     private boolean hasChestRoomKey = false;
@@ -36,6 +36,7 @@ public class Player extends MovingEntity {
     private List<Integer> booksRead = new LinkedList<>();
     private float invisibilityLeft = 0;
     private float invincibilityLeft = 0;
+    private float potionDelay = 0;
     private float slownessLeft = 0;
     private int dashesLeft = 0;
     private float dashCooldown = 3;
@@ -50,77 +51,74 @@ public class Player extends MovingEntity {
         setScale(2);
     }
 
-    public boolean hasFirestarter(){
+    public boolean hasFirestarter() {
         return hasFirestarter;
     }
 
-    public boolean hasMoney(){
+    public boolean hasMoney() {
         return hasMoney;
     }
 
-    public int booksRead(){
+    public int booksRead() {
         return booksRead.size();
     }
 
-    public boolean hasStaff(){
+    public boolean hasStaff() {
         return hasStaff;
     }
 
-    public boolean hasJanitorKey(){
+    public boolean hasJanitorKey() {
         return hasJanitorKey;
     }
 
-    public void giveLockpick(){
-        if(!hasLockpick){
-            ToastSystem.addToast("You found a lockpick!",GOOD);
+    public void giveLockpick() {
+        if (!hasLockpick) {
+            ToastSystem.addToast("You found a lockpick!", GOOD);
             hasLockpick = true;
         }
     }
 
-    public void giveFirestarter(){
-        if(!hasFirestarter){
-            if(hasMoney){
-                ToastSystem.addToast("You bought a firestarter!",GOOD);
+    public void giveFirestarter() {
+        if (!hasFirestarter) {
+            if (hasMoney) {
+                ToastSystem.addToast("You bought a firestarter!", GOOD);
                 ToastSystem.addToast("'Thank you for your purchase!'");
                 hasFirestarter = true;
-            }
-            else{
+            } else {
                 ToastSystem.addToast("You see a firestarter for sale, but you don't have any money!");
             }
 
         }
     }
 
-    public void giveJanitorKey(){
-        if(!hasJanitorKey){
-            ToastSystem.addToast("You found the janitor's key!",GOOD);
+    public void giveJanitorKey() {
+        if (!hasJanitorKey) {
+            ToastSystem.addToast("You found the janitor's key!", GOOD);
             hasJanitorKey = true;
         }
 
     }
 
-    public void giveStaff(){
-        if(!hasStaff){
+    public void giveStaff() {
+        if (!hasStaff) {
             RenderingSystem.hideLayer("Staff");
             int books = booksRead.size();
 
             ToastSystem.addToast("You picked up the staff...", GOOD);
             hasStaff = true;
 
-            if(books < 3){
-                ToastSystem.addToast("But you don't know how to use it!",BAD);
-            }
-            else if(books < 7){
-                ToastSystem.addToast("If you finish your studies, you might be able to use it!",GOOD);
-            }
-            else{
-                ToastSystem.addToast("It seems your studying has paid off! You can now use it on the boss!",GOOD);
+            if (books < 3) {
+                ToastSystem.addToast("But you don't know how to use it!", BAD);
+            } else if (books < 7) {
+                ToastSystem.addToast("If you finish your studies, you might be able to use it!", GOOD);
+            } else {
+                ToastSystem.addToast("It seems your studying has paid off! You can now use it on the boss!", GOOD);
             }
         }
     }
 
-    public void giveMoney(){
-        if(!hasMoney){
+    public void giveMoney() {
+        if (!hasMoney) {
             ToastSystem.addToast("You found a dinar in the bush!", GOOD);
             RenderingSystem.hideLayer("Coin");
             hasMoney = true;
@@ -148,22 +146,23 @@ public class Player extends MovingEntity {
         slownessLeft = 0;
         dashesLeft = 0;
         dashCooldown = 3;
+        potionDelay = 0;
         invisibilityWarningGiven = true;
 
     }
 
-    public int getHealth(){
+    public int getHealth() {
         return health;
     }
 
-    public void damage(){
-        if(health > 1){
+    public void damage() {
+        if (health > 1) {
             health -= 1;
-        }
-        else{
+        } else {
             Main.LoseGame();
         }
     }
+
     /**
      * @return wether the player has the key to open the exit.
      */
@@ -175,7 +174,9 @@ public class Player extends MovingEntity {
      *
      * @return if the player has the lockpick
      */
-    public boolean hasLockpick() { return hasLockpick; }
+    public boolean hasLockpick() {
+        return hasLockpick;
+    }
 
     /**
      * Give the player the key to open the exit.
@@ -232,15 +233,23 @@ public class Player extends MovingEntity {
         invisibilityWarningGiven = false;
     }
 
+    public void potionTriggered() {
+        potionDelay = 3;
+    }
+
+    public float getPotionDelay() {
+        return potionDelay;
+    }
+
     /**
      *
      */
-    public void readBook(int id){
-        if(!booksRead.contains(id)){
+    public void readBook(int id) {
+        if (!booksRead.contains(id)) {
             booksRead.add(id);
             ToastSystem.addToast("You read the book!");
 
-            switch (id){
+            switch (id) {
                 case 1:
                     ToastSystem.addToast("It contains hastily written lecture notes left behind by a student.");
                     break;
@@ -264,27 +273,30 @@ public class Player extends MovingEntity {
                     break;
             }
 
-            switch(booksRead.size()){
+            switch (booksRead.size()) {
                 case 1:
                 case 2:
                     ToastSystem.addToast("You don't understand what you are reading at all.", BAD);
                     break;
                 case 3:
-                    ToastSystem.addToast("It still doesn't make any sense to you.",BAD);
+                    ToastSystem.addToast("It still doesn't make any sense to you.", BAD);
                     break;
                 case 4:
-                    ToastSystem.addToast("You can only understand a little bit of what you are reading.",BAD);
+                    ToastSystem.addToast("You can only understand a little bit of what you are reading.", BAD);
                     break;
                 case 5:
-                    ToastSystem.addToast("Some of the topics covered actually make a bit of sense.",GOOD);
+                    ToastSystem.addToast("Some of the topics covered actually make a bit of sense.", GOOD);
                     break;
                 case 6:
-                    ToastSystem.addToast("For once, you feel as though you understand most of what you are reading.",GOOD);
+                    ToastSystem.addToast("For once, you feel as though you understand most of what you are reading.",
+                            GOOD);
                     break;
                 case 7:
-                    ToastSystem.addToast("After reading the book, you finally have a basic understanding of evil pacifist magic!",GOOD);
-                    if(hasStaff){
-                        ToastSystem.addToast("You can now use your staff on the boss!",GOOD);
+                    ToastSystem.addToast(
+                            "After reading the book, you finally have a basic understanding of evil pacifist magic!",
+                            GOOD);
+                    if (hasStaff) {
+                        ToastSystem.addToast("You can now use your staff on the boss!", GOOD);
                     }
                     break;
             }
@@ -293,8 +305,10 @@ public class Player extends MovingEntity {
 
     /**
      * Move the player in the given direction
-     * @param direction The direction to move (D = Down, U = Up, L = Left, R = Right).
-    */
+     * 
+     * @param direction The direction to move (D = Down, U = Up, L = Left, R =
+     *                  Right).
+     */
     public void slownessPotion() {
         slownessLeft = 15;
         setSpeed(50);
@@ -337,12 +351,16 @@ public class Player extends MovingEntity {
                 changeAnimation(2 + animationOffset);
                 break;
         }
-        // System.out.println("Player Sprite Pos: " + Float.toString(getX()) + ", " + Float.toString(getY()));
-        // System.out.println("Player Sprite Size: " + Float.toString(getWidth()) + ", " + Float.toString(getHeight()));
+        // System.out.println("Player Sprite Pos: " + Float.toString(getX()) + ", " +
+        // Float.toString(getY()));
+        // System.out.println("Player Sprite Size: " + Float.toString(getWidth()) + ", "
+        // + Float.toString(getHeight()));
         // System.out.println(
-        //         "Hitbox Pos: " + Float.toString(getHitbox().getX()) + ", " + Float.toString(getHitbox().getY()));
-        // System.out.println("Hitbox Size: " + Float.toString(getHitbox().getWidth()) + ", "
-        //         + Float.toString(getHitbox().getHeight()));
+        // "Hitbox Pos: " + Float.toString(getHitbox().getX()) + ", " +
+        // Float.toString(getHitbox().getY()));
+        // System.out.println("Hitbox Size: " + Float.toString(getHitbox().getWidth()) +
+        // ", "
+        // + Float.toString(getHitbox().getHeight()));
         return super.move(direction);
     }
 
@@ -388,7 +406,7 @@ public class Player extends MovingEntity {
         }
 
         // Invincible Check
-        if(isInvincible()){
+        if (isInvincible()) {
             invincibilityLeft -= Gdx.graphics.getDeltaTime();
             if (!isInvincible()) {
                 changeAnimation(1);
@@ -411,6 +429,10 @@ public class Player extends MovingEntity {
                 dashed = false;
                 dashCooldown = 3;
             }
+        }
+
+        if (potionDelay != 0) {
+            potionDelay -= Gdx.graphics.getDeltaTime();
         }
     }
 
