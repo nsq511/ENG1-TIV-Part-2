@@ -76,10 +76,8 @@ public class Main extends ApplicationAdapter {
     private static boolean playerCaught = false; // Whether the player is currently being held by the Dean.
     private static boolean playerCaughtByLibrarian = false;
     final static float INITALPLAYERCAUGHTTIME = 1.2f;
-    private static float playerCaughtTime = INITALPLAYERCAUGHTTIME; // how many seconds the Dean will hold the player
-                                                                    // when caught.
-    final static Vector2 PLAYERSTARTPOS = new Vector2(730, 500); // Where the player begins the game, and returns to
-                                                                 // when caught.
+    private static float playerCaughtTime = INITALPLAYERCAUGHTTIME; // how many seconds the Dean will hold the player when caught.
+    final static Vector2 PLAYERSTARTPOS = new Vector2(150, 500); // Where the player begins the game, and returns to when caught.
     final static float DEFAULTPLAYERSPEED = 200; // The players speed.
 
     private static Dean dean;
@@ -115,7 +113,6 @@ public class Main extends ApplicationAdapter {
     public static InputSystem inputSystem = new InputSystem();
 
     private static Boss boss;
-    final static float BOSSSPEED = 0;
     final static Vector2 BOSSSTARTPOS = new Vector2(450, 255);
     private static float BOSSATTACKCOOLDOWN = 2.5f;
     final static float BOSSFIGHTLENGTH = 60f;
@@ -137,6 +134,15 @@ public class Main extends ApplicationAdapter {
     public static final String ACH_QUICK = "Fancy a Quickie?";
     public static final String ACH_BOOK = "Thief";
     public static final String ACH_POTION = "A true Witch";
+    public static final String ACH_ARSONIST = "Arsonist";
+    public static final String ACH_WORLD_ENDER = "World ender";
+    public static final String ACH_SELF_SERVING = "Self-serving";
+    public static final String ACH_PROSELYTISER = "Proselytiser";
+    public static final String ACH_COWARD = "COWARD!";
+    public static final String ACH_TRUE_AND_PERFECT_KNIGHT = "A true and perfect knight";
+    public static final String ACH_ERUDITE = "Erudite";
+    public static final String ACH_PAPAL_AUTHORITY = "Papal authority";
+
 
     @Override
     public void create() {
@@ -147,7 +153,7 @@ public class Main extends ApplicationAdapter {
         worldCollision = collisionSystem.getWorldCollision();
         player = new Player(PLAYERSTARTPOS, DEFAULTPLAYERSPEED);
         dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEFAULTDEANPATH);
-        boss = new Boss(BOSSSTARTPOS, BOSSSPEED, false, BOSSATTACKCOOLDOWN, PROJECTILESPACING);
+        boss = new Boss(BOSSSTARTPOS,BOSSATTACKCOOLDOWN,PROJECTILESPACING);
         librarian = new Dean(LIBRARIANSTARTPOS, DEFAULTLIBRARIANSPEED, LIBRARIANPATH,
                 "Characters/librarianAnimations.png");
         projectiles = new ArrayList<>();
@@ -165,6 +171,7 @@ public class Main extends ApplicationAdapter {
      */
     public static void initSystem() {
         gameState = 0; // Not started
+        boss.deactivate();
         projectiles = new ArrayList<>();
         projectileWarnings = new ArrayList<>();
         chestDoorOpen = false;
@@ -297,8 +304,9 @@ public class Main extends ApplicationAdapter {
     // "openOutsideRoomDoor".
     // I have a feeling the wrong door will give the toast.
 
-    public static void defeatBoss() {
-        if (!defeatedBoss) {
+    public static void defeatBoss(){
+        if(!defeatedBoss){
+            System.out.println("Boss defeated!");
             defeatedBoss = true;
             collisionSystem.removeCollisionByName("BossBarrier");
             RoomSystem.unlockDoor(20);
@@ -310,6 +318,7 @@ public class Main extends ApplicationAdapter {
             RenderingSystem.hideLayer("Pyre");
             RenderingSystem.showLayer("Staff");
             RenderingSystem.showLayer("ExitKey");
+            incAchievement(ACH_ARSONIST);
         }
     }
 
@@ -421,6 +430,23 @@ public class Main extends ApplicationAdapter {
         if (TimerSystem.elapsedTime <= 60) {
             incAchievement(ACH_QUICK); // Trigger quick finish achievement
         }
+
+        if(player.hasStaff() && player.booksRead() >= 7 && !releasedPope && !bossConverted){
+            incAchievement(ACH_SELF_SERVING);
+        }
+
+        if(bossConverted){
+            incAchievement(ACH_PROSELYTISER);
+        }
+
+        if(releasedPope && !bossConverted && defeatedBoss){
+            incAchievement(ACH_TRUE_AND_PERFECT_KNIGHT);
+        }
+
+        if(!releasedPope && !defeatedBoss){
+            incAchievement(ACH_COWARD);
+        }
+
         gameState = 3;
     }
 
@@ -489,6 +515,10 @@ public class Main extends ApplicationAdapter {
 
         if (!achTriggered && TimerSystem.elapsedTime > 4 * 60) {
             achTriggered = incAchievement(ACH_LOST); // Trigger slow finish achievement
+        }
+
+        if(player.booksRead() >= 7){
+            incAchievement(ACH_ERUDITE);
         }
 
         dean.nextMove();
@@ -614,13 +644,19 @@ public class Main extends ApplicationAdapter {
         }
     }
 
-    public static void spawnProjectile(Vector2 position, Character direction) {
+    /**
+     * Spawns a projectile, should only be used for the boss fight.
+     * @param position - the position of the projectile
+     * @param direction - the direction that the projectile is travelling
+     */
+    public static void spawnProjectile(Vector2 position, Character direction){
         float warningLength = PROJECTILEWARNINGLENGTH;
-        // float delta = Gdx.graphics.getDeltaTime();
+        //float delta = Gdx.graphics.getDeltaTime();
         ProjectileWarning warning = new ProjectileWarning(position, direction, warningLength);
         BossProjectile projectile = new BossProjectile(position, direction, PROJECTILESPEED, PROJECTILEWARNINGLENGTH);
         projectileWarnings.add(warning);
         projectiles.add(projectile);
+        System.out.println(projectiles.size());
     }
 
     /**
@@ -673,14 +709,20 @@ public class Main extends ApplicationAdapter {
      * Used to release the pope from his cell, which reduces the length of the boss
      * fight.
      */
-    public static void releasePope() {
-        if (!releasedPope && player.hasLockpick()) {
-            releasedPope = true;
-            collisionSystem.removeCollisionByName("popeCellDoor");
-            RenderingSystem.hideLayer("Pope");
-            RenderingSystem.hideLayer("PopeCellDoor");
-            RenderingSystem.showLayer("PopeSeraph");
-            ToastSystem.addToast("\"GSZMP BLF UIRVMW! R DROO KIZB ULI BLFI ERXGLIB!\"");
+    public static void releasePope(){
+        if(!releasedPope){
+            if(player.hasLockpick()){
+                releasedPope = true;
+                collisionSystem.removeCollisionByName("popeCellDoor");
+                RenderingSystem.hideLayer("Pope");
+                RenderingSystem.hideLayer("PopeCellDoor");
+                RenderingSystem.showLayer("PopeSeraph");
+                incAchievement(ACH_PAPAL_AUTHORITY);
+                ToastSystem.addToast("\"GSZMP BLF UIRVMW! R DROO KIZB ULI BLFI ERXGLIB!\"");
+            }
+            else{
+                ToastSystem.addToast("\"I CANNOT STAND THIS IMPRISONMENT ANY LONGER! FIND A LOCKPICK AND RELEASE ME\"");
+            }
         }
     }
 
@@ -704,7 +746,11 @@ public class Main extends ApplicationAdapter {
     public static void releaseBob() {
         if (player.hasLockpick()) {
             bobReleased = true;
+            incAchievement(ACH_WORLD_ENDER);
             LoseGame();
+        }
+        else{
+            ToastSystem.addToast("The door is locked! But maybe that's for the best...");
         }
     }
 
@@ -754,6 +800,7 @@ public class Main extends ApplicationAdapter {
         // Spawn Room
         if (x == 0 && y == 0) {
             dean.activate();
+            dean.setPosition(DEANSTARTPOS);
             librarian.setX(librarianPos.x);
             librarian.setY(librarianPos.y);
             librarian.setPath(librarianPath);
@@ -822,7 +869,9 @@ public class Main extends ApplicationAdapter {
                 if (player.hasFirestarter()) {
                     timeModifier += 20f;
                 }
-                boss.start(BOSSFIGHTLENGTH - timeModifier);
+                if(!defeatedBoss){
+                    boss.start(BOSSFIGHTLENGTH-timeModifier);
+                }
                 RenderingSystem.hideLayer("Boss");
                 RenderingSystem.hideLayer("Staff");
             }

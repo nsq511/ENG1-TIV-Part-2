@@ -25,15 +25,14 @@ public class MovingEntity extends AnimatedEntity {
 
     public MovingEntity(
             Texture spriteSheetTexture, int[] frameNumbers,
-            int tileWidth, int tileHeight, 
+            int tileWidth, int tileHeight,
             float speed, Vector2 startPos,
             Vector2 hitboxOffset, boolean active, boolean canCollide
         ) {
         super(spriteSheetTexture, frameNumbers, tileWidth, tileHeight, startPos, hitboxOffset);
         this.speed = speed;
         initSpeed = speed;
-        initActive = true;
-        active = true;
+        initActive = active;
         frozen = false;
         this.active = active;
         this.canCollide = canCollide;
@@ -41,21 +40,13 @@ public class MovingEntity extends AnimatedEntity {
 
     public MovingEntity(
             Texture spriteSheetTexture, int[] frameNumbers,
-            int tileWidth, int tileHeight, 
+            int tileWidth, int tileHeight,
             float speed, Vector2 startPos,
             Vector2 hitboxOffset
         ) {
         this(spriteSheetTexture, frameNumbers, tileWidth, tileHeight, speed, startPos, hitboxOffset, true, true);
 
     }
-
-    // public MovingEntity(Texture spriteSheetTexture, int[] frameNumbers, int tileWidth, int tileHeight, float speed, Vector2 startPos, boolean active, boolean canCollide) {
-    //     super(spriteSheetTexture, frameNumbers, tileWidth, tileHeight, startPos);
-    //     this.speed = speed;
-    //     initSpeed = speed;
-    //     initActive = active;
-    // }
-
 
     /**
      * Resets the MovingEntity to its original state
@@ -74,7 +65,7 @@ public class MovingEntity extends AnimatedEntity {
 
     /**
      * Update the speed of the entity.
-     * 
+     *
      * @param newSpeed - How fast the entity will now move.
      */
     public void setSpeed(float newSpeed) {
@@ -90,7 +81,7 @@ public class MovingEntity extends AnimatedEntity {
 
     /**
      * Moves the entity in a given direction provided it wont collide with anything.
-     * 
+     *
      * @param direction           The direction as either 'U' 'D' 'L' or'R'
      * @param collisionRectangles A list of rectangles which the entity cannot move
      *                            into.
