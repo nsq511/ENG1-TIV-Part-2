@@ -52,7 +52,7 @@ public class AchievementSystem {
                 Main.ACH_QUICK,
                 "Escape in under a minute",
                 1,
-                50,
+                250,
                 "ach_quick.png");
 
         AchievementSystem.addAchievement(
@@ -80,8 +80,8 @@ public class AchievementSystem {
         AchievementSystem.addAchievement(
             Main.ACH_WORLD_ENDER,
             "WHAT HAVE YOU DONE?!",
-            1
-            -100000,
+            1,
+            -999999999,
             "ach_world_ender.png"
         );
 
@@ -113,20 +113,22 @@ public class AchievementSystem {
             Main.ACH_PROSELYTISER,
             "Convert the boss using evil pacifist magic",
             1,
-            100,
+            250,
             "ach_proselytiser.png"
         );
 
         AchievementSystem.addAchievement(
             Main.ACH_SELF_SERVING,
             "Seize the staff and knowledge of evil pacifist magic for yourself",
-            100,
+            1,
+            250,
             "ach_self_serving.png"
         );
 
         AchievementSystem.addAchievement(
             Main.ACH_TRUE_AND_PERFECT_KNIGHT,
             "Complete both of your missions",
+            1,
             100,
             "ach_true_and_perfect_knight.png"
         );
@@ -234,7 +236,9 @@ public class AchievementSystem {
 
     public static float modifyScore(float score) {
         for (Achievement a : achievements.values()) {
-            score = (int) a.modifyScore(score);
+            if(a.isAchieved()){
+                score = (int) a.modifyScore(score);
+            }
         }
         return score;
     }
