@@ -26,7 +26,7 @@ public class Player extends MovingEntity {
     private boolean hasExitKey = false;
     private boolean hasChestRoomKey = false;
     private boolean hasRedPotion = false;
-    private boolean hasLockpick = false;
+    private boolean hasLockpick = true;
     // I am getting a warning on the next line but an error if I remove it...
     private boolean defeatedBoss = false;
     private boolean hasFirestarter = false;
@@ -302,7 +302,7 @@ public class Player extends MovingEntity {
 
     /**
      * Move the player in the given direction
-     * 
+     *
      * @param direction The direction to move (D = Down, U = Up, L = Left, R =
      *                  Right).
      */
@@ -400,7 +400,7 @@ public class Player extends MovingEntity {
             slownessLeft -= Gdx.graphics.getDeltaTime();
             if (slownessLeft <= 0) {
                 ToastSystem.addToast("Your slowness potion finally ran out!");
-                setSpeed(100);
+                setSpeed(200);
             }
         }
 

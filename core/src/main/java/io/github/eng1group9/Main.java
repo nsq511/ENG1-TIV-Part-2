@@ -14,6 +14,8 @@ import com.badlogic.gdx.math.Vector2;
 import io.github.eng1group9.entities.*;
 import io.github.eng1group9.systems.*;
 
+import javax.swing.text.DefaultEditorKit;
+
 /**
  * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all
  * platforms.
@@ -43,8 +45,8 @@ public class Main extends ApplicationAdapter {
     public static boolean releasedPope = false;
     public static boolean bossConverted = false;
     public static boolean bobReleased = false;
-    public static boolean defeatedBoss = true;
-    public static int longboiBonus = 0; // the bonus to add based on whether LongBoi was found.
+    public static boolean defeatedBoss = false;
+    public static int longboiBonus = 25; // the bonus to add based on whether LongBoi was found.
     public static boolean bookUsed = false; // Whether the book power up has been collected.
     public static boolean potionAch = false;
     public static String[] potions = { "speed", "slow", "dark" };
@@ -115,11 +117,11 @@ public class Main extends ApplicationAdapter {
     private static Boss boss;
     final static Vector2 BOSSSTARTPOS = new Vector2(450, 255);
     private static float BOSSATTACKCOOLDOWN = 2.5f;
-    final static float BOSSFIGHTLENGTH = 60f;
+    final static float BOSSFIGHTLENGTH = 45f;
 
     private static ArrayList<BossProjectile> projectiles;
     private static ArrayList<ProjectileWarning> projectileWarnings;
-    private static float PROJECTILESPEED = 1000f;
+    private static float PROJECTILESPEED = 500f;
     private static final float PROJECTILEWARNINGLENGTH = 2.5f;
     private static final int PROJECTILESPACING = 96;
     // Achievement names
@@ -206,6 +208,8 @@ public class Main extends ApplicationAdapter {
         RenderingSystem.reset();
         collisionSystem.reset();
         RenderingSystem.hideLayer("PopeSeraph");
+        RenderingSystem.hideLayer("Staff");
+        RenderingSystem.hideLayer("Boss");
         loadRoom(0, 0, PLAYERSTARTPOS, LIBRARIANSTARTPOS, LIBRARIANPATH);
         TriggerSystem.init(TMXPATH, VIEWPORTWIDTH, VIEWPORTHEIGHT);
         AchievementSystem.reset();
@@ -292,17 +296,18 @@ public class Main extends ApplicationAdapter {
      * Remove its hitbox and graphic.
      */
     public static void openChestRoomDoor() {
-        if (player.hasChestRoomKey() || player.hasLockpick() && !chestDoorOpen) {
-            ToastSystem.addToast("You Opened the Door!", GOOD);
-            collisionSystem.removeCollisionByName("chestRoomDoor");
-            RenderingSystem.hideLayer("ChestDoorClosed");
-            chestDoorOpen = true;
+        if(!chestDoorOpen){
+            if (player.hasChestRoomKey() || player.hasLockpick()) {
+                ToastSystem.addToast("You Opened the Door!", GOOD);
+                collisionSystem.removeCollisionByName("chestRoomDoor");
+                RenderingSystem.hideLayer("ChestDoorClosed");
+                chestDoorOpen = true;
+            }
+            else{
+                ToastSystem.addToast("The door is locked!", BAD);
+            }
         }
     }
-
-    // TODO: CHECK THERE ARE NO CONFLICTS HERE BETWEEN "defeatBoss" and
-    // "openOutsideRoomDoor".
-    // I have a feeling the wrong door will give the toast.
 
     public static void defeatBoss(){
         if(!defeatedBoss){
@@ -312,7 +317,7 @@ public class Main extends ApplicationAdapter {
             RoomSystem.unlockDoor(20);
             RenderingSystem.showLayer("Boss");
             RenderingSystem.hideLayer("Flames");
-
+            RenderingSystem.hideLayer("LibraryBookshelves1");
             RenderingSystem.hideLayer("LibraryBookshelves2");
             RenderingSystem.hideLayer("LibraryBookshelves3");
             RenderingSystem.hideLayer("Pyre");
@@ -341,8 +346,16 @@ public class Main extends ApplicationAdapter {
         if (player.hasExitKey() && !exitOpen) {
             ToastSystem.addToast("You Opened the Exit!", GOOD);
             collisionSystem.removeCollisionByName("exitDoor");
-            RenderingSystem.hideLayer("ExitClosed");
             exitOpen = true;
+        }
+    }
+
+    /**
+     * Checks if the player has read 7 books, which gives the erudite achievement
+     */
+    public static void checkErudite(){
+        if(player.booksRead() >= 7){
+            incAchievement(ACH_ERUDITE);
         }
     }
 
@@ -425,24 +438,30 @@ public class Main extends ApplicationAdapter {
      */
     public static void winGame() {
         togglePause();
-        if (TimerSystem.elapsedTime <= 60) {
-            incAchievement(ACH_QUICK); // Trigger quick finish achievement
-        }
 
-        if(player.hasStaff() && player.booksRead() >= 7 && !releasedPope && !bossConverted){
-            incAchievement(ACH_SELF_SERVING);
-        }
+        if(!bobReleased){
+            if (TimerSystem.elapsedTime <= 60) {
+                incAchievement(ACH_QUICK); // Trigger quick finish achievement
+            }
 
-        if(bossConverted){
-            incAchievement(ACH_PROSELYTISER);
-        }
+            if(player.hasStaff() && player.booksRead() >= 7 && !releasedPope && !bossConverted){
+                incAchievement(ACH_SELF_SERVING);
+            }
 
-        if(releasedPope && !bossConverted && defeatedBoss){
-            incAchievement(ACH_TRUE_AND_PERFECT_KNIGHT);
-        }
+            if(bossConverted){
+                incAchievement(ACH_PROSELYTISER);
+            }
 
-        if(!releasedPope && !defeatedBoss){
-            incAchievement(ACH_COWARD);
+            if(releasedPope && !bossConverted && defeatedBoss){
+                incAchievement(ACH_TRUE_AND_PERFECT_KNIGHT);
+            }
+
+            if(!releasedPope && !defeatedBoss){
+                incAchievement(ACH_COWARD);
+            }
+        }
+        else{
+            incAchievement(ACH_WORLD_ENDER);
         }
 
         gameState = 3;
@@ -513,10 +532,6 @@ public class Main extends ApplicationAdapter {
 
         if (!achTriggered && TimerSystem.elapsedTime > 4 * 60) {
             achTriggered = incAchievement(ACH_LOST); // Trigger slow finish achievement
-        }
-
-        if(player.booksRead() >= 7){
-            incAchievement(ACH_ERUDITE);
         }
 
         dean.nextMove();
@@ -674,10 +689,15 @@ public class Main extends ApplicationAdapter {
      * Used to open the door to the room with the chest containing the lockpick
      */
     public static void openLockpickRoomDoor() {
-        if (!lockpickRoomOpened && (player.hasLockpick() || player.hasJanitorKey())) {
-            collisionSystem.removeCollisionByName("lockpickRoomDoor");
-            RenderingSystem.hideLayer("LockpickRoomDoor");
-            lockpickRoomOpened = true;
+        if(!lockpickRoomOpened){
+            if (player.hasLockpick() || player.hasJanitorKey()) {
+                collisionSystem.removeCollisionByName("lockpickRoomDoor");
+                RenderingSystem.hideLayer("LockpickRoomDoor");
+                lockpickRoomOpened = true;
+            }
+            else{
+                ToastSystem.addToast("The door is locked!", BAD);
+            }
         }
     }
 
@@ -685,21 +705,32 @@ public class Main extends ApplicationAdapter {
      * Used to open the door to the dungeons from the outside
      */
     public static void openDungeonDoor() {
-        if (!dungeonDoorOpened && (player.hasLockpick() || player.hasJanitorKey())) {
-            collisionSystem.removeCollisionByName("dungeonDoor");
-            RenderingSystem.hideLayer("DungeonDoor");
-            dungeonDoorOpened = true;
+        if(!dungeonDoorOpened){
+            if (player.hasLockpick() || player.hasJanitorKey()) {
+                collisionSystem.removeCollisionByName("dungeonDoor");
+                RenderingSystem.hideLayer("DungeonDoor");
+                dungeonDoorOpened = true;
+            }
+            else{
+                ToastSystem.addToast("The door is locked!", BAD);
+            }
         }
+
     }
 
     /**
      * Used to open the locked door inside the PNQ building
      */
     public static void openPNQDoor() {
-        if (!PNQDoorOpened && (player.hasLockpick() || player.hasJanitorKey())) {
-            collisionSystem.removeCollisionByName("PNQDoor");
-            RenderingSystem.hideLayer("PNQDoor");
-            PNQDoorOpened = true;
+        if(!PNQDoorOpened){
+            if (player.hasLockpick() || player.hasJanitorKey()) {
+                collisionSystem.removeCollisionByName("PNQDoor");
+                RenderingSystem.hideLayer("PNQDoor");
+                PNQDoorOpened = true;
+            }
+            else{
+                ToastSystem.addToast("The door is locked!", BAD);
+            }
         }
     }
 
@@ -744,11 +775,10 @@ public class Main extends ApplicationAdapter {
     public static void releaseBob() {
         if (player.hasLockpick()) {
             bobReleased = true;
-            incAchievement(ACH_WORLD_ENDER);
-            LoseGame();
+            winGame();
         }
         else{
-            ToastSystem.addToast("The door is locked! But maybe that's for the best...");
+            ToastSystem.addToast("Luckily for you, the door is locked.");
         }
     }
 
@@ -797,8 +827,11 @@ public class Main extends ApplicationAdapter {
 
         // Spawn Room
         if (x == 0 && y == 0) {
+
             dean.activate();
-            dean.setPosition(DEANSTARTPOS);
+
+            dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEFAULTDEANPATH);
+
             librarian.setX(librarianPos.x);
             librarian.setY(librarianPos.y);
             librarian.setPath(librarianPath);
@@ -862,10 +895,10 @@ public class Main extends ApplicationAdapter {
                 RenderingSystem.showLayer("Flames");
                 float timeModifier = 0f;
                 if (releasedPope) {
-                    timeModifier += 30f;
+                    timeModifier += 25f;
                 }
                 if (player.hasFirestarter()) {
-                    timeModifier += 20f;
+                    timeModifier += 15f;
                 }
                 if(!defeatedBoss){
                     boss.start(BOSSFIGHTLENGTH-timeModifier);

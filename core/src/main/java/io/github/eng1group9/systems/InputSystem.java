@@ -12,7 +12,7 @@ import io.github.eng1group9.entities.Player;
 public class InputSystem {
     /**
      * Processes user input, both for movement and misc inputs.
-     * 
+     *
      * @param player - the player to move based on input.
      */
     public void handle(Player player) {
