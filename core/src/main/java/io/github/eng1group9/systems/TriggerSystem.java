@@ -73,6 +73,8 @@ public class TriggerSystem {
     private static List<Trigger> interactTriggers = new LinkedList<>();
 
     public static void init(String tmxPath, int viewportWidth, int viewportHeight) {
+        touchTriggers.clear();
+        interactTriggers.clear();
         List<Trigger> triggers = getTriggers(tmxPath, viewportWidth, viewportHeight);
         for (Trigger t : triggers) {
             if (t.isActivateOnTouch()) {
@@ -242,7 +244,7 @@ public class TriggerSystem {
             case 6: // Standing by the chest room door
                 Main.openChestRoomDoor();
                 break;
-            case 7: // Standing by the chest room door
+            case 7: // DEPRECIATED
                 Main.openExit();
                 break;
             case 8: // Pickup red potion.
@@ -283,24 +285,31 @@ public class TriggerSystem {
                 break;
             case 26:
                 player.readBook(1);
+                Main.checkErudite();
                 break;
             case 21:
                 player.readBook(2);
+                Main.checkErudite();
                 break;
             case 22:
                 player.readBook(3);
+                Main.checkErudite();
                 break;
             case 23:
                 player.readBook(4);
+                Main.checkErudite();
                 break;
             case 24:
                 player.readBook(5);
+                Main.checkErudite();
                 break;
             case 25:
                 player.readBook(6);
+                Main.checkErudite();
                 break;
             case 20:
                 player.readBook(7);
+                Main.checkErudite();
                 break;
             case 27:
                 Main.loadRoom(0, 1, new Vector2(30, 30), new Vector2(50, 50), new Character[] { 'U', 'D' });
@@ -331,6 +340,10 @@ public class TriggerSystem {
                     player.potionTriggered();
                     Main.getPotion();
                 }
+                break;
+            case 34:
+                ToastSystem.addToast("You see a terrifying creature behind the cell door.");
+                ToastSystem.addToast("Perhaps it wouldn't be the best idea to release it...");
                 break;
             default:
                 break;
