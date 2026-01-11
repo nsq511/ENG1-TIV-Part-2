@@ -149,7 +149,7 @@ public class Boss extends MovingEntity {
     @Override
     public void reset(){
         super.reset();
-
+        defeated = false;
     }
 
 }
