@@ -2,7 +2,11 @@ package io.github.eng1group9.entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+<<<<<<< Updated upstream
 import com.badlogic.gdx.math.Vector2;
+=======
+import io.github.eng1group9.Main;
+>>>>>>> Stashed changes
 
 /**
  * An animated entity which can move. This class handles speed and collision.
@@ -17,6 +21,7 @@ public class MovingEntity extends AnimatedEntity {
 
     private float speed = 0;
     private boolean frozen = false;
+<<<<<<< Updated upstream
     private float initSpeed = 0f;
     private boolean initActive = true;
     private boolean active = true;
@@ -30,6 +35,11 @@ public class MovingEntity extends AnimatedEntity {
             Vector2 hitboxOffset, boolean active, boolean canCollide
         ) {
         super(spriteSheetTexture, frameNumbers, tileWidth, tileHeight, startPos, hitboxOffset);
+=======
+
+    public MovingEntity(Texture spriteSheetTexture, int[] frameNumbers, int tileWidth, int tileHeight, float speed) {
+        super(spriteSheetTexture, frameNumbers, tileWidth, tileHeight);
+>>>>>>> Stashed changes
         this.speed = speed;
         initSpeed = speed;
         initActive = active;
@@ -49,6 +59,7 @@ public class MovingEntity extends AnimatedEntity {
     }
 
     /**
+<<<<<<< Updated upstream
      * Resets the MovingEntity to its original state
      */
     public void reset() {
@@ -66,6 +77,9 @@ public class MovingEntity extends AnimatedEntity {
     /**
      * Update the speed of the entity.
      *
+=======
+     * Update the speed of the entity.
+>>>>>>> Stashed changes
      * @param newSpeed - How fast the entity will now move.
      */
     public void setSpeed(float newSpeed) {
@@ -80,11 +94,17 @@ public class MovingEntity extends AnimatedEntity {
     }
 
     /**
+<<<<<<< Updated upstream
      * Moves the entity in a given direction provided it wont collide with anything.
      *
      * @param direction           The direction as either 'U' 'D' 'L' or'R'
      * @param collisionRectangles A list of rectangles which the entity cannot move
      *                            into.
+=======
+     * Moves the entity in a given direction provided it wont collide with anything and .
+     * @param direction The direction as either 'U' 'D' 'L' or'R'
+     * @param collisionRectangles A list of rectangles which the entity cannot move into.
+>>>>>>> Stashed changes
      */
     public float move(Character direction) {
         if (!frozen) {
@@ -108,7 +128,11 @@ public class MovingEntity extends AnimatedEntity {
                     newX += distance;
                     break;
             }
+<<<<<<< Updated upstream
             if (io.github.eng1group9.Main.collisionSystem.safeToMove(newX, newY, getHitbox()) || !canCollide) {
+=======
+            if (Main.collisionSystem.safeToMove(newX, newY, getHitbox())) {
+>>>>>>> Stashed changes
                 setPosition(newX, newY);
                 return distance;
             }
@@ -116,6 +140,7 @@ public class MovingEntity extends AnimatedEntity {
         return 0;
     }
 
+<<<<<<< Updated upstream
     public float dash(Character direction) {
         if (!frozen) {
             float newX = getX();
@@ -141,6 +166,8 @@ public class MovingEntity extends AnimatedEntity {
         }
         return 0;
     }
+=======
+>>>>>>> Stashed changes
 
     /**
      * Prevent the entity from moving, and pause their animation.

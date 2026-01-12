@@ -35,6 +35,10 @@ public class InputSystem {
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             Main.startGame();
         }
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 
         if (!player.isFrozen()) {
             if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {

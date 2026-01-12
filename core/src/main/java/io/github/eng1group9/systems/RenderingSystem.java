@@ -1,7 +1,10 @@
 package io.github.eng1group9.systems;
 
 import com.badlogic.gdx.Gdx;
+<<<<<<< Updated upstream
 import com.badlogic.gdx.Input;
+=======
+>>>>>>> Stashed changes
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -56,9 +59,14 @@ public class RenderingSystem {
 
     /**
      * Takes and tileset and sets up a renderer to display it.
+<<<<<<< Updated upstream
      *
      * @param tmxPath        - The path to the tileset (.tmx file).
      * @param viewportWidth  - how many pixels wide the world is.
+=======
+     * @param tmxPath - The path to the tileset (.tmx file).
+     * @param viewportWidth - how many pixels wide the world is.
+>>>>>>> Stashed changes
      * @param viewportHeight - how many pixels high the world is.
      */
     public void initWorld(String tmxPath, int viewportWidth, int viewportHeight) {
@@ -99,7 +107,10 @@ public class RenderingSystem {
 
     /**
      * Hide a layer so that tiles on it are NOT rendered.
+<<<<<<< Updated upstream
      *
+=======
+>>>>>>> Stashed changes
      * @param name - The name of the layer.
      */
     public static void hideLayer(String name) {
@@ -107,6 +118,7 @@ public class RenderingSystem {
     }
 
     /**
+<<<<<<< Updated upstream
      * Resets layers
      */
     public static void reset() {
@@ -127,6 +139,9 @@ public class RenderingSystem {
     /**
      * Show a layer so that tiles on it are rendered.
      *
+=======
+     * Show a layer so that tiles on it are rendered.
+>>>>>>> Stashed changes
      * @param name - The name of the layer.
      */
     public static void showLayer(String name) {
@@ -135,12 +150,19 @@ public class RenderingSystem {
 
     /**
      * Draw a frame to display.
+<<<<<<< Updated upstream
      *
      * @param player         - The current player object.
      * @param dean           - The dean object.
      * @param showCollision  - Wether to render the zones for collision / triggers
      *                       (dev mode).
      * @param elapsedTime    - How much time has passed since the game began.
+=======
+     * @param player - The current player object.
+     * @param dean - The dean object.
+     * @param showCollision - Wether to render the zones for collision / triggers (dev mode).
+     * @param elapsedTime - How much time has passed since the game began.
+>>>>>>> Stashed changes
      * @param worldCollision - A list of rectangles representing the games collison.
      */
     public void draw(Player player, Dean dean, Boss boss, Dean librarian, boolean showCollision, float elapsedTime,
@@ -259,8 +281,12 @@ public class RenderingSystem {
     /**
      * Render the toast display on the top left of the screen.
      * This is used to display text messages to the user for 5s.
+<<<<<<< Updated upstream
      *
      * @param font    The BitmapFont which used to render the text.
+=======
+     * @param font The BitmapFont which used to render the text.
+>>>>>>> Stashed changes
      * @param uiBatch - The SpriteBatch used for this (should be the ui batch).
      */
     public void renderToasts(BitmapFont font, SpriteBatch uiBatch) {
@@ -278,9 +304,13 @@ public class RenderingSystem {
 
     /**
      * Render the zones for collision / triggers (dev mode).
+<<<<<<< Updated upstream
      *
      * @param uiBatch        - The SpriteBatch used for this (should be the ui
      *                       batch).
+=======
+     * @param uiBatch - The SpriteBatch used for this (should be the ui batch).
+>>>>>>> Stashed changes
      * @param worldCollision - A list of rectangles representing the games collison.
      * @param player
      */
@@ -330,9 +360,14 @@ public class RenderingSystem {
 
     /**
      * Display the pause overlay, with instructions and controls.
+<<<<<<< Updated upstream
      *
      * @param screenWidth          - how many pixels wide the screen is.
      * @param screenHeight         - how many pixels high the screen is.
+=======
+     * @param screenWidth - how many pixels wide the screen is.
+     * @param screenHeight - how many pixels high the screen is.
+>>>>>>> Stashed changes
      * @param positiveEventCounter - Number of PowerUps collected.
      * @param negativeEventCounter - Number of times caught by the dean.
      * @param hiddenEventCounter   - Number of secrets found.
@@ -356,10 +391,15 @@ public class RenderingSystem {
     }
 
     /**
+<<<<<<< Updated upstream
      * Display the start overlay, with instructions, controls and how to start the
      * game.
      *
      * @param screenWidth  - how many pixels wide the screen is.
+=======
+     * Display the start overlay, with instructions, controls and how to start the game.
+     * @param screenWidth - how many pixels wide the screen is.
+>>>>>>> Stashed changes
      * @param screenHeight - how many pixels high the screen is.
      */
     public void renderStartOverlay(int screenWidth, int screenHeight) {
@@ -369,6 +409,7 @@ public class RenderingSystem {
         uiBatch.setColor(1, 1, 1, 1);
 
         font.getData().setScale(2f);
+<<<<<<< Updated upstream
         font.draw(uiBatch, "Escape from Uni", screenWidth / 8f, (screenHeight / 2f) + 40);
         font.draw(uiBatch, "Instructions", screenWidth / 8f, (screenHeight / 2f) - 120);
 
@@ -381,14 +422,31 @@ public class RenderingSystem {
         font.setColor(0, 1, 1, 1);
         font.draw(uiBatch, "Press Space to Start!", screenWidth / 8f, (screenHeight / 2f) - 240);
         font.setColor(1, 1, 1, 1);
+=======
+        font.draw(uiBatch, "Escape from Uni", screenWidth / 2f, (screenHeight / 2f) + 40);
+        font.draw(uiBatch, "Instructions", screenWidth / 2f, (screenHeight / 2f) - 120);
+
+        font.setColor(0, 1, 1, 1);
+        font.draw(uiBatch, "Press Space to Start!", screenWidth / 2f, (screenHeight / 2f) - 200);
+        font.setColor(1, 1, 1, 1);
+
+        font.getData().setScale(1f);
+        renderControls(screenWidth, screenHeight);
+        font.draw(uiBatch, "Avoid the dean and escape the maze in time!", screenWidth / 2f, (screenHeight / 2f) - 160);
+
+>>>>>>> Stashed changes
 
         uiBatch.end();
     }
 
     /**
      * Render the controls list, tellign you all the buttons and what they do.
+<<<<<<< Updated upstream
      *
      * @param screenWidth  - how many pixels wide the screen is.
+=======
+     * @param screenWidth - how many pixels wide the screen is.
+>>>>>>> Stashed changes
      * @param screenHeight - how many pixels high the screen is.
      */
     private void renderControls(int screenWidth, int screenHeight) {
@@ -401,11 +459,17 @@ public class RenderingSystem {
     }
 
     /**
+<<<<<<< Updated upstream
      * Render the Stats at the bottom of the overlay, showing PowerUps collected,
      * times caught and secrets found.
      *
      * @param screenWidth          - how many pixels wide the screen is.
      * @param screenHeight         - how many pixels high the screen is.
+=======
+     * Render the Stats at the bottom of the overlay, showing PowerUps collected, times caught and secrets found.
+     * @param screenWidth - how many pixels wide the screen is.
+     * @param screenHeight - how many pixels high the screen is.
+>>>>>>> Stashed changes
      * @param positiveEventCounter - Number of PowerUps collected.
      * @param negativeEventCounter - Number of times caught by the dean.
      * @param hiddenEventCounter   - Number of secrets found.
@@ -419,11 +483,18 @@ public class RenderingSystem {
 
     /**
      * Display the win overlay, with your score and how much time was left.
+<<<<<<< Updated upstream
      *
      * @param screenWidth          - How many pixels wide the screen is.
      * @param screenHeight         - How many pixels high the screen is.
      * @param timeLeft             - How much time was left when the player escaped.
      * @param score                - the score the player managed to get.
+=======
+     * @param screenWidth - How many pixels wide the screen is.
+     * @param screenHeight - How many pixels high the screen is.
+     * @param timeLeft - How much time was left when the player escaped.
+     * @param score - the score the player managed to get.
+>>>>>>> Stashed changes
      * @param positiveEventCounter - Number of PowerUps collected.
      * @param negativeEventCounter - Number of times caught by the dean.
      * @param hiddenEventCounter   - Number of secrets found.
@@ -474,9 +545,14 @@ public class RenderingSystem {
 
     /**
      * Display the lose overlay, for when you run out of time.
+<<<<<<< Updated upstream
      *
      * @param screenWidth          - How many pixels wide the screen is.
      * @param screenHeight         - How many pixels high the screen is.
+=======
+     * @param screenWidth - How many pixels wide the screen is.
+     * @param screenHeight - How many pixels high the screen is.
+>>>>>>> Stashed changes
      * @param positiveEventCounter - Number of PowerUps collected.
      * @param negativeEventCounter - Number of times caught by the dean.
      * @param hiddenEventCounter   - Number of secrets found.
