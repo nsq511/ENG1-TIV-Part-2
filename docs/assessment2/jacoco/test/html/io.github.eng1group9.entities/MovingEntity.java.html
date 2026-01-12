@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MovingEntity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">core</a> &gt; <a href="index.source.html" class="el_package">io.github.eng1group9.entities</a> &gt; <span class="el_source">MovingEntity.java</span></div><h1>MovingEntity.java</h1><pre class="source lang-java linenums">package io.github.eng1group9.entities;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
+
+/**
+ * An animated entity which can move. This class handles speed and collision.
+ * @param spriteSheetTexture - The texture contaning the frames laid out in a grid, which are then used to create the aniamtions.
+ * @param frameNumbers - An array of integers which state how many frames are in each animation, values should match the number of sprites on each row of the spriteSheet.
+ * @param tileWidth - How wide each tile in the SpriteSheet is in pixels.
+ * @param tileHeight - How high each tile in the SpriteSheet is in pixels.
+ * @param speed - How fast the entity will move.
+ * @param active- If the entity is active on game start
+ */
+public class MovingEntity extends AnimatedEntity {
+
+<span class="nc" id="L18">    private float speed = 0;</span>
+<span class="nc" id="L19">    private boolean frozen = false;</span>
+<span class="nc" id="L20">    private float initSpeed = 0f;</span>
+<span class="nc" id="L21">    private boolean initActive = true;</span>
+<span class="nc" id="L22">    private boolean active = true;</span>
+<span class="nc" id="L23">    private boolean canCollide = true;</span>
+<span class="nc" id="L24">    private float dash = 75;</span>
+
+    public MovingEntity(
+            Texture spriteSheetTexture, int[] frameNumbers,
+            int tileWidth, int tileHeight,
+            float speed, Vector2 startPos,
+            Vector2 hitboxOffset, boolean active, boolean canCollide
+        ) {
+<span class="nc" id="L32">        super(spriteSheetTexture, frameNumbers, tileWidth, tileHeight, startPos, hitboxOffset);</span>
+<span class="nc" id="L33">        this.speed = speed;</span>
+<span class="nc" id="L34">        initSpeed = speed;</span>
+<span class="nc" id="L35">        initActive = active;</span>
+<span class="nc" id="L36">        frozen = false;</span>
+<span class="nc" id="L37">        this.active = active;</span>
+<span class="nc" id="L38">        this.canCollide = canCollide;</span>
+<span class="nc" id="L39">    }</span>
+
+    public MovingEntity(
+            Texture spriteSheetTexture, int[] frameNumbers,
+            int tileWidth, int tileHeight,
+            float speed, Vector2 startPos,
+            Vector2 hitboxOffset
+        ) {
+<span class="nc" id="L47">        this(spriteSheetTexture, frameNumbers, tileWidth, tileHeight, speed, startPos, hitboxOffset, true, true);</span>
+
+<span class="nc" id="L49">    }</span>
+
+    /**
+     * Resets the MovingEntity to its original state
+     */
+    public void reset() {
+<span class="nc" id="L55">        super.reset();</span>
+<span class="nc" id="L56">        speed = initSpeed;</span>
+<span class="nc" id="L57">        frozen = false;</span>
+<span class="nc bnc" id="L58" title="All 2 branches missed.">        if(initActive){</span>
+<span class="nc" id="L59">            activate();</span>
+        }
+        else{
+<span class="nc" id="L62">            deactivate();</span>
+        }
+<span class="nc" id="L64">    }</span>
+
+    /**
+     * Update the speed of the entity.
+     *
+     * @param newSpeed - How fast the entity will now move.
+     */
+    public void setSpeed(float newSpeed) {
+<span class="nc" id="L72">        speed = newSpeed;</span>
+<span class="nc" id="L73">    }</span>
+
+    /**
+     * @return The speed of the entity.
+     */
+    public float getSpeed() {
+<span class="nc" id="L79">        return speed;</span>
+    }
+
+    /**
+     * Moves the entity in a given direction provided it wont collide with anything.
+     *
+     * @param direction           The direction as either 'U' 'D' 'L' or'R'
+     * @param collisionRectangles A list of rectangles which the entity cannot move
+     *                            into.
+     */
+    public float move(Character direction) {
+<span class="nc bnc" id="L90" title="All 2 branches missed.">        if (!frozen) {</span>
+<span class="nc" id="L91">            float delta = Gdx.graphics.getDeltaTime();</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">            if (delta &gt; 0.1)</span>
+<span class="nc" id="L93">                delta = 0;</span>
+<span class="nc" id="L94">            float distance = delta * speed;</span>
+<span class="nc" id="L95">            float newX = getX();</span>
+<span class="nc" id="L96">            float newY = getY();</span>
+<span class="nc bnc" id="L97" title="All 5 branches missed.">            switch (direction) {</span>
+                case 'U':
+<span class="nc" id="L99">                    newY += distance;</span>
+<span class="nc" id="L100">                    break;</span>
+                case 'D':
+<span class="nc" id="L102">                    newY -= distance;</span>
+<span class="nc" id="L103">                    break;</span>
+                case 'L':
+<span class="nc" id="L105">                    newX -= distance;</span>
+<span class="nc" id="L106">                    break;</span>
+                case 'R':
+<span class="nc" id="L108">                    newX += distance;</span>
+                    break;
+            }
+<span class="nc bnc" id="L111" title="All 4 branches missed.">            if (io.github.eng1group9.Main.collisionSystem.safeToMove(newX, newY, getHitbox()) || !canCollide) {</span>
+<span class="nc" id="L112">                setPosition(newX, newY);</span>
+<span class="nc" id="L113">                return distance;</span>
+            }
+        }
+<span class="nc" id="L116">        return 0;</span>
+    }
+
+    public float dash(Character direction) {
+<span class="nc bnc" id="L120" title="All 2 branches missed.">        if (!frozen) {</span>
+<span class="nc" id="L121">            float newX = getX();</span>
+<span class="nc" id="L122">            float newY = getY();</span>
+<span class="nc bnc" id="L123" title="All 5 branches missed.">            switch (direction) {</span>
+                case 'U':
+<span class="nc" id="L125">                    newY += dash;</span>
+<span class="nc" id="L126">                    break;</span>
+                case 'D':
+<span class="nc" id="L128">                    newY -= dash;</span>
+<span class="nc" id="L129">                    break;</span>
+                case 'L':
+<span class="nc" id="L131">                    newX -= dash;</span>
+<span class="nc" id="L132">                    break;</span>
+                case 'R':
+<span class="nc" id="L134">                    newX += dash;</span>
+                    break;
+            }
+<span class="nc bnc" id="L137" title="All 2 branches missed.">            if (io.github.eng1group9.Main.collisionSystem.safeToMove(newX, newY, getHitbox())) {</span>
+<span class="nc" id="L138">                setPosition(newX, newY);</span>
+<span class="nc" id="L139">                return dash;</span>
+            }
+        }
+<span class="nc" id="L142">        return 0;</span>
+    }
+
+    /**
+     * Prevent the entity from moving, and pause their animation.
+     */
+    public void freeze() {
+<span class="nc" id="L149">        frozen = true;</span>
+<span class="nc" id="L150">        pauseAnimation();</span>
+<span class="nc" id="L151">    }</span>
+
+    /**
+     * Allow the entity to move, and resume their animation.
+     */
+    public void unfreeze() {
+<span class="nc" id="L157">        frozen = false;</span>
+<span class="nc" id="L158">        playAnimation();</span>
+<span class="nc" id="L159">    }</span>
+
+    /**
+     * @return Wether the entity is frozen.
+     */
+    public boolean isFrozen() {
+<span class="nc" id="L165">        return frozen;</span>
+    }
+
+    /**
+     * Makes the entity visible and unfreezes it, as well as whatever is defined in the inherited entity class
+     */
+    public void activate(){
+<span class="nc" id="L172">        active = true;</span>
+<span class="nc" id="L173">        unfreeze();</span>
+<span class="nc" id="L174">    }</span>
+
+    /**
+     * Hides the entity and freezes it, as well as whatever is defined in the inherited entity class
+     */
+    public void deactivate(){
+<span class="nc" id="L180">        active = false;</span>
+<span class="nc" id="L181">        freeze();</span>
+<span class="nc" id="L182">    }</span>
+
+    /**
+     * @return whether the entity is active
+     */
+    public boolean isActive() {
+<span class="nc" id="L188">        return active;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

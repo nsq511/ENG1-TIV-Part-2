@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RoomSystem.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">core</a> &gt; <a href="index.source.html" class="el_package">io.github.eng1group9.systems</a> &gt; <span class="el_source">RoomSystem.java</span></div><h1>RoomSystem.java</h1><pre class="source lang-java linenums">package io.github.eng1group9.systems;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.math.Rectangle;
+
+import com.badlogic.gdx.math.Vector2;
+import io.github.eng1group9.Main;
+import io.github.eng1group9.entities.Player;
+
+/**
+ * System used to manage doors to other rooms on the map.
+ * The Doors layer in the tilemap contains rectangles
+ * which are the zones where the player can interact with the door.
+ * If the player is in the zone, they will use the door when 'E' is pressed
+ * and appear in the centre of the zone of the door that it leads to and load the
+ * room that the other door is in.
+ * &lt;p&gt;&lt;/p&gt;
+ * The name of the rectangle is in the form &quot;ID,transitionID,locked&quot;,
+ * where ID is the ID of the door, transitionID is the ID of the door that it
+ * leads to, and locked is either U or L for unlocked or locked respectively.
+ */
+<span class="nc" id="L31">public class RoomSystem {</span>
+
+    /**
+     * A door on the map that the player can use to traverse through rooms.
+     */
+    static class Door{
+        private int id;
+        private boolean locked;
+        private Rectangle zone;
+        private Vector2 roomCoordinates;
+        private int transitionID;
+
+<span class="nc" id="L43">        public Door(int id, int transitionID, boolean locked, Rectangle zone, Vector2 roomCoordinates) {</span>
+<span class="nc" id="L44">            this.id = id;</span>
+<span class="nc" id="L45">            this.zone = zone;</span>
+<span class="nc" id="L46">            this.locked = locked;</span>
+<span class="nc" id="L47">            this.roomCoordinates = roomCoordinates;</span>
+<span class="nc" id="L48">            this.transitionID = transitionID;</span>
+<span class="nc" id="L49">        }</span>
+
+        public void moveZone(int x,int y){
+<span class="nc" id="L52">            this.zone.setPosition(zone.getX()+x,zone.getY()+y);</span>
+<span class="nc" id="L53">        }</span>
+
+        public int getID() {
+<span class="nc" id="L56">            return id;</span>
+        }
+
+        public Rectangle getZone() {
+<span class="nc" id="L60">            return zone;</span>
+        }
+
+        public void lock(){
+<span class="nc" id="L64">            locked = true;</span>
+<span class="nc" id="L65">        }</span>
+
+        public void unlock() {
+<span class="nc" id="L68">            locked = false;</span>
+<span class="nc" id="L69">        }</span>
+
+        public int getRoomX(){
+<span class="nc" id="L72">            return (int)roomCoordinates.x;</span>
+        }
+
+        public int getRoomY(){
+<span class="nc" id="L76">            return (int)roomCoordinates.y;</span>
+        }
+
+        public boolean playerInZone(Player player) {
+<span class="nc" id="L80">            return player.isColliding(zone);</span>
+        }
+    }
+
+    private static float doorCooldown;
+    private static float doorCooldownRemaining;
+<span class="nc" id="L86">    private static List&lt;Door&gt; doors = new LinkedList&lt;&gt;();</span>
+
+    public static void init(String tmxPath, int viewportWidth, int viewportHeight, float doorCooldownLength){
+<span class="nc" id="L89">        doorCooldown = doorCooldownLength;</span>
+<span class="nc" id="L90">        doorCooldownRemaining = doorCooldownLength;</span>
+<span class="nc" id="L91">        TiledMap map = new TmxMapLoader().load(tmxPath);</span>
+<span class="nc" id="L92">        MapLayer doorLayer = map.getLayers().get(&quot;Doors&quot;);</span>
+<span class="nc" id="L93">        MapObjects doorObjects = doorLayer.getObjects();</span>
+
+<span class="nc bnc" id="L95" title="All 2 branches missed.">        for (MapObject mapObject : doorObjects) {</span>
+<span class="nc" id="L96">            RectangleMapObject recMapObj = (RectangleMapObject) mapObject;</span>
+            try{
+<span class="nc" id="L98">                int ID = Integer.parseInt(recMapObj.getName().split(&quot;,&quot;)[0]);</span>
+<span class="nc" id="L99">                int transitionID = Integer.parseInt(recMapObj.getName().split(&quot;,&quot;)[1]);</span>
+<span class="nc" id="L100">                String locked = recMapObj.getName().split(&quot;,&quot;)[2];</span>
+
+<span class="nc" id="L102">                Rectangle zone = recMapObj.getRectangle();</span>
+<span class="nc" id="L103">                zone.set(zone.x * 2, zone.y * 2, zone.width * 2, zone.height * 2);</span>
+
+<span class="nc" id="L105">                int roomX = ((int)zone.getX())/(viewportWidth*2);</span>
+<span class="nc" id="L106">                int roomY = ((int)zone.getY())/(viewportHeight*2);</span>
+<span class="nc" id="L107">                Vector2 roomCoordinates =  new Vector2((float)roomX, (float)roomY);</span>
+<span class="nc" id="L108">                Door d = new Door(ID, transitionID, locked.equals(&quot;L&quot;), zone, roomCoordinates);</span>
+<span class="nc" id="L109">                doors.add(d);</span>
+<span class="nc" id="L110">                System.out.println(&quot;Initialised door &quot; + ID + &quot; to &quot; + transitionID + &quot; with coordinates &quot; + roomCoordinates + &quot;and X: &quot; + zone.getX() + &quot; Y: &quot; + zone.getY());</span>
+            }
+<span class="nc" id="L112">            catch(Exception e){</span>
+<span class="nc" id="L113">                System.out.println(&quot;Failed to initialise door&quot;);</span>
+<span class="nc" id="L114">            }</span>
+<span class="nc" id="L115">        }</span>
+<span class="nc" id="L116">    }</span>
+
+    /**
+     * Returns a door object with the specified ID.
+     * @return The door with that ID
+     * @param ID The ID of the door
+     */
+    public static Door getDoor(int ID){
+<span class="nc" id="L124">        Door door = null;</span>
+<span class="nc bnc" id="L125" title="All 2 branches missed.">        for (Door d : doors) {</span>
+<span class="nc bnc" id="L126" title="All 2 branches missed.">            if (d.id==ID){</span>
+<span class="nc" id="L127">                door = d;</span>
+            }
+<span class="nc" id="L129">        }</span>
+<span class="nc" id="L130">        return door;</span>
+    }
+
+    /**
+     * Unlocks the specified door
+     * @param ID the ID of the door
+     */
+    public static void unlockDoor(int ID){
+<span class="nc bnc" id="L138" title="All 2 branches missed.">        for (Door d : doors) {</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">            if (d.id==ID){</span>
+<span class="nc" id="L140">                d.unlock();</span>
+            }
+<span class="nc" id="L142">        }</span>
+<span class="nc" id="L143">    }</span>
+
+    /**
+     * Locks the specified door
+     * @param ID the ID of the door
+     */
+    public static void lockDoor(int ID){
+<span class="nc bnc" id="L150" title="All 2 branches missed.">        for (Door d : doors) {</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">            if (d.id==ID){</span>
+<span class="nc" id="L152">                d.lock();</span>
+            }
+<span class="nc" id="L154">        }</span>
+<span class="nc" id="L155">    }</span>
+
+    /**
+     * @return A list of all doors in the system.
+     */
+    public static List&lt;Door&gt; getDoors(){
+<span class="nc" id="L161">        return doors;</span>
+    }
+
+    /**
+     * Moves the door
+     * @param offsetX
+     * @param offsetY
+     */
+    public static void loadRoom(int offsetX, int offsetY){
+<span class="nc" id="L170">        int x = -offsetX;</span>
+<span class="nc" id="L171">        int y = -offsetY;</span>
+<span class="nc bnc" id="L172" title="All 2 branches missed.">        for(Door door : doors){</span>
+<span class="nc" id="L173">            door.moveZone(x,y);</span>
+<span class="nc" id="L174">        }</span>
+<span class="nc" id="L175">    }</span>
+
+    /**
+     * Checks if the player is standing in front of a door and can therefore interact with it.
+     * @param player The player which is being checked.
+     */
+    public static void checkDoors(Player player){
+<span class="nc bnc" id="L182" title="All 2 branches missed.">        for(Door door : doors){</span>
+<span class="nc bnc" id="L183" title="All 2 branches missed.">            if(door.playerInZone(player)){</span>
+<span class="nc" id="L184">                useDoor(door,player);</span>
+            }
+<span class="nc" id="L186">        }</span>
+<span class="nc" id="L187">    }</span>
+
+    /**
+     * Decrements the cooldown to use doors.
+     */
+    public static void checkCooldown(){
+<span class="nc" id="L193">        float delta = Gdx.graphics.getDeltaTime();</span>
+<span class="nc" id="L194">        doorCooldownRemaining -= delta;</span>
+<span class="nc" id="L195">    }</span>
+
+    /**
+     * Uses the door in question if it is unlocked or if the player has a key/lockpick.
+     * Will teleport the player to the other door connected to the door in question.
+     * @param door The door in question.
+     * @param player The player.
+     */
+    private static void useDoor(Door door, Player player){
+<span class="nc" id="L204">        Door transitionDoor =  getDoor(door.transitionID);</span>
+<span class="nc" id="L205">        boolean locked = door.locked;</span>
+
+<span class="nc bnc" id="L207" title="All 2 branches missed.">        if(locked){</span>
+<span class="nc bnc" id="L208" title="All 4 branches missed.">            if(door.id == 7 &amp;&amp; player.hasExitKey()){</span>
+<span class="nc" id="L209">                ToastSystem.addToast(&quot;You unlocked the door!&quot;);</span>
+<span class="nc" id="L210">                door.unlock();</span>
+            }
+<span class="nc bnc" id="L212" title="All 4 branches missed.">            else if(player.hasLockpick() &amp;&amp; door.id != 20){</span>
+<span class="nc" id="L213">                ToastSystem.addToast(&quot;You picked the lock!&quot;);</span>
+<span class="nc" id="L214">                door.unlock();</span>
+            }
+            else{
+<span class="nc" id="L217">                ToastSystem.addToast(&quot;The door is locked!&quot;);</span>
+            }
+        }
+
+<span class="nc bnc" id="L221" title="All 2 branches missed.">        if(!locked){</span>
+<span class="nc bnc" id="L222" title="All 2 branches missed.">            if(doorCooldownRemaining &lt;= 0){</span>
+<span class="nc" id="L223">                doorCooldownRemaining = doorCooldown;</span>
+<span class="nc" id="L224">                System.out.println(&quot;Entering room with coordinates: &quot; + transitionDoor.roomCoordinates);</span>
+<span class="nc" id="L225">                Main.loadRoom(transitionDoor.roomCoordinates);</span>
+<span class="nc" id="L226">                float playerPosX = transitionDoor.zone.getX();</span>
+<span class="nc" id="L227">                float playerPosY = transitionDoor.zone.getY();</span>
+<span class="nc" id="L228">                player.setPosition(playerPosX,playerPosY);</span>
+<span class="nc bnc" id="L229" title="All 2 branches missed.">                if(transitionDoor.id != 20){</span>
+<span class="nc" id="L230">                    transitionDoor.unlock();</span>
+                }
+            }
+
+        }
+<span class="nc" id="L235">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
