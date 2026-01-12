@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LeaderBoard.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">core</a> &gt; <a href="index.source.html" class="el_package">io.github.eng1group9.systems</a> &gt; <span class="el_source">LeaderBoard.java</span></div><h1>LeaderBoard.java</h1><pre class="source lang-java linenums">package io.github.eng1group9.systems;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
+public class LeaderBoard {
+    private HashMap&lt;String, Integer&gt; entries;
+    private int maxLen;
+    private int length;
+
+    /**
+     * Creates a leaderboard from a map of Usernames and Scores, with the specified max length
+     *
+     * @param leaderboard Pairings of unique usernames to scores
+     * @param maxLength The maximum number of entries that can exist on the leaderboard
+     */
+<span class="fc" id="L25">    public LeaderBoard(HashMap&lt;String, Integer&gt; leaderboard, int maxLength){</span>
+<span class="fc" id="L26">        entries = new HashMap&lt;&gt;(leaderboard);</span>
+<span class="fc" id="L27">        maxLen = maxLength;</span>
+<span class="fc" id="L28">    }</span>
+    /**
+     * Creates an empty leaderboard with 5 spaces
+     */
+    public LeaderBoard(){
+<span class="fc" id="L33">        this(new HashMap&lt;&gt;(), 5);</span>
+<span class="fc" id="L34">    }</span>
+
+    // NOT USED
+//    public int getLength(){
+//        return length;
+//    }
+
+    /**
+     * Adds an entry to the leaderboard if there is space
+     * If there is not sufficient space then behaviour will depend on whether the score ranks above the lowest value already in the leaderboard
+     * If the score is less than or equal to the lowest value in the leaderboard, it will not be added
+     * If the score is higher than the lowest value, it will be added and the lowest value will be removed
+     *
+     * @param name The name of the user who achieved the score. If name already exists it will overwrite
+     * @param score The score that the user achieved
+     */
+    public void addEntry(String name, int score){
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">        if(length == maxLen){</span>
+<span class="nc" id="L52">            popLowest();</span>
+        }
+        else{
+<span class="fc" id="L55">            length++;</span>
+        }
+<span class="fc" id="L57">        entries.put(name, score);</span>
+<span class="fc" id="L58">    }</span>
+
+    private Entry&lt;String, Integer&gt; getEntry(int rank) throws IndexOutOfBoundsException{
+<span class="fc" id="L61">        return getSortedList().get(rank);</span>
+    }
+
+    /**
+     * Gets the score corresponding to the given name
+     *
+     * @param name The name of the user who's score to get
+     * @return The score of the user
+     */
+    public Integer get(String name){
+<span class="fc" id="L71">        return entries.get(name);</span>
+    }
+    /**
+     * Gets the score corresponding to the user of the specified rank when ordered by score
+     *
+     * @param rank The rank of the user who's score to get
+     * @return The score of the corresponding user
+     * @throws IndexOutOfBoundsException If rank is out of range
+     */
+    public Integer get(int rank) throws IndexOutOfBoundsException{
+<span class="fc" id="L81">        return getEntry(rank).getValue();</span>
+    }
+
+    /**
+     * Removes an entry by the rank when ordered by score
+     *
+     * @param rank The rank to remove
+     * @throws IndexOutOfBoundsException If rank is out of range
+     */
+    // NEVER USED
+//    public void removeEntry(int rank) throws IndexOutOfBoundsException{
+//        if( rank &lt; 0 | rank &gt; length){
+//            throw new IndexOutOfBoundsException();
+//        }
+//
+//        Integer removed = entries.remove(getEntry(rank).getKey());
+//        if(removed != null){
+//            length--;
+//        }
+//    }
+    /**
+     * Removes an entry by the name of the user
+     *
+     * @param name The name of the user to remove
+     */
+    // NEVER USED
+//    public void removeEntry(String name){
+//        length--;
+//        Integer removed = entries.remove(name);
+//        if(removed != null){
+//            length--;
+//        }
+//    }
+
+    /**
+     * Gets a list of entries ordered by ascending score
+     *
+     * @return The list of ordered entries
+     */
+    public ArrayList&lt;Map.Entry&lt;String, Integer&gt;&gt; getSortedList(){
+<span class="fc" id="L121">        ArrayList&lt;Map.Entry&lt;String, Integer&gt;&gt; list = new ArrayList&lt;&gt;(entries.entrySet());</span>
+<span class="fc" id="L122">        list.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));</span>
+<span class="fc" id="L123">        return list;</span>
+    }
+
+    /**
+     * Removes the lowest entry
+     *
+     * @return The lowest entry
+     */
+    public Map.Entry&lt;String, Integer&gt; popLowest(){
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">        if(length == 0) return null;</span>
+
+<span class="fc" id="L134">        Map.Entry&lt;String, Integer&gt; lowest = getSortedList().get(length - 1);</span>
+<span class="fc" id="L135">        entries.remove(lowest.getKey());</span>
+<span class="fc" id="L136">        return lowest;</span>
+    }
+
+    /**
+     * Formats as an ordered leaderboard across multiple lines
+     */
+    public String toString(){
+<span class="fc" id="L143">        String rankedList = &quot;LEADERBOARD\n&quot;;</span>
+<span class="fc" id="L144">        int i = 1;</span>
+<span class="fc bfc" id="L145" title="All 2 branches covered.">        for(Entry&lt;String, Integer&gt; e : getSortedList()){</span>
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">            if(i &gt; maxLen) break;</span>
+
+<span class="fc" id="L148">            rankedList += Integer.toString(i++) + &quot;. &quot; + e.getKey() + &quot;    &quot; + e.getValue().toString() + &quot;\n&quot;;</span>
+<span class="fc" id="L149">        }</span>
+<span class="fc bfc" id="L150" title="All 2 branches covered.">        while(i &lt;= maxLen){</span>
+<span class="fc" id="L151">            rankedList += Integer.toString(i) + &quot;.\n&quot;;</span>
+<span class="fc" id="L152">            i++;</span>
+        }
+
+<span class="fc" id="L155">        return rankedList;</span>
+    }
+
+    /**
+     * Converts the LeaderBoard entries to a JSON
+     * @return The JSON string
+     */
+    private String toJson(){
+<span class="fc" id="L163">        String json = &quot;{\n&quot;;</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">        for(Entry&lt;String, Integer&gt; e : getSortedList()){</span>
+<span class="fc" id="L165">            json += &quot;\&quot;&quot; + e.getKey() + &quot;\&quot;: &quot; + e.getValue().toString() + &quot;,\n&quot;;</span>
+<span class="fc" id="L166">        }</span>
+<span class="fc" id="L167">        json += &quot;}&quot;;</span>
+<span class="fc" id="L168">        return json;</span>
+    }
+
+    /**
+     * Creates a LeaderBoard object from a JSON
+     *
+     * @param json The JSON specifying the username and score entries
+     * @param maxLength The maximum number of entries
+     * @return The corresponding LeaderBoard
+     */
+    private static LeaderBoard fromJson(String json, int maxLength){
+<span class="nc" id="L179">        HashMap&lt;String, Integer&gt; newEntries = new HashMap&lt;&gt;();</span>
+
+        try{
+<span class="nc" id="L182">            json = json.replaceAll(&quot;[{}\n]&quot;, &quot;&quot;);</span>
+<span class="nc" id="L183">            String[] lines = json.split(&quot;,&quot;);</span>
+<span class="nc bnc" id="L184" title="All 2 branches missed.">            for(String line : lines){</span>
+<span class="nc" id="L185">                String[] parts = line.split(&quot;: &quot;);</span>
+<span class="nc" id="L186">                String key = parts[0].replace(&quot;\&quot;&quot;, &quot;&quot;);</span>
+<span class="nc" id="L187">                Integer value =  Integer.parseInt(parts[1]);</span>
+<span class="nc" id="L188">                newEntries.put(key, value);</span>
+            }
+        }
+<span class="nc" id="L191">        catch(Exception e){</span>
+<span class="nc" id="L192">            e.printStackTrace();</span>
+<span class="nc" id="L193">            System.err.println(&quot;Error parsing leaderboard JSON. Using empty leaderboard&quot;);</span>
+<span class="nc" id="L194">            return new LeaderBoard(new HashMap&lt;&gt;(), maxLength);</span>
+<span class="nc" id="L195">        }</span>
+<span class="nc" id="L196">        return new LeaderBoard(newEntries, maxLength);</span>
+    }
+
+    /**
+     * Saves the leaderboard entry data to the specified file in JSON format
+     * Does not save if the file cannot be written to
+     *
+     * @param filepath The file to save the data to
+     */
+    public void saveToFile(String filepath){
+        try{
+<span class="nc" id="L207">            Files.write(Paths.get(filepath), toJson().getBytes());</span>
+        }
+<span class="fc" id="L209">        catch(IOException e){</span>
+<span class="fc" id="L210">            e.printStackTrace();</span>
+<span class="nc" id="L211">        }</span>
+<span class="fc" id="L212">    }</span>
+
+    /**
+     * Loads a leaderboard from the specified file
+     *
+     * @param filepath The file containing the entry data in JSON format
+     * @param maxLength The maximum number of entries
+     * @return The corresponding leaderboard. Or an empty leaderboard if the file is not readable
+     */
+    public static LeaderBoard loadFromFile(String filepath, int maxLength){
+<span class="fc" id="L222">        Path path = Paths.get(filepath);</span>
+        //DEBUG
+<span class="fc" id="L224">        System.out.println(path);</span>
+        try {
+<span class="nc" id="L226">            String content = Files.lines(path).collect(Collectors.joining(&quot;\n&quot;));</span>
+<span class="nc" id="L227">            return fromJson(content, maxLength);</span>
+<span class="fc" id="L228">        } catch (IOException e) {</span>
+<span class="fc" id="L229">            e.printStackTrace();</span>
+<span class="fc" id="L230">            return new LeaderBoard();</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

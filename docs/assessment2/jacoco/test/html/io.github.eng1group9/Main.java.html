@@ -1,0 +1,943 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Main.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">core</a> &gt; <a href="index.source.html" class="el_package">io.github.eng1group9</a> &gt; <span class="el_source">Main.java</span></div><h1>Main.java</h1><pre class="source lang-java linenums">package io.github.eng1group9;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+//import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+
+import io.github.eng1group9.entities.*;
+import io.github.eng1group9.systems.*;
+
+/**
+ * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all
+ * platforms.
+ */
+<span class="fc" id="L21">public class Main extends ApplicationAdapter {</span>
+
+    final static int VIEWPORTWIDTH = 480;
+    final static int VIEWPORTHEIGHT = 320;
+
+<span class="fc" id="L26">    boolean isFullscreen = false;</span>
+<span class="fc" id="L27">    static int gameState = 0;</span>
+    /// 0 = Not started
+    /// 1 = Playing
+    /// 2 = Paused
+    /// 3 = Win
+    /// 4 = Lose
+
+<span class="fc" id="L34">    public static float TIMERSTARTVALUE = 300f;</span>
+<span class="fc" id="L35">    public static boolean chestDoorOpen = false; // Whether the door to the chest room has been opened.</span>
+<span class="fc" id="L36">    public static boolean outsideDoorOpen = false; // Whether the door to the outside room has been opened.</span>
+<span class="fc" id="L37">    public static boolean exitOpen = false; // Whether the exit is open/</span>
+<span class="fc" id="L38">    public static boolean spikesLowered = false; // Whether the spikes in the chest room have been lowered.</span>
+<span class="fc" id="L39">    public static boolean cloakUsed = false; // Whether the cloak power up has been collected.</span>
+<span class="fc" id="L40">    public static boolean dungeonDoorOpened = false;</span>
+<span class="fc" id="L41">    public static boolean lockpickRoomOpened = false;</span>
+<span class="fc" id="L42">    public static boolean PNQDoorOpened = false;</span>
+<span class="fc" id="L43">    public static boolean releasedPope = false;</span>
+<span class="fc" id="L44">    public static boolean bossConverted = false;</span>
+<span class="fc" id="L45">    public static boolean bobReleased = false;</span>
+<span class="fc" id="L46">    public static boolean defeatedBoss = true;</span>
+<span class="fc" id="L47">    public static int longboiBonus = 0; // the bonus to add based on whether LongBoi was found.</span>
+<span class="fc" id="L48">    public static boolean bookUsed = false; // Whether the book power up has been collected.</span>
+<span class="fc" id="L49">    public static boolean potionAch = false;</span>
+<span class="fc" id="L50">    public static String[] potions = { &quot;speed&quot;, &quot;slow&quot;, &quot;dark&quot; };</span>
+<span class="fc" id="L51">    public static int hiddenEventCounter = 0;</span>
+<span class="fc" id="L52">    public static int negativeEventCounter = 0;</span>
+<span class="fc" id="L53">    public static int positiveEventCounter = 0;</span>
+<span class="fc" id="L54">    public static int speedCounter = 0;</span>
+<span class="fc" id="L55">    public static int slowCounter = 0;</span>
+<span class="fc" id="L56">    public static int darknessCounter = 0;</span>
+    public static final String leaderBoardFilePath = &quot;leaderboard.txt&quot;;
+
+<span class="fc" id="L59">    public static LeaderBoard leaderBoard = LeaderBoard.loadFromFile(leaderBoardFilePath, 5);</span>
+
+<span class="fc" id="L61">    private static TimerSystem timerSystem = new TimerSystem(TIMERSTARTVALUE);</span>
+<span class="fc" id="L62">    public static boolean showCollision = false;</span>
+
+    private List&lt;Rectangle&gt; worldCollision;
+    // private List&lt;Rectangle&gt; doors;
+    final static String TMXPATH = &quot;World/testMap.tmx&quot;;
+
+<span class="fc" id="L68">    final static Vector2 PRISONCOORDS = new Vector2(3, 0);</span>
+<span class="fc" id="L69">    final static Vector2 PLAYERPRISONPOS = new Vector2(380, 200);</span>
+
+    final static float DOORCOOLDOWN = 0.5f;
+    private static int currentRoomX;
+    private static int currentRoomY;
+
+    public static Player player;
+<span class="fc" id="L76">    private static boolean playerCaught = false; // Whether the player is currently being held by the Dean.</span>
+<span class="fc" id="L77">    private static boolean playerCaughtByLibrarian = false;</span>
+    final static float INITALPLAYERCAUGHTTIME = 1.2f;
+<span class="fc" id="L79">    private static float playerCaughtTime = INITALPLAYERCAUGHTTIME; // how many seconds the Dean will hold the player when caught.</span>
+<span class="fc" id="L80">    final static Vector2 PLAYERSTARTPOS = new Vector2(150, 500); // Where the player begins the game, and returns to when caught.</span>
+    final static float DEFAULTPLAYERSPEED = 200; // The players speed.
+
+    private static Dean dean;
+<span class="fc" id="L84">    final static Vector2 DEANSTARTPOS = new Vector2(32, 352); // Where the Dean begins the game, and returns to after</span>
+                                                              // catching the player.
+    static final float DEFAULTDEANSPEED = 100;
+<span class="fc" id="L87">    final int DEANPUNISHMENT = 30; // The number of seconds the Dean adds to the timer.</span>
+<span class="fc" id="L88">    final static Character[] DEFAULTDEANPATH = { // The path the dean will take in the first room (D = Down, U = Up, L =</span>
+                                                 // Left, R = Right). The path will loop.
+<span class="fc" id="L90">            'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',</span>
+<span class="fc" id="L91">            'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D',</span>
+<span class="fc" id="L92">            'R', 'R', 'R',</span>
+<span class="fc" id="L93">            'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U',</span>
+<span class="fc" id="L94">            'L', 'L', 'L',</span>
+<span class="fc" id="L95">            'D', 'D', 'D', 'D',</span>
+<span class="fc" id="L96">            'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L'</span>
+    };
+
+    private static Dean librarian;
+<span class="fc" id="L100">    final static Vector2 LIBRARIANSTARTPOS = new Vector2(224, 15);</span>
+    final static float DEFAULTLIBRARIANSPEED = 150;
+<span class="fc" id="L102">    final static Character[] LIBRARIANPATH = { 'R', 'R', 'R', 'R', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', 'U',</span>
+<span class="fc" id="L103">            'U', 'U', 'U', 'U', 'U', 'U', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D',</span>
+<span class="fc" id="L104">            'D', 'D', 'L', 'L', 'L', 'L' };</span>
+
+<span class="fc" id="L106">    final static Color BAD = new Color(1f, 1f, 0f, 1f);</span>
+<span class="fc" id="L107">    final static Color GOOD = new Color(0f, 1f, 1f, 1f);</span>
+<span class="fc" id="L108">    final static Color ACHIEVEMENT = new Color(1f, 0.7f, 0.1f, 1f);</span>
+
+    public static Main instance;
+<span class="fc" id="L111">    public static RenderingSystem renderingSystem = new RenderingSystem();</span>
+<span class="fc" id="L112">    public static CollisionSystem collisionSystem = new CollisionSystem();</span>
+<span class="fc" id="L113">    public static InputSystem inputSystem = new InputSystem();</span>
+
+    private static Boss boss;
+<span class="fc" id="L116">    final static Vector2 BOSSSTARTPOS = new Vector2(450, 255);</span>
+<span class="fc" id="L117">    private static float BOSSATTACKCOOLDOWN = 2.5f;</span>
+    final static float BOSSFIGHTLENGTH = 60f;
+
+    private static ArrayList&lt;BossProjectile&gt; projectiles;
+    private static ArrayList&lt;ProjectileWarning&gt; projectileWarnings;
+<span class="fc" id="L122">    private static float PROJECTILESPEED = 1000f;</span>
+    private static final float PROJECTILEWARNINGLENGTH = 2.5f;
+    private static final int PROJECTILESPACING = 96;
+    // Achievement names
+    public static final String ACH_LONGBOI = &quot;Bird Spotter&quot;;
+    public final static int LONGBOIBONUSAMOUNT = 50;
+    public static final String ACH_DEAN_CAPTURES = &quot;Troublemaker&quot;;
+    public static final int ACH_DEAN_CAPTURE_POINT_PUNISHMENT = -20; // The points lost for getting the dean capture
+                                                                     // achievement
+    public static final String ACH_INVIS = &quot;Now you see me...&quot;;
+    public static final String ACH_LOST = &quot;Detour Champion&quot;;
+<span class="fc" id="L133">    public static boolean achTriggered = false;</span>
+    public static final String ACH_QUICK = &quot;Fancy a Quickie?&quot;;
+    public static final String ACH_BOOK = &quot;Thief&quot;;
+    public static final String ACH_POTION = &quot;A true Witch&quot;;
+    public static final String ACH_ARSONIST = &quot;Arsonist&quot;;
+    public static final String ACH_WORLD_ENDER = &quot;World ender&quot;;
+    public static final String ACH_SELF_SERVING = &quot;Self-serving&quot;;
+    public static final String ACH_PROSELYTISER = &quot;Proselytiser&quot;;
+    public static final String ACH_COWARD = &quot;COWARD!&quot;;
+    public static final String ACH_TRUE_AND_PERFECT_KNIGHT = &quot;A true and perfect knight&quot;;
+    public static final String ACH_ERUDITE = &quot;Erudite&quot;;
+    public static final String ACH_PAPAL_AUTHORITY = &quot;Papal authority&quot;;
+
+
+    @Override
+    public void create() {
+<span class="nc" id="L149">        renderingSystem.initWorld(TMXPATH, VIEWPORTWIDTH, VIEWPORTHEIGHT);</span>
+<span class="nc" id="L150">        collisionSystem.init(renderingSystem.getMapRenderer().getMap());</span>
+<span class="nc" id="L151">        TriggerSystem.init(TMXPATH, VIEWPORTWIDTH, VIEWPORTHEIGHT);</span>
+<span class="nc" id="L152">        RoomSystem.init(TMXPATH, VIEWPORTWIDTH, VIEWPORTHEIGHT, DOORCOOLDOWN);</span>
+<span class="nc" id="L153">        worldCollision = collisionSystem.getWorldCollision();</span>
+<span class="nc" id="L154">        player = new Player(PLAYERSTARTPOS, DEFAULTPLAYERSPEED);</span>
+<span class="nc" id="L155">        dean = new Dean(DEANSTARTPOS, DEFAULTDEANSPEED, DEFAULTDEANPATH);</span>
+<span class="nc" id="L156">        boss = new Boss(BOSSSTARTPOS,BOSSATTACKCOOLDOWN,PROJECTILESPACING);</span>
+<span class="nc" id="L157">        librarian = new Dean(LIBRARIANSTARTPOS, DEFAULTLIBRARIANSPEED, LIBRARIANPATH,</span>
+                &quot;Characters/librarianAnimations.png&quot;);
+<span class="nc" id="L159">        projectiles = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L160">        projectileWarnings = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L161">        loadRoom(0, 0, PLAYERSTARTPOS, LIBRARIANSTARTPOS, LIBRARIANPATH);</span>
+<span class="nc" id="L162">        togglePause();</span>
+<span class="nc" id="L163">        instance = this;</span>
+
+<span class="nc" id="L165">        AchievementSystem.init();</span>
+<span class="nc" id="L166">    }</span>
+
+    /**
+     * Initialises variables such as game states and entity positions. Used on
+     * initialisation and reset
+     */
+    public static void initSystem() {
+<span class="nc" id="L173">        gameState = 0; // Not started</span>
+<span class="nc" id="L174">        boss.deactivate();</span>
+<span class="nc" id="L175">        projectiles = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L176">        projectileWarnings = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L177">        chestDoorOpen = false;</span>
+<span class="nc" id="L178">        outsideDoorOpen = false;</span>
+<span class="nc" id="L179">        exitOpen = false;</span>
+<span class="nc" id="L180">        spikesLowered = false;</span>
+<span class="nc" id="L181">        cloakUsed = false;</span>
+<span class="nc" id="L182">        dungeonDoorOpened = false;</span>
+<span class="nc" id="L183">        lockpickRoomOpened = false;</span>
+<span class="nc" id="L184">        PNQDoorOpened = false;</span>
+<span class="nc" id="L185">        releasedPope = false;</span>
+<span class="nc" id="L186">        bossConverted = false;</span>
+<span class="nc" id="L187">        bobReleased = false;</span>
+<span class="nc" id="L188">        defeatedBoss = false;</span>
+<span class="nc" id="L189">        bookUsed = false;</span>
+<span class="nc" id="L190">        longboiBonus = 0;</span>
+<span class="nc" id="L191">        hiddenEventCounter = 0;</span>
+<span class="nc" id="L192">        negativeEventCounter = 0;</span>
+<span class="nc" id="L193">        positiveEventCounter = 0;</span>
+<span class="nc" id="L194">        speedCounter = 0;</span>
+<span class="nc" id="L195">        slowCounter = 0;</span>
+<span class="nc" id="L196">        darknessCounter = 0;</span>
+<span class="nc" id="L197">        potionAch = false;</span>
+<span class="nc" id="L198">        timerSystem.reset();</span>
+<span class="nc" id="L199">        playerCaught = false;</span>
+<span class="nc" id="L200">        playerCaughtTime = INITALPLAYERCAUGHTTIME;</span>
+<span class="nc" id="L201">        player.reset();</span>
+<span class="nc" id="L202">        dean.reset();</span>
+<span class="nc" id="L203">        boss.reset();</span>
+<span class="nc" id="L204">        librarian.reset();</span>
+<span class="nc" id="L205">        librarian.freeze();</span>
+<span class="nc" id="L206">        RenderingSystem.reset();</span>
+<span class="nc" id="L207">        collisionSystem.reset();</span>
+<span class="nc" id="L208">        RenderingSystem.hideLayer(&quot;PopeSeraph&quot;);</span>
+<span class="nc" id="L209">        loadRoom(0, 0, PLAYERSTARTPOS, LIBRARIANSTARTPOS, LIBRARIANPATH);</span>
+<span class="nc" id="L210">        TriggerSystem.init(TMXPATH, VIEWPORTWIDTH, VIEWPORTHEIGHT);</span>
+<span class="nc" id="L211">        AchievementSystem.reset();</span>
+<span class="nc" id="L212">        achTriggered = false;</span>
+<span class="nc" id="L213">    }</span>
+
+    @Override
+    public void render() {
+<span class="nc" id="L217">        inputSystem.handle(player);</span>
+<span class="nc bnc" id="L218" title="All 2 branches missed.">        if (gameState == 1)</span>
+<span class="nc" id="L219">            logic();</span>
+<span class="nc" id="L220">        draw();</span>
+<span class="nc" id="L221">    }</span>
+
+    /**
+     * Check if the player has the red potion.
+     * If they do, show Long Boi and complete the hidden event.
+     * If not, tell the player they must find the potion.
+     */
+    public static void checkForLongboi() {
+<span class="nc" id="L229">        Color messageColour = new Color(0.2f, 1, 0.2f, 1);</span>
+<span class="nc bnc" id="L230" title="All 4 branches missed.">        if (longboiBonus == 0 &amp;&amp; !player.hasRedPotion()) {</span>
+<span class="nc" id="L231">            ToastSystem.addToast(&quot;Hello There! I seem to have misplaced my Red Potion, could you get it for me?&quot;,</span>
+                    messageColour);
+<span class="nc bnc" id="L233" title="All 4 branches missed.">        } else if (longboiBonus == 0 &amp;&amp; player.hasRedPotion()) {</span>
+<span class="nc" id="L234">            ToastSystem.addToast(&quot;You found my potion! Thank you!&quot;, messageColour);</span>
+<span class="nc" id="L235">            RenderingSystem.showLayer(&quot;LONGBOI&quot;);</span>
+<span class="nc" id="L236">            hiddenEventCounter++;</span>
+<span class="nc" id="L237">            incAchievement(ACH_LONGBOI); // Trigger longboi achievement</span>
+        }
+<span class="nc" id="L239">    }</span>
+
+    /**
+     * Adds an achievement toast
+     *
+     * @param text The
+     */
+    private static void achNotif(String achievementName) {
+<span class="nc" id="L247">        ToastSystem.addToast(&quot;Achievement: &quot; + achievementName, ACHIEVEMENT);</span>
+<span class="nc" id="L248">    }</span>
+
+    /**
+     * Increments an achievement and adds a toast message if this increment acquired
+     * the achievement
+     *
+     * @param achievement_name The name of the achievment to increment
+     *
+     * @return Whether the achievement was acquired in this increment
+     */
+    private static boolean incAchievement(String achievement_name) {
+<span class="nc" id="L259">        boolean ach_achieved = AchievementSystem.incAchievement(achievement_name);</span>
+<span class="nc bnc" id="L260" title="All 2 branches missed.">        if (ach_achieved) {</span>
+<span class="nc" id="L261">            achNotif(achievement_name);</span>
+        }
+<span class="nc" id="L263">        return ach_achieved;</span>
+    }
+
+    public void draw() {
+<span class="nc" id="L267">        renderingSystem.draw(player, dean, boss, librarian, showCollision, TimerSystem.elapsedTime, worldCollision,</span>
+                projectiles, projectileWarnings);
+<span class="nc bnc" id="L269" title="All 5 branches missed.">        switch (gameState) {</span>
+            case 0:
+<span class="nc" id="L271">                renderingSystem.renderStartOverlay(960, 640);</span>
+<span class="nc" id="L272">                break;</span>
+            case 2:
+<span class="nc" id="L274">                renderingSystem.renderPauseOverlay(960, 640, positiveEventCounter, negativeEventCounter,</span>
+                        hiddenEventCounter);
+<span class="nc" id="L276">                break;</span>
+            case 3:
+<span class="nc" id="L278">                renderingSystem.renderWinOverlay(960, 640, TimerSystem.getTimeLeft(), calculateScore(),</span>
+                        positiveEventCounter, negativeEventCounter, hiddenEventCounter);
+<span class="nc" id="L280">                break;</span>
+            case 4:
+<span class="nc" id="L282">                renderingSystem.renderLoseOverlay(960, 640, positiveEventCounter, negativeEventCounter,</span>
+                        hiddenEventCounter);
+<span class="nc" id="L284">                break;</span>
+            default:
+                break;
+        }
+<span class="nc" id="L288">    }</span>
+
+    /**
+     * Open the door of the room with the chest.
+     * Remove its hitbox and graphic.
+     */
+    public static void openChestRoomDoor() {
+<span class="nc bnc" id="L295" title="All 6 branches missed.">        if (player.hasChestRoomKey() || player.hasLockpick() &amp;&amp; !chestDoorOpen) {</span>
+<span class="nc" id="L296">            ToastSystem.addToast(&quot;You Opened the Door!&quot;, GOOD);</span>
+<span class="nc" id="L297">            collisionSystem.removeCollisionByName(&quot;chestRoomDoor&quot;);</span>
+<span class="nc" id="L298">            RenderingSystem.hideLayer(&quot;ChestDoorClosed&quot;);</span>
+<span class="nc" id="L299">            chestDoorOpen = true;</span>
+        }
+<span class="nc" id="L301">    }</span>
+
+    // TODO: CHECK THERE ARE NO CONFLICTS HERE BETWEEN &quot;defeatBoss&quot; and
+    // &quot;openOutsideRoomDoor&quot;.
+    // I have a feeling the wrong door will give the toast.
+
+    public static void defeatBoss(){
+<span class="nc bnc" id="L308" title="All 2 branches missed.">        if(!defeatedBoss){</span>
+<span class="nc" id="L309">            System.out.println(&quot;Boss defeated!&quot;);</span>
+<span class="nc" id="L310">            defeatedBoss = true;</span>
+<span class="nc" id="L311">            collisionSystem.removeCollisionByName(&quot;BossBarrier&quot;);</span>
+<span class="nc" id="L312">            RoomSystem.unlockDoor(20);</span>
+<span class="nc" id="L313">            RenderingSystem.showLayer(&quot;Boss&quot;);</span>
+<span class="nc" id="L314">            RenderingSystem.hideLayer(&quot;Flames&quot;);</span>
+
+<span class="nc" id="L316">            RenderingSystem.hideLayer(&quot;LibraryBookshelves2&quot;);</span>
+<span class="nc" id="L317">            RenderingSystem.hideLayer(&quot;LibraryBookshelves3&quot;);</span>
+<span class="nc" id="L318">            RenderingSystem.hideLayer(&quot;Pyre&quot;);</span>
+<span class="nc" id="L319">            RenderingSystem.showLayer(&quot;Staff&quot;);</span>
+<span class="nc" id="L320">            RenderingSystem.showLayer(&quot;ExitKey&quot;);</span>
+<span class="nc" id="L321">            incAchievement(ACH_ARSONIST);</span>
+        }
+<span class="nc" id="L323">    }</span>
+
+    public static void openOutsideRoomDoor() {
+<span class="nc bnc" id="L326" title="All 2 branches missed.">        if (!outsideDoorOpen) {</span>
+<span class="nc" id="L327">            ToastSystem.addToast(&quot;You Opened the Door!&quot;, GOOD);</span>
+<span class="nc" id="L328">            collisionSystem.removeCollisionByName(&quot;outsideRoomDoor&quot;);</span>
+<span class="nc" id="L329">            RenderingSystem.hideLayer(&quot;OutsideDoorClosed&quot;);</span>
+<span class="nc" id="L330">            outsideDoorOpen = true;</span>
+        }
+<span class="nc" id="L332">    }</span>
+
+    // END OF todo
+
+    /**
+     * Open the exit.
+     * Remove its hitbox and hide its graphic.
+     */
+    public static void openExit() {
+<span class="nc bnc" id="L341" title="All 4 branches missed.">        if (player.hasExitKey() &amp;&amp; !exitOpen) {</span>
+<span class="nc" id="L342">            ToastSystem.addToast(&quot;You Opened the Exit!&quot;, GOOD);</span>
+<span class="nc" id="L343">            collisionSystem.removeCollisionByName(&quot;exitDoor&quot;);</span>
+<span class="nc" id="L344">            RenderingSystem.hideLayer(&quot;ExitClosed&quot;);</span>
+<span class="nc" id="L345">            exitOpen = true;</span>
+        }
+<span class="nc" id="L347">    }</span>
+
+    /**
+     * Give the scroll powerup to the player, making the player invisible for 15s.
+     * Hide the scroll graphic.
+     */
+    public static void getcloak() {
+<span class="nc bnc" id="L354" title="All 2 branches missed.">        if (!cloakUsed) {</span>
+<span class="nc" id="L355">            incAchievement(ACH_INVIS); // Trigger invisible scroll achievement</span>
+<span class="nc" id="L356">            player.becomeInvisible();</span>
+<span class="nc" id="L357">            cloakUsed = true;</span>
+<span class="nc" id="L358">            ToastSystem.addToast(&quot;You found the invisibility cloak!&quot;, GOOD);</span>
+<span class="nc" id="L359">            positiveEventCounter++;</span>
+        }
+<span class="nc" id="L361">    }</span>
+
+    public static void getBook() {
+<span class="nc bnc" id="L364" title="All 2 branches missed.">        if (!bookUsed) {</span>
+<span class="nc" id="L365">            librarian.unfreeze();</span>
+<span class="nc" id="L366">            RenderingSystem.hideLayer(&quot;Book&quot;);</span>
+<span class="nc" id="L367">            bookUsed = true;</span>
+<span class="nc" id="L368">            ToastSystem.addToast(&quot;You stole a book...&quot;, BAD);</span>
+<span class="nc" id="L369">            ToastSystem.addToast(&quot;RUN!!!!&quot;, BAD);</span>
+<span class="nc" id="L370">            negativeEventCounter++;</span>
+<span class="nc" id="L371">            incAchievement(ACH_BOOK);</span>
+
+        }
+<span class="nc" id="L374">    }</span>
+
+    public static void getPotion() {
+<span class="nc" id="L377">        String effect = potions[MathUtils.random(potions.length - 1)];</span>
+
+<span class="nc bnc" id="L379" title="All 2 branches missed.">        if (effect == &quot;speed&quot;) {</span>
+<span class="nc" id="L380">            player.speedPotion();</span>
+<span class="nc" id="L381">            ToastSystem.addToast(&quot;SPEED POTION ACTIVATED&quot;, GOOD);</span>
+<span class="nc" id="L382">            ToastSystem.addToast(&quot;Press Q to Dash&quot;, GOOD);</span>
+<span class="nc" id="L383">            positiveEventCounter++;</span>
+<span class="nc" id="L384">            speedCounter++;</span>
+
+        }
+<span class="nc bnc" id="L387" title="All 2 branches missed.">        if (effect == &quot;slow&quot;) {</span>
+<span class="nc" id="L388">            player.slownessPotion();</span>
+<span class="nc" id="L389">            ToastSystem.addToast(&quot;SLOW POTION ACTIVATED&quot;, BAD);</span>
+<span class="nc" id="L390">            negativeEventCounter++;</span>
+<span class="nc" id="L391">            slowCounter++;</span>
+
+        }
+<span class="nc bnc" id="L394" title="All 2 branches missed.">        if (effect == &quot;dark&quot;) {</span>
+<span class="nc" id="L395">            renderingSystem.activateDarkness();</span>
+<span class="nc" id="L396">            ToastSystem.addToast(&quot;DARKNESS POTION ACTIVATED&quot;, BAD);</span>
+<span class="nc" id="L397">            ToastSystem.addToast(&quot;Who turned off the lights...?&quot;, BAD);</span>
+<span class="nc" id="L398">            negativeEventCounter++;</span>
+<span class="nc" id="L399">            darknessCounter++;</span>
+
+        }
+
+<span class="nc bnc" id="L403" title="All 8 branches missed.">        if (!potionAch &amp;&amp; speedCounter &gt;= 1 &amp;&amp; slowCounter &gt;= 1 &amp;&amp; darknessCounter &gt;= 1) {</span>
+<span class="nc" id="L404">            incAchievement(ACH_POTION);</span>
+        }
+<span class="nc" id="L406">    }</span>
+
+    /**
+     * Set the game to the started state, and unpause it.
+     * Used once to start the game.
+     */
+    public static void startGame() {
+<span class="nc bnc" id="L413" title="All 2 branches missed.">        if (gameState == 0) {</span>
+<span class="nc" id="L414">            initSystem();</span>
+<span class="nc" id="L415">            gameState = 2;</span>
+<span class="nc" id="L416">            togglePause();</span>
+<span class="nc bnc" id="L417" title="All 4 branches missed.">        } else if (gameState == 3 || gameState == 4) {</span>
+<span class="nc" id="L418">            initSystem();</span>
+<span class="nc" id="L419">            gameState = 1;</span>
+        }
+<span class="nc" id="L421">    }</span>
+
+    /**
+     * Set the game to the win state, used when the player escapes.
+     */
+    public static void winGame() {
+<span class="nc" id="L427">        togglePause();</span>
+<span class="nc bnc" id="L428" title="All 2 branches missed.">        if (TimerSystem.elapsedTime &lt;= 60) {</span>
+<span class="nc" id="L429">            incAchievement(ACH_QUICK); // Trigger quick finish achievement</span>
+        }
+
+<span class="nc bnc" id="L432" title="All 8 branches missed.">        if(player.hasStaff() &amp;&amp; player.booksRead() &gt;= 7 &amp;&amp; !releasedPope &amp;&amp; !bossConverted){</span>
+<span class="nc" id="L433">            incAchievement(ACH_SELF_SERVING);</span>
+        }
+
+<span class="nc bnc" id="L436" title="All 2 branches missed.">        if(bossConverted){</span>
+<span class="nc" id="L437">            incAchievement(ACH_PROSELYTISER);</span>
+        }
+
+<span class="nc bnc" id="L440" title="All 6 branches missed.">        if(releasedPope &amp;&amp; !bossConverted &amp;&amp; defeatedBoss){</span>
+<span class="nc" id="L441">            incAchievement(ACH_TRUE_AND_PERFECT_KNIGHT);</span>
+        }
+
+<span class="nc bnc" id="L444" title="All 4 branches missed.">        if(!releasedPope &amp;&amp; !defeatedBoss){</span>
+<span class="nc" id="L445">            incAchievement(ACH_COWARD);</span>
+        }
+
+<span class="nc" id="L448">        gameState = 3;</span>
+<span class="nc" id="L449">    }</span>
+
+    /**
+     * Set the game to the lose state, used when the player runs out of time.
+     */
+    public static void LoseGame() {
+<span class="nc" id="L455">        togglePause();</span>
+<span class="nc" id="L456">        gameState = 4;</span>
+<span class="nc" id="L457">    }</span>
+
+    /**
+     * Calculate the players score based on how much time was left and wether they
+     * found Long Boi.
+     *
+     * @return The score.
+     */
+    public static int calculateScore() {
+<span class="nc" id="L466">        int score = TimerSystem.getTimeLeft();</span>
+<span class="nc" id="L467">        score = (int) AchievementSystem.modifyScore(score);</span>
+<span class="nc" id="L468">        return score;</span>
+    }
+
+    /**
+     * Toggle whether the window should be in Windowed or Fullcreen mode.
+     */
+    public void toggleFullscreen() {
+<span class="nc bnc" id="L475" title="All 2 branches missed.">        if (isFullscreen) {</span>
+<span class="nc" id="L476">            Gdx.graphics.setWindowedMode(960, 640);</span>
+        } else {
+<span class="nc" id="L478">            Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());</span>
+        }
+<span class="nc bnc" id="L480" title="All 2 branches missed.">        isFullscreen = !isFullscreen;</span>
+<span class="nc" id="L481">    }</span>
+
+    /**
+     * Toggle wether the game should be paused.
+     * This will freeze the player/dean, stop all game logic and display the pause
+     * overlay.
+     */
+    public static void togglePause() {
+<span class="nc bnc" id="L489" title="All 2 branches missed.">        if (gameState == 2) {</span>
+<span class="nc bnc" id="L490" title="All 2 branches missed.">            if (!playerCaught) {</span>
+<span class="nc" id="L491">                player.unfreeze();</span>
+<span class="nc" id="L492">                dean.unfreeze();</span>
+<span class="nc bnc" id="L493" title="All 2 branches missed.">                if (bookUsed) {</span>
+<span class="nc" id="L494">                    librarian.unfreeze();</span>
+                }
+            }
+<span class="nc" id="L497">            gameState = 1;</span>
+        } else {
+<span class="nc" id="L499">            player.freeze();</span>
+<span class="nc" id="L500">            dean.freeze();</span>
+<span class="nc" id="L501">            librarian.freeze();</span>
+<span class="nc bnc" id="L502" title="All 2 branches missed.">            if (gameState == 1)</span>
+<span class="nc" id="L503">                gameState = 2;</span>
+        }
+<span class="nc" id="L505">    }</span>
+
+    /**
+     * Where the game processes its logic each frame.
+     * It will not run if the game is paused.
+     */
+    public void logic() {
+<span class="nc" id="L512">        timerSystem.tick();</span>
+
+<span class="nc bnc" id="L514" title="All 4 branches missed.">        if (!achTriggered &amp;&amp; TimerSystem.elapsedTime &gt; 4 * 60) {</span>
+<span class="nc" id="L515">            achTriggered = incAchievement(ACH_LOST); // Trigger slow finish achievement</span>
+        }
+
+<span class="nc bnc" id="L518" title="All 2 branches missed.">        if(player.booksRead() &gt;= 7){</span>
+<span class="nc" id="L519">            incAchievement(ACH_ERUDITE);</span>
+        }
+
+<span class="nc" id="L522">        dean.nextMove();</span>
+<span class="nc" id="L523">        checkDeanCatch();</span>
+
+<span class="nc" id="L525">        librarian.nextMove();</span>
+
+<span class="nc" id="L527">        boss.logic();</span>
+<span class="nc" id="L528">        checkProjectiles();</span>
+
+<span class="nc" id="L530">        TriggerSystem.checkTouchTriggers(player);</span>
+<span class="nc" id="L531">        RoomSystem.checkCooldown();</span>
+<span class="nc" id="L532">        player.update();</span>
+
+<span class="nc" id="L534">    }</span>
+
+    /**
+     * Checks if the dean has caught the player, and punishes them if he has by
+     * removing 50s from time left.
+     */
+    public void checkDeanCatch() {
+<span class="nc bnc" id="L541" title="All 4 branches missed.">        if (dean.canReach(player) &amp;&amp; !playerCaught) {</span>
+<span class="nc" id="L542">            incAchievement(ACH_DEAN_CAPTURES); // Increment count for Dean capture achievment</span>
+<span class="nc" id="L543">            startPlayerCatch();</span>
+<span class="nc bnc" id="L544" title="All 4 branches missed.">        } else if (librarian.canReach(player) &amp;&amp; !playerCaught) {</span>
+<span class="nc" id="L545">            incAchievement(ACH_DEAN_CAPTURES); // Increment count for Dean capture achievment</span>
+<span class="nc" id="L546">            playerCaughtByLibrarian = true;</span>
+<span class="nc" id="L547">            startPlayerCatch();</span>
+<span class="nc bnc" id="L548" title="All 2 branches missed.">        } else if (playerCaught) {</span>
+<span class="nc bnc" id="L549" title="All 2 branches missed.">            if (playerCaughtTime &lt;= 0) {</span>
+<span class="nc" id="L550">                endPlayerCatch();</span>
+<span class="nc" id="L551">                playerCaughtTime = INITALPLAYERCAUGHTTIME;</span>
+            } else {
+<span class="nc" id="L553">                float delta = Gdx.graphics.getDeltaTime();</span>
+<span class="nc" id="L554">                playerCaughtTime -= delta;</span>
+            }
+        }
+<span class="nc" id="L557">    }</span>
+
+    /**
+     * Run when the player is first caught by the Dean.
+     * This will begin the sequence where the player is held in detention while the
+     * timer goes down.
+     * This will freeze the player and dean.
+     */
+    private void startPlayerCatch() {
+<span class="nc" id="L566">        playerCaught = true;</span>
+<span class="nc" id="L567">        loadRoom(PRISONCOORDS, PLAYERPRISONPOS);</span>
+<span class="nc" id="L568">        player.freeze();</span>
+
+<span class="nc bnc" id="L570" title="All 2 branches missed.">        if (playerCaughtByLibrarian) {</span>
+<span class="nc" id="L571">            librarian.freeze();</span>
+<span class="nc" id="L572">            librarian.changeAnimation(3);</span>
+<span class="nc" id="L573">            librarian.setPosition(PLAYERSTARTPOS.x + 32, PLAYERSTARTPOS.y);</span>
+<span class="nc" id="L574">            timerSystem.addGradually(DEANPUNISHMENT - INITALPLAYERCAUGHTTIME);</span>
+<span class="nc" id="L575">            ToastSystem.addToast(&quot;Librarian took his book back&quot;, BAD);</span>
+<span class="nc" id="L576">            ToastSystem.addToast(</span>
+<span class="nc" id="L577">                    &quot;You were stuck being his assistant for &quot; + Integer.toString(DEANPUNISHMENT) + &quot;s!&quot;, BAD);</span>
+        } else {
+            // THE PREVIOUS DEAN CAPTURE BEHAVIOUR
+            /**
+             * dean.freeze();
+             * dean.changeAnimation(3);
+             * dean.setPosition(PLAYERSTARTPOS.x + 32, PLAYERSTARTPOS.y);
+             * timerSystem.addGradually(DEANPUNISHMENT - INITALPLAYERCAUGHTTIME);
+             * ToastSystem.addToast(&quot;You were caught by the Dean!&quot;, BAD);
+             * ToastSystem.addToast(&quot;You were stuck being lectured for &quot; +
+             * Integer.toString(DEANPUNISHMENT) + &quot;s!&quot;,
+             * BAD);
+             * ToastSystem.addToast(&quot;Luckily for you the door isn't very sturdy, it only
+             * takes you &quot; + Integer.toString(DEANPUNISHMENT) + &quot;s to break it down&quot;, BAD);
+             */
+
+<span class="nc" id="L593">            timerSystem.addGradually(DEANPUNISHMENT - INITALPLAYERCAUGHTTIME);</span>
+<span class="nc" id="L594">            ToastSystem.addToast(&quot;You were thrown in the dungeon by the Dean!&quot;, BAD);</span>
+<span class="nc" id="L595">            ToastSystem.addToast(&quot;Luckily for you the door isn't very sturdy, it only takes you &quot;</span>
+<span class="nc" id="L596">                    + Integer.toString(DEANPUNISHMENT) + &quot;s to break it down&quot;, BAD);</span>
+<span class="nc" id="L597">            player.setPosition(PLAYERPRISONPOS);</span>
+        }
+<span class="nc" id="L599">        negativeEventCounter++;</span>
+<span class="nc" id="L600">    }</span>
+
+    /**
+     * This will end the sequence where the player is held in detention while the
+     * timer goes down.
+     * This will unfreeze the player and dean.
+     * It will rest the dean to the start of its patrol.
+     */
+    private void endPlayerCatch() {
+<span class="nc bnc" id="L609" title="All 2 branches missed.">        if (playerCaughtByLibrarian) {</span>
+<span class="nc" id="L610">            librarian.setPosition(LIBRARIANSTARTPOS);</span>
+<span class="nc" id="L611">            librarian.restartPath();</span>
+<span class="nc" id="L612">            librarian.unfreeze();</span>
+        } else {
+<span class="nc" id="L614">            dean.setPosition(DEANSTARTPOS);</span>
+<span class="nc" id="L615">            dean.restartPath();</span>
+<span class="nc" id="L616">            dean.unfreeze();</span>
+        }
+<span class="nc" id="L618">        player.unfreeze();</span>
+<span class="nc" id="L619">        playerCaught = false;</span>
+<span class="nc" id="L620">        playerCaughtByLibrarian = false;</span>
+<span class="nc" id="L621">    }</span>
+
+    public static void checkProjectiles() {
+<span class="nc bnc" id="L624" title="All 2 branches missed.">        for (int i = projectileWarnings.size() - 1; i &gt;= 0; i--) {</span>
+<span class="nc" id="L625">            ProjectileWarning warning = projectileWarnings.get(i);</span>
+<span class="nc bnc" id="L626" title="All 2 branches missed.">            if (warning.getWarningLength() &lt;= 0) {</span>
+<span class="nc" id="L627">                projectileWarnings.remove(i);</span>
+            }
+        }
+<span class="nc bnc" id="L630" title="All 2 branches missed.">        for (int i = projectiles.size() - 1; i &gt;= 0; i--) {</span>
+<span class="nc" id="L631">            BossProjectile projectile = projectiles.get(i);</span>
+<span class="nc" id="L632">            projectile.nextMove();</span>
+<span class="nc bnc" id="L633" title="All 2 branches missed.">            if (projectile.hittingPlayer(player)) {</span>
+<span class="nc" id="L634">                player.damage();</span>
+            }
+<span class="nc" id="L636">            int removeOffset = 100; // how far off the screen in pixels the projectile is before it is removed</span>
+
+<span class="nc bnc" id="L638" title="All 4 branches missed.">            if (projectile.getX() &lt; 0 - removeOffset || projectile.getX() &gt; VIEWPORTWIDTH * 2 + removeOffset ||</span>
+<span class="nc bnc" id="L639" title="All 4 branches missed.">                    projectile.getY() &lt; 0 - removeOffset || projectile.getY() &gt; VIEWPORTHEIGHT * 2 + removeOffset) {</span>
+<span class="nc" id="L640">                projectiles.remove(projectile);</span>
+            }
+        }
+<span class="nc" id="L643">    }</span>
+
+    /**
+     * Spawns a projectile, should only be used for the boss fight.
+     * @param position - the position of the projectile
+     * @param direction - the direction that the projectile is travelling
+     */
+    public static void spawnProjectile(Vector2 position, Character direction){
+<span class="nc" id="L651">        float warningLength = PROJECTILEWARNINGLENGTH;</span>
+        //float delta = Gdx.graphics.getDeltaTime();
+<span class="nc" id="L653">        ProjectileWarning warning = new ProjectileWarning(position, direction, warningLength);</span>
+<span class="nc" id="L654">        BossProjectile projectile = new BossProjectile(position, direction, PROJECTILESPEED, PROJECTILEWARNINGLENGTH);</span>
+<span class="nc" id="L655">        projectileWarnings.add(warning);</span>
+<span class="nc" id="L656">        projectiles.add(projectile);</span>
+<span class="nc" id="L657">        System.out.println(projectiles.size());</span>
+<span class="nc" id="L658">    }</span>
+
+    /**
+     * Use to drop remove the spikes in the chest room when the switch is pressed.
+     */
+    public static void dropSpikes() {
+<span class="nc bnc" id="L664" title="All 2 branches missed.">        if (!spikesLowered) {</span>
+<span class="nc" id="L665">            collisionSystem.removeCollisionByName(&quot;chestRoomSpikes&quot;);</span>
+<span class="nc" id="L666">            ToastSystem.addToast(&quot;You Lowered the Spikes!&quot;, GOOD);</span>
+<span class="nc" id="L667">            RenderingSystem.hideLayer(&quot;Spikes&quot;);</span>
+<span class="nc" id="L668">            RenderingSystem.hideLayer(&quot;Switch&quot;);</span>
+<span class="nc" id="L669">            spikesLowered = true;</span>
+        }
+<span class="nc" id="L671">    }</span>
+
+    /**
+     * Used to open the door to the room with the chest containing the lockpick
+     */
+    public static void openLockpickRoomDoor() {
+<span class="nc bnc" id="L677" title="All 6 branches missed.">        if (!lockpickRoomOpened &amp;&amp; (player.hasLockpick() || player.hasJanitorKey())) {</span>
+<span class="nc" id="L678">            collisionSystem.removeCollisionByName(&quot;lockpickRoomDoor&quot;);</span>
+<span class="nc" id="L679">            RenderingSystem.hideLayer(&quot;LockpickRoomDoor&quot;);</span>
+<span class="nc" id="L680">            lockpickRoomOpened = true;</span>
+        }
+<span class="nc" id="L682">    }</span>
+
+    /**
+     * Used to open the door to the dungeons from the outside
+     */
+    public static void openDungeonDoor() {
+<span class="nc bnc" id="L688" title="All 6 branches missed.">        if (!dungeonDoorOpened &amp;&amp; (player.hasLockpick() || player.hasJanitorKey())) {</span>
+<span class="nc" id="L689">            collisionSystem.removeCollisionByName(&quot;dungeonDoor&quot;);</span>
+<span class="nc" id="L690">            RenderingSystem.hideLayer(&quot;DungeonDoor&quot;);</span>
+<span class="nc" id="L691">            dungeonDoorOpened = true;</span>
+        }
+<span class="nc" id="L693">    }</span>
+
+    /**
+     * Used to open the locked door inside the PNQ building
+     */
+    public static void openPNQDoor() {
+<span class="nc bnc" id="L699" title="All 6 branches missed.">        if (!PNQDoorOpened &amp;&amp; (player.hasLockpick() || player.hasJanitorKey())) {</span>
+<span class="nc" id="L700">            collisionSystem.removeCollisionByName(&quot;PNQDoor&quot;);</span>
+<span class="nc" id="L701">            RenderingSystem.hideLayer(&quot;PNQDoor&quot;);</span>
+<span class="nc" id="L702">            PNQDoorOpened = true;</span>
+        }
+<span class="nc" id="L704">    }</span>
+
+    /**
+     * Used to release the pope from his cell, which reduces the length of the boss
+     * fight.
+     */
+    public static void releasePope(){
+<span class="nc bnc" id="L711" title="All 2 branches missed.">        if(!releasedPope){</span>
+<span class="nc bnc" id="L712" title="All 2 branches missed.">            if(player.hasLockpick()){</span>
+<span class="nc" id="L713">                releasedPope = true;</span>
+<span class="nc" id="L714">                collisionSystem.removeCollisionByName(&quot;popeCellDoor&quot;);</span>
+<span class="nc" id="L715">                RenderingSystem.hideLayer(&quot;Pope&quot;);</span>
+<span class="nc" id="L716">                RenderingSystem.hideLayer(&quot;PopeCellDoor&quot;);</span>
+<span class="nc" id="L717">                RenderingSystem.showLayer(&quot;PopeSeraph&quot;);</span>
+<span class="nc" id="L718">                incAchievement(ACH_PAPAL_AUTHORITY);</span>
+<span class="nc" id="L719">                ToastSystem.addToast(&quot;\&quot;GSZMP BLF UIRVMW! R DROO KIZB ULI BLFI ERXGLIB!\&quot;&quot;);</span>
+            }
+            else{
+<span class="nc" id="L722">                ToastSystem.addToast(&quot;\&quot;I CANNOT STAND THIS IMPRISONMENT ANY LONGER! FIND A LOCKPICK AND RELEASE ME\&quot;&quot;);</span>
+            }
+        }
+<span class="nc" id="L725">    }</span>
+
+    /**
+     * Used to end the game by turning the boss into a pacifist
+     */
+    public static void convertBoss() {
+<span class="nc bnc" id="L731" title="All 2 branches missed.">        if (player.hasStaff()) {</span>
+<span class="nc bnc" id="L732" title="All 2 branches missed.">            if (player.booksRead() &gt;= 7) {</span>
+<span class="nc" id="L733">                bossConverted = true;</span>
+<span class="nc" id="L734">                winGame();</span>
+            } else {
+<span class="nc" id="L736">                ToastSystem.addToast(&quot;If you knew how to use the staff, you could use it on him.&quot;, BAD);</span>
+            }
+        }
+<span class="nc" id="L739">    }</span>
+
+    /**
+     * Used to release Bob from his cell, which ends the game.
+     */
+    public static void releaseBob() {
+<span class="nc bnc" id="L745" title="All 2 branches missed.">        if (player.hasLockpick()) {</span>
+<span class="nc" id="L746">            bobReleased = true;</span>
+<span class="nc" id="L747">            incAchievement(ACH_WORLD_ENDER);</span>
+<span class="nc" id="L748">            LoseGame();</span>
+        }
+        else{
+<span class="nc" id="L751">            ToastSystem.addToast(&quot;The door is locked! But maybe that's for the best...&quot;);</span>
+        }
+<span class="nc" id="L753">    }</span>
+
+    /**
+     * &lt;P&gt;
+     * Teleports the player to a room on the tiled map based on the coordinates
+     * passed.
+     * &lt;/P&gt;
+     * &lt;P&gt;
+     * Each coordinate represents one room.
+     * &lt;/P&gt;
+     * &lt;P&gt;
+     * The width and height of each room in pixels is equivalent to the viewport
+     * width and height.
+     * &lt;/P&gt;
+     * &lt;P&gt;
+     * Teleports the player to a room on the tiled map based on the coordinates
+     * passed.
+     * &lt;/P&gt;
+     * &lt;P&gt;
+     * Each coordinate represents one room.
+     * &lt;/P&gt;
+     * &lt;P&gt;
+     * The width and height of each room in pixels is equivalent to the viewport
+     * width and height.
+     * &lt;/P&gt;
+     *
+     * @param x         the x coordinate of the room
+     * @param y         The y coordinate of the room
+     * @param playerPos The coordinates of the player after they enter the room
+     */
+    public static void loadRoom(int x, int y, Vector2 playerPos, Vector2 librarianPos, Character[] librarianPath) {
+
+<span class="nc" id="L785">        int offsetX = (x - currentRoomX) * VIEWPORTWIDTH * 2;</span>
+<span class="nc" id="L786">        int offsetY = (y - currentRoomY) * VIEWPORTHEIGHT * 2;</span>
+
+<span class="nc" id="L788">        RoomSystem.loadRoom(offsetX, offsetY);</span>
+<span class="nc" id="L789">        collisionSystem.loadRoom(offsetX, offsetY);</span>
+<span class="nc" id="L790">        TriggerSystem.loadRoom(offsetX, offsetY);</span>
+<span class="nc" id="L791">        renderingSystem.loadRoom(offsetX / 2, offsetY / 2);</span>
+<span class="nc" id="L792">        player.setX(playerPos.x);</span>
+<span class="nc" id="L793">        player.setY(playerPos.y);</span>
+
+<span class="nc" id="L795">        dean.deactivate();</span>
+<span class="nc" id="L796">        librarian.deactivate();</span>
+
+        // Spawn Room
+<span class="nc bnc" id="L799" title="All 4 branches missed.">        if (x == 0 &amp;&amp; y == 0) {</span>
+<span class="nc" id="L800">            dean.activate();</span>
+<span class="nc" id="L801">            dean.setPosition(DEANSTARTPOS);</span>
+<span class="nc" id="L802">            librarian.setX(librarianPos.x);</span>
+<span class="nc" id="L803">            librarian.setY(librarianPos.y);</span>
+<span class="nc" id="L804">            librarian.setPath(librarianPath);</span>
+<span class="nc" id="L805">            librarian.activate();</span>
+<span class="nc bnc" id="L806" title="All 2 branches missed.">            if (!bookUsed) {</span>
+<span class="nc" id="L807">                librarian.freeze();</span>
+            }
+
+        }
+
+        // Coridoor Patrolling Room
+<span class="nc bnc" id="L813" title="All 4 branches missed.">        else if (x == 1 &amp;&amp; y == 0) {</span>
+<span class="nc" id="L814">            dean.activate();</span>
+<span class="nc" id="L815">            Vector2 pos = new Vector2(80, 64);</span>
+<span class="nc" id="L816">            Character[] path = {</span>
+<span class="nc" id="L817">                    'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',</span>
+<span class="nc" id="L818">                    'R', 'R', 'R', 'R',</span>
+<span class="nc" id="L819">                    'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L',</span>
+<span class="nc" id="L820">                    'L', 'L', 'L', 'L'</span>
+            };
+
+<span class="nc" id="L823">            dean = new Dean(pos, DEFAULTDEANSPEED, path);</span>
+<span class="nc" id="L824">        }</span>
+
+        // Speed Buff Room
+<span class="nc bnc" id="L827" title="All 4 branches missed.">        else if (x == 2 &amp;&amp; y == 1) {</span>
+<span class="nc" id="L828">            dean.activate();</span>
+<span class="nc" id="L829">            Vector2 pos = new Vector2(250, 400);</span>
+<span class="nc" id="L830">            Character[] path = {</span>
+<span class="nc" id="L831">                    'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',</span>
+<span class="nc" id="L832">                    'D', 'D', 'D', 'D', 'D', 'D',</span>
+<span class="nc" id="L833">                    'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L',</span>
+<span class="nc" id="L834">                    'U', 'U', 'U', 'U', 'U', 'U'</span>
+            };
+
+<span class="nc" id="L837">            dean = new Dean(pos, 2000, path);</span>
+<span class="nc" id="L838">        }</span>
+
+        // Guard Room
+<span class="nc bnc" id="L841" title="All 4 branches missed.">        else if (x == 1 &amp;&amp; y == 2) {</span>
+<span class="nc" id="L842">            dean.activate();</span>
+<span class="nc" id="L843">            Vector2 pos = new Vector2(16, 490);</span>
+<span class="nc" id="L844">            Character[] path = {</span>
+<span class="nc" id="L845">                    'R',</span>
+<span class="nc" id="L846">                    'L'</span>
+            };
+
+<span class="nc" id="L849">            dean = new Dean(pos, DEFAULTDEANSPEED, path);</span>
+<span class="nc" id="L850">        }</span>
+
+        // Bridge Room
+<span class="nc bnc" id="L853" title="All 4 branches missed.">        else if (x == 2 &amp;&amp; y == 2) {</span>
+<span class="nc bnc" id="L854" title="All 2 branches missed.">            if (!boss.isDefeated()) {</span>
+<span class="nc" id="L855">                ToastSystem.addToast(&quot;You sense an evil presence at the end of this hallway...&quot;, BAD);</span>
+            }
+        }
+
+        // Boss Room
+<span class="nc bnc" id="L860" title="All 4 branches missed.">        else if (x == 3 &amp;&amp; y == 2) {</span>
+<span class="nc bnc" id="L861" title="All 2 branches missed.">            if (!boss.isDefeated()) {</span>
+<span class="nc" id="L862">                RenderingSystem.showLayer(&quot;Flames&quot;);</span>
+<span class="nc" id="L863">                float timeModifier = 0f;</span>
+<span class="nc bnc" id="L864" title="All 2 branches missed.">                if (releasedPope) {</span>
+<span class="nc" id="L865">                    timeModifier += 30f;</span>
+                }
+<span class="nc bnc" id="L867" title="All 2 branches missed.">                if (player.hasFirestarter()) {</span>
+<span class="nc" id="L868">                    timeModifier += 20f;</span>
+                }
+<span class="nc bnc" id="L870" title="All 2 branches missed.">                if(!defeatedBoss){</span>
+<span class="nc" id="L871">                    boss.start(BOSSFIGHTLENGTH-timeModifier);</span>
+                }
+<span class="nc" id="L873">                RenderingSystem.hideLayer(&quot;Boss&quot;);</span>
+<span class="nc" id="L874">                RenderingSystem.hideLayer(&quot;Staff&quot;);</span>
+            }
+        }
+<span class="nc" id="L877">        currentRoomX = x;</span>
+<span class="nc" id="L878">        currentRoomY = y;</span>
+<span class="nc" id="L879">    }</span>
+
+    /**
+     * &lt;P&gt;
+     * Teleports the player to a room on the tiled map based on the coordinates
+     * passed.
+     * &lt;/P&gt;
+     * &lt;P&gt;
+     * Each coordinate represents one room.
+     * &lt;/P&gt;
+     * &lt;P&gt;
+     * The width and height of each room in pixels is equivalent to the viewport
+     * width and height.
+     * &lt;/P&gt;
+     *
+     * @param x the x coordinate of the room
+     * @param y The y coordinate of the room
+     */
+    public static void loadRoom(Vector2 coordinates) {
+        // loadRoom(coordinates, PLAYERSTARTPOS, LIBRARIANSTARTPOS, LIBRARIANPATH);
+<span class="nc" id="L899">        loadRoom(coordinates, PLAYERSTARTPOS);</span>
+<span class="nc" id="L900">    }</span>
+
+    /**
+     * &lt;P&gt;
+     * Teleports the player to a room on the tiled map based on the coordinates
+     * passed.
+     * &lt;/P&gt;
+     * &lt;P&gt;
+     * Each coordinate represents one room.
+     * &lt;/P&gt;
+     * &lt;P&gt;
+     * The width and height of each room in pixels is equivalent to the viewport
+     * width and height.
+     * &lt;/P&gt;
+     *
+     * @param coordinates the coordinates of the room
+     */
+    public static void loadRoom(Vector2 coordinates, Vector2 playerPos) {
+<span class="nc" id="L918">        int x = (int) coordinates.x;</span>
+<span class="nc" id="L919">        int y = (int) coordinates.y;</span>
+<span class="nc" id="L920">        loadRoom(x, y, playerPos, LIBRARIANSTARTPOS, LIBRARIANPATH);</span>
+<span class="nc" id="L921">    }</span>
+
+    @Override
+    public void resize(int width, int height) {
+<span class="nc" id="L925">        renderingSystem.resize(width, height);</span>
+<span class="nc" id="L926">    }</span>
+
+    @Override
+    public void pause() {
+<span class="nc" id="L930">        togglePause();</span>
+<span class="nc" id="L931">    }</span>
+
+    @Override
+    public void resume() {
+<span class="nc" id="L935">        togglePause();</span>
+<span class="nc" id="L936">    }</span>
+
+    @Override
+    public void dispose() {
+<span class="nc" id="L940">        leaderBoard.saveToFile(Main.leaderBoardFilePath);</span>
+<span class="nc" id="L941">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

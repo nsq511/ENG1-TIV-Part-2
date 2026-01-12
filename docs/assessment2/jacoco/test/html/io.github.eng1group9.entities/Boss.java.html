@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Boss.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">core</a> &gt; <a href="index.source.html" class="el_package">io.github.eng1group9.entities</a> &gt; <span class="el_source">Boss.java</span></div><h1>Boss.java</h1><pre class="source lang-java linenums">package io.github.eng1group9.entities;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
+import io.github.eng1group9.Main;
+import io.github.eng1group9.systems.RenderingSystem;
+
+import java.util.Random;
+
+public class Boss extends MovingEntity {
+
+<span class="nc" id="L13">    private float timeLeft = 1000f;</span>
+    private boolean defeated;
+    final private float attackCooldownLength;
+    private float attackCooldown;
+<span class="nc" id="L17">    private final int NUMOFATTACKS = 8;</span>
+    private final Random random;
+    private final int spacing;
+
+    public Boss(Vector2 startPos, float attackCooldownLength, int spacing) {
+<span class="nc" id="L22">        super(new Texture(&quot;Characters/bossAnimations.png&quot;), new int[]{1}, 64, 80, 0f, startPos, new Vector2(0,0), false, true);</span>
+<span class="nc" id="L23">        setScale(2);</span>
+<span class="nc" id="L24">        System.out.println(timeLeft);</span>
+<span class="nc" id="L25">        defeated = false;</span>
+<span class="nc" id="L26">        random = new Random();</span>
+<span class="nc" id="L27">        this.attackCooldownLength = attackCooldownLength;</span>
+<span class="nc" id="L28">        attackCooldown = attackCooldownLength;</span>
+<span class="nc" id="L29">        this.spacing = spacing;</span>
+<span class="nc" id="L30">    }</span>
+
+    /**
+     * Spawns the boss in the room and starts the boss fight
+     * @param fightLength
+     */
+    public void start(float fightLength){
+<span class="nc" id="L37">        System.out.println(&quot;Began boss fight!&quot;);</span>
+<span class="nc" id="L38">        defeated = false;</span>
+<span class="nc" id="L39">        timeLeft = fightLength;</span>
+<span class="nc" id="L40">        activate();</span>
+<span class="nc" id="L41">    }</span>
+
+    /**
+     * Logic for the boss, should be called in the main logic loop.
+     */
+    public void logic(){
+<span class="nc bnc" id="L47" title="All 2 branches missed.">        if(isActive()){</span>
+<span class="nc" id="L48">            float delta = Gdx.graphics.getDeltaTime();</span>
+<span class="nc" id="L49">            timeLeft -= delta;</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">            if(timeLeft &lt; 0){</span>
+<span class="nc" id="L51">                defeated = true;</span>
+<span class="nc" id="L52">                Main.defeatBoss();</span>
+<span class="nc" id="L53">                deactivate();</span>
+            }
+<span class="nc bnc" id="L55" title="All 2 branches missed.">            if(!defeated){</span>
+<span class="nc" id="L56">                nextAttack();</span>
+            }
+        }
+<span class="nc" id="L59">    }</span>
+
+    /**
+     * Uses a random attack once the cooldown has expired.
+     */
+    public void nextAttack() {
+<span class="nc" id="L65">        float delta = Gdx.graphics.getDeltaTime();</span>
+<span class="nc" id="L66">        attackCooldown -= delta;</span>
+
+<span class="nc bnc" id="L68" title="All 2 branches missed.">        if (attackCooldown &lt;= 0) {</span>
+<span class="nc" id="L69">            int attack = random.nextInt(NUMOFATTACKS);</span>
+
+<span class="nc" id="L71">            int width = (int) RenderingSystem.getViewportWidth() * 2;</span>
+<span class="nc" id="L72">            int height = (int) RenderingSystem.getViewportHeight() * 2;</span>
+
+<span class="nc bnc" id="L74" title="All 9 branches missed.">            switch (attack) {</span>
+                case 0:
+<span class="nc" id="L76">                    spawnProjectiles('L', 0, height, spacing);</span>
+<span class="nc" id="L77">                    break;</span>
+                case 1:
+<span class="nc" id="L79">                    spawnProjectiles('R', -spacing, height+spacing, spacing);</span>
+<span class="nc" id="L80">                    break;</span>
+                case 2:
+<span class="nc" id="L82">                    spawnProjectiles('U', 0, width, spacing);</span>
+<span class="nc" id="L83">                    break;</span>
+                case 3:
+<span class="nc" id="L85">                    spawnProjectiles('D', -spacing, width+spacing, spacing);</span>
+<span class="nc" id="L86">                    break;</span>
+
+                case 4:
+<span class="nc" id="L89">                    spawnProjectiles('L', 0, height / 2, spacing/2);</span>
+<span class="nc" id="L90">                    break;</span>
+                case 5:
+<span class="nc" id="L92">                    spawnProjectiles('R', 0, height / 2, spacing/2);</span>
+<span class="nc" id="L93">                    break;</span>
+                case 6:
+<span class="nc" id="L95">                    spawnProjectiles('U', 0, width / 2, spacing/2);</span>
+<span class="nc" id="L96">                    break;</span>
+                case 7:
+<span class="nc" id="L98">                    spawnProjectiles('D', 0, width / 2, spacing/2);</span>
+                    break;
+            }
+<span class="nc" id="L101">            attackCooldown = attackCooldownLength;</span>
+        }
+<span class="nc" id="L103">    }</span>
+
+    /**
+     * Spawns projectiles across a fixed area in a certain direction.
+     *
+     * @param moveDirection The direction that the projectile will travel.
+     *                      'U' for up, 'D' for down, 'L' for left, 'R' for right.
+     *                      Projectiles travelling up or down will be spawned along the X axis.
+     *                      Projectiles travelling left or right will be spawned along the Y axis.
+     * @param from The starting coordinate for where the projectiles should be spawned
+     * @param to The last coordinate for where the projectiles should be spawned/
+     * @param spacing How many pixels there should be between each projectile.
+     */
+    private void spawnProjectiles(Character moveDirection,int from, int to,int spacing){
+
+<span class="nc" id="L118">        int width = (int)RenderingSystem.getViewportWidth()*2;</span>
+<span class="nc" id="L119">        int height = (int)RenderingSystem.getViewportHeight()*2;</span>
+
+<span class="nc" id="L121">        System.out.println(&quot;Spawning projectiles from &quot; +  from + &quot; to &quot; + to);</span>
+
+<span class="nc bnc" id="L123" title="All 2 branches missed.">        for(int i = from; i &lt;= to; i = i + spacing){</span>
+<span class="nc bnc" id="L124" title="All 5 branches missed.">            switch(moveDirection){</span>
+                case 'L':
+<span class="nc" id="L126">                    Main.spawnProjectile(new Vector2(width,i), moveDirection);</span>
+<span class="nc" id="L127">                    break;</span>
+                case 'R':
+<span class="nc" id="L129">                    Main.spawnProjectile(new Vector2(0,i), moveDirection);</span>
+<span class="nc" id="L130">                    break;</span>
+                case 'U':
+<span class="nc" id="L132">                    Main.spawnProjectile(new Vector2(i,0), moveDirection);</span>
+<span class="nc" id="L133">                    break;</span>
+                case 'D':
+<span class="nc" id="L135">                    Main.spawnProjectile(new Vector2(i,height), moveDirection);</span>
+                    break;
+            }
+        }
+<span class="nc" id="L139">    }</span>
+
+    public boolean isDefeated(){
+<span class="nc" id="L142">        return defeated;</span>
+    }
+
+    public float getTimeLeft(){
+<span class="nc" id="L146">        return timeLeft;</span>
+    }
+
+    @Override
+    public void reset(){
+<span class="nc" id="L151">        super.reset();</span>
+
+<span class="nc" id="L153">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

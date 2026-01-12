@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Player.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">core</a> &gt; <a href="index.source.html" class="el_package">io.github.eng1group9.entities</a> &gt; <span class="el_source">Player.java</span></div><h1>Player.java</h1><pre class="source lang-java linenums">package io.github.eng1group9.entities;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
+
+import io.github.eng1group9.Main;
+import io.github.eng1group9.systems.RenderingSystem;
+import io.github.eng1group9.systems.ToastSystem;
+
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ * Handles everything connected to the player.
+ *
+ * @param startPos - The players start positon.
+ * @param speed    - How fast the player will move.
+ */
+public class Player extends MovingEntity {
+
+<span class="nc" id="L23">    final static Color BAD = new Color(1, 1, 0, 1);</span>
+<span class="nc" id="L24">    final static Color GOOD = new Color(0, 1, 1, 1);</span>
+
+<span class="nc" id="L26">    private boolean hasExitKey = false;</span>
+<span class="nc" id="L27">    private boolean hasChestRoomKey = false;</span>
+<span class="nc" id="L28">    private boolean hasRedPotion = false;</span>
+<span class="nc" id="L29">    private boolean hasLockpick = false;</span>
+    // I am getting a warning on the next line but an error if I remove it...
+<span class="nc" id="L31">    private boolean defeatedBoss = false;</span>
+<span class="nc" id="L32">    private boolean hasFirestarter = false;</span>
+<span class="nc" id="L33">    private boolean hasMoney = false;</span>
+<span class="nc" id="L34">    private boolean hasStaff = false;</span>
+<span class="nc" id="L35">    private boolean hasJanitorKey = false;</span>
+<span class="nc" id="L36">    private List&lt;Integer&gt; booksRead = new LinkedList&lt;&gt;();</span>
+<span class="nc" id="L37">    private boolean visibility = true;</span>
+<span class="nc" id="L38">    private float invincibilityLeft = 0;</span>
+<span class="nc" id="L39">    private float potionDelay = 0;</span>
+<span class="nc" id="L40">    private float slownessLeft = 0;</span>
+<span class="nc" id="L41">    private int dashesLeft = 0;</span>
+<span class="nc" id="L42">    private float dashCooldown = 3;</span>
+<span class="nc" id="L43">    private boolean dashed = false;</span>
+
+    private int health;
+
+    public Player(Vector2 startPos, float speed) {
+<span class="nc" id="L48">        super(new Texture(&quot;Characters/playerAnimations.png&quot;), new int[] { 4, 4, 4, 4, 4, 4, 4, 4 }, 32, 32, speed,</span>
+                startPos, new Vector2(16, 0), true, true);
+<span class="nc" id="L50">        setScale(2);</span>
+<span class="nc" id="L51">    }</span>
+
+    public boolean hasFirestarter() {
+<span class="nc" id="L54">        return hasFirestarter;</span>
+    }
+
+    public boolean hasMoney() {
+<span class="nc" id="L58">        return hasMoney;</span>
+    }
+
+    public int booksRead() {
+<span class="nc" id="L62">        return booksRead.size();</span>
+    }
+
+    public boolean hasStaff() {
+<span class="nc" id="L66">        return hasStaff;</span>
+    }
+
+    public boolean hasJanitorKey() {
+<span class="nc" id="L70">        return hasJanitorKey;</span>
+    }
+
+    public void giveLockpick() {
+<span class="nc bnc" id="L74" title="All 2 branches missed.">        if (!hasLockpick) {</span>
+<span class="nc" id="L75">            ToastSystem.addToast(&quot;You found a lockpick!&quot;, GOOD);</span>
+<span class="nc" id="L76">            hasLockpick = true;</span>
+        }
+<span class="nc" id="L78">    }</span>
+
+    public void giveFirestarter() {
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        if (!hasFirestarter) {</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">            if (hasMoney) {</span>
+<span class="nc" id="L83">                ToastSystem.addToast(&quot;You bought a firestarter!&quot;, GOOD);</span>
+<span class="nc" id="L84">                ToastSystem.addToast(&quot;'Thank you for your purchase!'&quot;);</span>
+<span class="nc" id="L85">                hasFirestarter = true;</span>
+            } else {
+<span class="nc" id="L87">                ToastSystem.addToast(&quot;You see a firestarter for sale, but you don't have any money!&quot;);</span>
+            }
+
+        }
+<span class="nc" id="L91">    }</span>
+
+    public void giveJanitorKey() {
+<span class="nc bnc" id="L94" title="All 2 branches missed.">        if (!hasJanitorKey) {</span>
+<span class="nc" id="L95">            ToastSystem.addToast(&quot;You found the janitor's key!&quot;, GOOD);</span>
+<span class="nc" id="L96">            hasJanitorKey = true;</span>
+        }
+
+<span class="nc" id="L99">    }</span>
+
+    public void giveStaff() {
+<span class="nc bnc" id="L102" title="All 2 branches missed.">        if (!hasStaff) {</span>
+<span class="nc" id="L103">            RenderingSystem.hideLayer(&quot;Staff&quot;);</span>
+<span class="nc" id="L104">            int books = booksRead.size();</span>
+
+<span class="nc" id="L106">            ToastSystem.addToast(&quot;You picked up the staff...&quot;, GOOD);</span>
+<span class="nc" id="L107">            hasStaff = true;</span>
+
+<span class="nc bnc" id="L109" title="All 2 branches missed.">            if (books &lt; 3) {</span>
+<span class="nc" id="L110">                ToastSystem.addToast(&quot;But you don't know how to use it!&quot;, BAD);</span>
+<span class="nc bnc" id="L111" title="All 2 branches missed.">            } else if (books &lt; 7) {</span>
+<span class="nc" id="L112">                ToastSystem.addToast(&quot;If you finish your studies, you might be able to use it!&quot;, GOOD);</span>
+            } else {
+<span class="nc" id="L114">                ToastSystem.addToast(&quot;It seems your studying has paid off! You can now use it on the boss!&quot;, GOOD);</span>
+            }
+        }
+<span class="nc" id="L117">    }</span>
+
+    public void giveMoney() {
+<span class="nc bnc" id="L120" title="All 2 branches missed.">        if (!hasMoney) {</span>
+<span class="nc" id="L121">            ToastSystem.addToast(&quot;You found a dinar in the bush!&quot;, GOOD);</span>
+<span class="nc" id="L122">            RenderingSystem.hideLayer(&quot;Coin&quot;);</span>
+<span class="nc" id="L123">            hasMoney = true;</span>
+        }
+<span class="nc" id="L125">    }</span>
+
+    /**
+     * Resets the Player to its original state
+     */
+    public void reset() {
+<span class="nc" id="L131">        super.reset();</span>
+<span class="nc" id="L132">        health = 5;</span>
+<span class="nc" id="L133">        hasExitKey = false;</span>
+<span class="nc" id="L134">        hasChestRoomKey = false;</span>
+<span class="nc" id="L135">        hasRedPotion = false;</span>
+<span class="nc" id="L136">        hasLockpick = false;</span>
+<span class="nc" id="L137">        defeatedBoss = false;</span>
+<span class="nc" id="L138">        hasFirestarter = false;</span>
+<span class="nc" id="L139">        hasMoney = false;</span>
+<span class="nc" id="L140">        hasStaff = false;</span>
+<span class="nc" id="L141">        hasJanitorKey = false;</span>
+<span class="nc" id="L142">        booksRead = new LinkedList&lt;&gt;();</span>
+<span class="nc" id="L143">        visibility = true;</span>
+<span class="nc" id="L144">        invincibilityLeft = 0;</span>
+<span class="nc" id="L145">        slownessLeft = 0;</span>
+<span class="nc" id="L146">        dashesLeft = 0;</span>
+<span class="nc" id="L147">        dashCooldown = 3;</span>
+<span class="nc" id="L148">        potionDelay = 0;</span>
+
+<span class="nc" id="L150">    }</span>
+
+    public int getHealth() {
+<span class="nc" id="L153">        return health;</span>
+    }
+
+    public void damage() {
+<span class="nc bnc" id="L157" title="All 2 branches missed.">        if (health &gt; 1) {</span>
+<span class="nc" id="L158">            health -= 1;</span>
+        } else {
+<span class="nc" id="L160">            Main.LoseGame();</span>
+        }
+<span class="nc" id="L162">    }</span>
+
+    /**
+     * @return wether the player has the key to open the exit.
+     */
+    public boolean hasExitKey() {
+<span class="nc" id="L168">        return hasExitKey;</span>
+    }
+
+    /**
+     *
+     * @return if the player has the lockpick
+     */
+    public boolean hasLockpick() {
+<span class="nc" id="L176">        return hasLockpick;</span>
+    }
+
+    /**
+     * Give the player the key to open the exit.
+     */
+    public void giveExitKey() {
+<span class="nc bnc" id="L183" title="All 2 branches missed.">        if (!hasExitKey) {</span>
+<span class="nc" id="L184">            hasExitKey = true;</span>
+<span class="nc" id="L185">            RenderingSystem.hideLayer(&quot;ExitKey&quot;);</span>
+<span class="nc" id="L186">            ToastSystem.addToast(&quot;You found the Exit Key!&quot;);</span>
+        }
+<span class="nc" id="L188">    }</span>
+
+    /**
+     * @return wether the player has the key to open the room with the chest.
+     */
+    public boolean hasChestRoomKey() {
+<span class="nc" id="L194">        return hasChestRoomKey;</span>
+    }
+
+    /**
+     * Give the player the key to open the room with the chest.
+     */
+    public void giveChestRoomKey() {
+<span class="nc bnc" id="L201" title="All 2 branches missed.">        if (!hasChestRoomKey) {</span>
+<span class="nc" id="L202">            hasChestRoomKey = true;</span>
+<span class="nc" id="L203">            RenderingSystem.hideLayer(&quot;Key&quot;);</span>
+<span class="nc" id="L204">            ToastSystem.addToast(&quot;You found the Storage Room Key!&quot;);</span>
+        }
+<span class="nc" id="L206">    }</span>
+
+    /**
+     * Give the player the red potion they must give to LongBoi.
+     */
+    public void giveRedPotion() {
+<span class="nc bnc" id="L212" title="All 2 branches missed.">        if (!hasRedPotion) {</span>
+<span class="nc" id="L213">            hasRedPotion = true;</span>
+<span class="nc" id="L214">            RenderingSystem.hideLayer(&quot;Potion&quot;);</span>
+<span class="nc" id="L215">            ToastSystem.addToast(&quot;You found a Red Potion?&quot;);</span>
+        }
+<span class="nc" id="L217">    }</span>
+
+    /**
+     * @return wether the player has the potion for LongBoi.
+     */
+    public boolean hasRedPotion() {
+<span class="nc" id="L223">        return hasRedPotion;</span>
+    }
+
+    /**
+     * Make the player invisible for 15s, so they cannot be spotted by the Dean.
+     */
+    public void becomeInvisible() {
+<span class="nc" id="L230">        visibility = false;</span>
+<span class="nc" id="L231">    }</span>
+
+    public void potionTriggered() {
+<span class="nc" id="L234">        potionDelay = 3;</span>
+<span class="nc" id="L235">    }</span>
+
+    public float getPotionDelay() {
+<span class="nc" id="L238">        return potionDelay;</span>
+    }
+
+    /**
+     *
+     */
+    public void readBook(int id) {
+<span class="nc bnc" id="L245" title="All 2 branches missed.">        if (!booksRead.contains(id)) {</span>
+<span class="nc" id="L246">            booksRead.add(id);</span>
+<span class="nc" id="L247">            ToastSystem.addToast(&quot;You read the book!&quot;);</span>
+
+<span class="nc bnc" id="L249" title="All 8 branches missed.">            switch (id) {</span>
+                case 1:
+<span class="nc" id="L251">                    ToastSystem.addToast(&quot;It contains hastily written lecture notes left behind by a student.&quot;);</span>
+<span class="nc" id="L252">                    break;</span>
+                case 2:
+<span class="nc" id="L254">                    ToastSystem.addToast(&quot;It is a study of celestial storms, annotated by a student.&quot;);</span>
+<span class="nc" id="L255">                    break;</span>
+                case 3:
+<span class="nc" id="L257">                    ToastSystem.addToast(&quot;It is an anatomical treatise on evil pacifist magic users.&quot;);</span>
+<span class="nc" id="L258">                    break;</span>
+                case 4:
+<span class="nc" id="L260">                    ToastSystem.addToast(&quot;It is a heretical prayerbook with seemingly random annotations.&quot;);</span>
+<span class="nc" id="L261">                    break;</span>
+                case 5:
+<span class="nc" id="L263">                    ToastSystem.addToast(&quot;It describes how to extract and store souls using evil pacifist magic.&quot;);</span>
+<span class="nc" id="L264">                    break;</span>
+                case 6:
+<span class="nc" id="L266">                    ToastSystem.addToast(&quot;It describes how to enchant coffee using evil pacifist magic.&quot;);</span>
+<span class="nc" id="L267">                    break;</span>
+                case 7:
+<span class="nc" id="L269">                    ToastSystem.addToast(&quot;It describes how to turn lead into gold using evil pacifist magic.&quot;);</span>
+                    break;
+            }
+
+<span class="nc bnc" id="L273" title="All 7 branches missed.">            switch (booksRead.size()) {</span>
+                case 1:
+                case 2:
+<span class="nc" id="L276">                    ToastSystem.addToast(&quot;You don't understand what you are reading at all.&quot;, BAD);</span>
+<span class="nc" id="L277">                    break;</span>
+                case 3:
+<span class="nc" id="L279">                    ToastSystem.addToast(&quot;It still doesn't make any sense to you.&quot;, BAD);</span>
+<span class="nc" id="L280">                    break;</span>
+                case 4:
+<span class="nc" id="L282">                    ToastSystem.addToast(&quot;You can only understand a little bit of what you are reading.&quot;, BAD);</span>
+<span class="nc" id="L283">                    break;</span>
+                case 5:
+<span class="nc" id="L285">                    ToastSystem.addToast(&quot;Some of the topics covered actually make a bit of sense.&quot;, GOOD);</span>
+<span class="nc" id="L286">                    break;</span>
+                case 6:
+<span class="nc" id="L288">                    ToastSystem.addToast(&quot;For once, you feel as though you understand most of what you are reading.&quot;,</span>
+                            GOOD);
+<span class="nc" id="L290">                    break;</span>
+                case 7:
+<span class="nc" id="L292">                    ToastSystem.addToast(</span>
+                            &quot;After reading the book, you finally have a basic understanding of evil pacifist magic!&quot;,
+                            GOOD);
+<span class="nc bnc" id="L295" title="All 2 branches missed.">                    if (hasStaff) {</span>
+<span class="nc" id="L296">                        ToastSystem.addToast(&quot;You can now use your staff on the boss!&quot;, GOOD);</span>
+                    }
+                    break;
+            }
+        }
+<span class="nc" id="L301">    }</span>
+
+    /**
+     * Move the player in the given direction
+     * 
+     * @param direction The direction to move (D = Down, U = Up, L = Left, R =
+     *                  Right).
+     */
+    public void slownessPotion() {
+<span class="nc" id="L310">        slownessLeft = 15;</span>
+<span class="nc" id="L311">        setSpeed(50);</span>
+<span class="nc" id="L312">    }</span>
+
+    public void speedPotion() {
+<span class="nc" id="L315">        dashesLeft = 10;</span>
+<span class="nc" id="L316">    }</span>
+
+    public float getDashes() {
+<span class="nc" id="L319">        return dashesLeft;</span>
+    }
+
+    public boolean hasDashed() {
+<span class="nc" id="L323">        return dashed;</span>
+    }
+
+    /**
+     * Move the player in the given direction
+     *
+     * @param direction The direction to move (D = Down, U = Up, L = Left, R =
+     *                  Right).
+     */
+    @Override
+    public float move(Character direction) {
+<span class="nc" id="L334">        int animationOffset = 0;</span>
+<span class="nc bnc" id="L335" title="All 2 branches missed.">        if (!isVisible())</span>
+<span class="nc" id="L336">            animationOffset = 4;</span>
+<span class="nc bnc" id="L337" title="All 5 branches missed.">        switch (direction) {</span>
+            case 'U':
+<span class="nc" id="L339">                changeAnimation(1 + animationOffset);</span>
+<span class="nc" id="L340">                break;</span>
+            case 'D':
+<span class="nc" id="L342">                changeAnimation(0 + animationOffset);</span>
+<span class="nc" id="L343">                break;</span>
+            case 'L':
+<span class="nc" id="L345">                changeAnimation(3 + animationOffset);</span>
+<span class="nc" id="L346">                break;</span>
+            case 'R':
+<span class="nc" id="L348">                changeAnimation(2 + animationOffset);</span>
+                break;
+        }
+        // System.out.println(&quot;Player Sprite Pos: &quot; + Float.toString(getX()) + &quot;, &quot; +
+        // Float.toString(getY()));
+        // System.out.println(&quot;Player Sprite Size: &quot; + Float.toString(getWidth()) + &quot;, &quot;
+        // + Float.toString(getHeight()));
+        // System.out.println(
+        // &quot;Hitbox Pos: &quot; + Float.toString(getHitbox().getX()) + &quot;, &quot; +
+        // Float.toString(getHitbox().getY()));
+        // System.out.println(&quot;Hitbox Size: &quot; + Float.toString(getHitbox().getWidth()) +
+        // &quot;, &quot;
+        // + Float.toString(getHitbox().getHeight()));
+<span class="nc" id="L361">        return super.move(direction);</span>
+    }
+
+    public float dash(Character direction) {
+<span class="nc" id="L365">        dashesLeft--;</span>
+<span class="nc" id="L366">        dashed = true;</span>
+<span class="nc" id="L367">        return super.dash(direction);</span>
+    }
+
+    /**
+     * @return Wether the player is visible (to the Dean).
+     */
+    public boolean isVisible() {
+<span class="nc" id="L374">        return visibility;</span>
+    }
+
+    /**
+     * @return WHETHER the player is invincible after being damaged
+     *
+     */
+    public boolean isInvincible() {
+<span class="nc bnc" id="L382" title="All 2 branches missed.">        return invincibilityLeft &lt;= 0;</span>
+    }
+
+    /**
+     * Used to update the players invisiblity timer (could be used for more).
+     */
+    public void update() {
+
+        // Invincible Check
+<span class="nc bnc" id="L391" title="All 2 branches missed.">        if (isInvincible()) {</span>
+<span class="nc" id="L392">            invincibilityLeft -= Gdx.graphics.getDeltaTime();</span>
+<span class="nc bnc" id="L393" title="All 2 branches missed.">            if (!isInvincible()) {</span>
+<span class="nc" id="L394">                changeAnimation(1);</span>
+            }
+        }
+
+        // Slowness Check
+<span class="nc bnc" id="L399" title="All 2 branches missed.">        if (!(slownessLeft &lt;= 0)) {</span>
+<span class="nc" id="L400">            slownessLeft -= Gdx.graphics.getDeltaTime();</span>
+<span class="nc bnc" id="L401" title="All 2 branches missed.">            if (slownessLeft &lt;= 0) {</span>
+<span class="nc" id="L402">                ToastSystem.addToast(&quot;Your slowness potion finally ran out!&quot;);</span>
+<span class="nc" id="L403">                setSpeed(100);</span>
+            }
+        }
+
+        // Dash Check
+<span class="nc bnc" id="L408" title="All 2 branches missed.">        if (dashed) {</span>
+<span class="nc" id="L409">            dashCooldown -= Gdx.graphics.getDeltaTime();</span>
+<span class="nc bnc" id="L410" title="All 2 branches missed.">            if (dashCooldown &lt;= 0) {</span>
+<span class="nc" id="L411">                dashed = false;</span>
+<span class="nc" id="L412">                dashCooldown = 3;</span>
+            }
+        }
+
+<span class="nc bnc" id="L416" title="All 2 branches missed.">        if (potionDelay != 0) {</span>
+<span class="nc" id="L417">            potionDelay -= Gdx.graphics.getDeltaTime();</span>
+        }
+<span class="nc" id="L419">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
