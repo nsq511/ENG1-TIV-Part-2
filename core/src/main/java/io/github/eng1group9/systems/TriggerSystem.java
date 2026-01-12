@@ -1,5 +1,6 @@
 package io.github.eng1group9.systems;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import com.badlogic.gdx.maps.MapLayer;
@@ -9,28 +10,33 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
+//import com.badlogic.gdx.math.Vector2;
 import io.github.eng1group9.Main;
 import io.github.eng1group9.entities.Player;
 
 /**
  * The system used to make things happen if a player enters a given area.
- * The Triggers layer on the TileMap contains Rectangles used to denote these areas.
- * The name of the Rectangle is in the form "ID,triggerType" 
+ * The Triggers layer on the TileMap contains Rectangles used to denote these
+ * areas.
+ * The name of the Rectangle is in the form "ID,triggerType"
  * which is used to determine what happens when it is triggered, and how.
- * 
+ * <p>
+ * </p>
  * triggerType must be in the form T or I
  * for Touch or Interact
  */
 public class TriggerSystem {
 
     /**
-     * A Trigger with a zone and a player it relates too. 
+     * A Trigger with a zone and a player it relates too.
      */
     static class Trigger {
         private int ID;
         private Rectangle zone;
         private boolean activateOnTouch = false;
+        // private Vector2 roomCoordinates;
 
         public Trigger(int ID, boolean activateOnTouch, Rectangle zone) {
             this.ID = ID;
@@ -57,30 +63,34 @@ public class TriggerSystem {
         public boolean playerInZone(Player player) {
             return player.isColliding(zone);
         }
+
+        public void moveZone(int x, int y) {
+            this.zone.setPosition(zone.getX() + x, zone.getY() + y);
+        }
     }
 
     private static List<Trigger> touchTriggers = new LinkedList<>();
     private static List<Trigger> interactTriggers = new LinkedList<>();
 
-    public static void init(String tmxPath) {
-        List<Trigger> triggers = getTriggers(tmxPath);
+    public static void init(String tmxPath, int viewportWidth, int viewportHeight) {
+        List<Trigger> triggers = getTriggers(tmxPath, viewportWidth, viewportHeight);
         for (Trigger t : triggers) {
             if (t.isActivateOnTouch()) {
                 touchTriggers.add(t);
-            }
-            else {
+            } else {
                 interactTriggers.add(t);
             }
         }
     }
 
     /**
-     * Return a list of all triggers in a tileset. 
-     * This should only be used when first loading the tileset. 
+     * Return a list of all triggers in a tileset.
+     * This should only be used when first loading the tileset.
+     *
      * @param tmxPath - The path to the tileset (.tmx file).
-     * @return A list of all Triggers. 
+     * @return A list of all Triggers.
      */
-    public static List<Trigger> getTriggers(String tmxPath) {
+    public static List<Trigger> getTriggers(String tmxPath, int viewportWidth, int viewportHeight) {
         TiledMap map = new TmxMapLoader().load(tmxPath);
         MapLayer triggerLayer = map.getLayers().get("Triggers");
         MapObjects triggerObjects = triggerLayer.getObjects();
@@ -96,7 +106,7 @@ public class TriggerSystem {
             String triggerType = recMapObj.getName().split(",")[1];
             Trigger t = new Trigger(ID, triggerType.equals("T"), zone);
             triggers.add(t);
-            System.out.println("Loaded Trigger " + t.getID());
+            System.out.println("Loaded Trigger " + t.getID() + " X:" + zone.getX() + " Y:" + zone.getY());
         }
         return triggers;
     }
@@ -116,20 +126,23 @@ public class TriggerSystem {
     }
 
     /**
-     * Remove a trigger from the system. 
-     * @param ID - The ID of the trigger which should be removed. 
-     * @return True if it was successful. 
+     * Remove a trigger from the system.
+     *
+     * @param ID - The ID of the trigger which should be removed.
+     * @return True if it was successful.
      */
     public static boolean remove(int ID) {
-        for (Trigger t : touchTriggers) {
+        for (Iterator<Trigger> it = touchTriggers.iterator(); it.hasNext();) {
+            Trigger t = it.next();
             if (t.getID() == ID) {
-                touchTriggers.remove(t);
+                it.remove();
                 return true;
             }
         }
-        for (Trigger t : interactTriggers) {
+        for (Iterator<Trigger> it = interactTriggers.iterator(); it.hasNext();) {
+            Trigger t = it.next();
             if (t.getID() == ID) {
-                interactTriggers.remove(t);
+                it.remove();
                 return true;
             }
         }
@@ -147,9 +160,11 @@ public class TriggerSystem {
     }
 
     /**
-     * Will check if the given player is staninding in any triggers, and trigger them if so.
+     * Will check if the given player is staninding in any triggers, and trigger
+     * them if so.
+     *
      * @param player The player which is being checked.
-     * This is run each time the player presses E.
+     *               This is run each time the player presses E.
      */
     public static void checkInteractTriggers(Player player) {
         for (Trigger t : interactTriggers) {
@@ -161,20 +176,47 @@ public class TriggerSystem {
     }
 
     /**
-     * Will check if the given player is staninding in any triggers, and trigger them if so.
+     * Will check if the given player is staninding in any triggers, and trigger
+     * them if so.
+     *
      * @param player The player which is being checked.
-     * This is run each frame.
+     *               This is run each frame.
      */
     public static void checkTouchTriggers(Player player) {
-        for (Trigger t : touchTriggers) {
+        for (Iterator<Trigger> it = touchTriggers.iterator(); it.hasNext();) {
+            Trigger t = it.next();
+
             if (t.playerInZone(player)) {
                 trigger(t.getID(), player);
+                it.remove();
             }
         }
     }
 
     /**
+     * <P>
+     * Adjusts the trigger zones to the current room.
+     * </P>
+     * <P>
+     * This should only be called from the loadRoom method in Main
+     * </P>
+     *
+     * @param x              - The x coordinate of the room.
+     * @param y              - The y coordinate of the room.
+     * @param viewportWidth  - The viewport width.
+     * @param viewportHeight - The viewport height.
+     */
+    public static void loadRoom(int offsetX, int offsetY) {
+        int x = -offsetX;
+        int y = -offsetY;
+        for (Trigger trigger : getTriggers()) {
+            trigger.moveZone(x, y);
+        }
+    }
+
+    /**
      * Will act based on which trigger has been activated
+     *
      * @param ID the trigger that has been activated
      */
     public static void trigger(int ID, Player player) {
@@ -186,16 +228,16 @@ public class TriggerSystem {
                 player.giveChestRoomKey();
                 break;
             case 2: // Get the scroll
-                Main.getScroll();
+                Main.getcloak();
                 break;
-            case 3: // Standing by the switch 
+            case 3: // Standing by the switch
                 Main.dropSpikes();
                 break;
             case 4: // Standing by the mouse hole
                 Main.checkForLongboi();
                 break;
             case 5: // Standing by the chest
-                player.giveExitKey();
+                player.giveJanitorKey();
                 break;
             case 6: // Standing by the chest room door
                 Main.openChestRoomDoor();
@@ -205,6 +247,90 @@ public class TriggerSystem {
                 break;
             case 8: // Pickup red potion.
                 player.giveRedPotion();
+                break;
+            case 9:
+                player.giveExitKey();
+                break;
+            case 10:
+                player.giveStaff();
+                break;
+            case 11:
+                player.giveFirestarter();
+                break;
+            case 12:
+                player.giveLockpick();
+                break;
+            case 13:
+                Main.releasePope();
+                break;
+            case 14:
+                Main.releaseBob();
+                break;
+            case 15:
+                Main.convertBoss();
+                break;
+            case 16:
+                Main.openPNQDoor();
+                break;
+            case 17:
+                Main.openDungeonDoor();
+                break;
+            case 18:
+                Main.openLockpickRoomDoor();
+                break;
+            case 19:
+                player.giveMoney();
+                break;
+            case 26:
+                player.readBook(1);
+                break;
+            case 21:
+                player.readBook(2);
+                break;
+            case 22:
+                player.readBook(3);
+                break;
+            case 23:
+                player.readBook(4);
+                break;
+            case 24:
+                player.readBook(5);
+                break;
+            case 25:
+                player.readBook(6);
+                break;
+            case 20:
+                player.readBook(7);
+                break;
+            case 27:
+                Main.loadRoom(0, 1, new Vector2(30, 30), new Vector2(50, 50), new Character[] { 'U', 'D' });
+                break;
+            case 29:
+                Main.openOutsideRoomDoor();
+                break;
+            case 30:
+                Main.getBook();
+                break;
+            case 31:
+                RenderingSystem.hideLayer("Potion1");
+                if (player.getPotionDelay() == 0) {
+                    player.potionTriggered();
+                    Main.getPotion();
+                }
+                break;
+            case 32:
+                RenderingSystem.hideLayer("Potion2");
+                if (player.getPotionDelay() < 1) {
+                    player.potionTriggered();
+                    Main.getPotion();
+                }
+                break;
+            case 33:
+                RenderingSystem.hideLayer("Potion3");
+                if (player.getPotionDelay() < 1) {
+                    player.potionTriggered();
+                    Main.getPotion();
+                }
                 break;
             default:
                 break;

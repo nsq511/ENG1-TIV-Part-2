@@ -1,52 +1,114 @@
 package io.github.eng1group9.entities;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 /**
- * This is the Dean, the games negative event and antagonist. 
- * They will not collide with the walls, but will catch the player if they get too close.
- * @param startPos - Where the dean will start. 
- * @param speed - How fast the dean will move. 
- * @param path - The deans path, it will follow this on loop. 
+ * This is the Dean, the games negative event and antagonist.
+ * They will not collide with the walls, but will catch the player if they get
+ * too close.
+ * 
+ * @param startPos - Where the dean will start.
+ * @param speed    - How fast the dean will move.
+ * @param path     - The deans path, it will follow this on loop.
  */
 public class Dean extends MovingEntity {
-    private int reach = 3; // size of dean hitbox in tiles (3x3)
+    private int reach = 2; // size of dean hitbox in tiles (3x3)
     private int moveNum = 0;
     private float nextTileDistance = 32;
     private Character[] path;
     private Rectangle reachRectangle;
     final Vector2 STARTPOS;
+    private float reachOffsetX;
+    private float reachOffsetY;
+
+    public void setPath(Character[] newPath) {
+        this.path = newPath;
+        this.reset();
+    }
 
     public Dean(Vector2 startPos, float speed, Character[] path) {
-        super(new Texture("Characters/deanAnimations.png"), new int[] {4, 4,4,4} , 32, 32, speed);
+        super(new Texture("Characters/deanAnimations.png"), new int[] { 4, 4, 4, 4 }, 32, 32, speed, startPos,
+                new Vector2(16, 0), true, true);
         setScale(2);
-        setPosition(startPos);
-        setHitbox(new Rectangle());
 
         reachRectangle = new Rectangle();
-        reachRectangle.setPosition(startPos.x -32, startPos.y -42);
-        reachRectangle.setSize(reach * 32);
+        int reachSize = reach * 32;
+        reachRectangle.setSize(reachSize);
+        reachOffsetX = (reachSize - getWidth()) / 2f;
+        reachOffsetY = (reachSize - getHeight()) / 2f;
+        /*
+         * Entity hitboxes are at the feet so the deans hitbox should be adjusted
+         * downwards so that the dean still captures
+         * the player when it looks like the players head overlaps with the dean
+         */
+        reachOffsetY += 32;
+        reachRectangle.setPosition(getX() - reachOffsetX, getY() - reachOffsetY);
         setHitbox(new Rectangle());
         this.path = path;
         STARTPOS = startPos;
+
+    }
+
+    public Dean(Vector2 startPos, float speed, Character[] path, String characterImage) {
+        super(new Texture(characterImage), new int[] { 4, 4, 4, 4 }, 32, 32, speed, startPos,
+                new Vector2(16, 0));
+        setScale(2);
+
+        reachRectangle = new Rectangle();
+        int reachSize = reach * 32;
+        reachRectangle.setSize(reachSize);
+        reachOffsetX = (reachSize - getWidth()) / 2f;
+        reachOffsetY = (reachSize - getHeight()) / 2f;
+        /*
+         * Entity hitboxes are at the feet so the deans hitbox should be adjusted
+         * downwards so that the dean still captures
+         * the player when it looks like the players head overlaps with the dean
+         */
+        reachOffsetY += 32;
+        reachRectangle.setPosition(getX() - reachOffsetX, getY() - reachOffsetY);
+        setHitbox(new Rectangle());
+        this.path = path;
+        STARTPOS = startPos;
+        setHitbox(new Rectangle());
+
+    }
+
+    /**
+     * Resets the Dean to its original state
+     */
+    public void reset() {
+        super.reset();
+        restartPath();
     }
 
     /**
      * Move the dean along its set path.
-     * It will move in a given direction until it has moved one tile, then look at the next direction. 
+     * It will move in a given direction until it has moved one tile, then look at
+     * the next direction.
      */
     public void nextMove() {
         Character direction = getNextDirection();
         float distance = move(direction);
         nextTileDistance -= distance;
-        if (!isFrozen()) updateAnimation(direction);
-        reachRectangle.setPosition(getX() - 32, getY() - 42);
+        if (!isFrozen())
+            updateAnimation(direction);
+        reachRectangle.setPosition(getX() - reachOffsetX, getY() - reachOffsetY);
+
+        // System.out.println("Sprite Pos: " + Float.toString(getX()) + ", " + Float.toString(getY()));
+        // System.out.println("Sprite Size: " + Float.toString(getWidth()) + ", " + Float.toString(getHeight()));
+        // System.out.println(
+        //         "Reach Pos: " + Float.toString(reachRectangle.getX()) + ", " + Float.toString(reachRectangle.getY()));
+        // System.out.println("Reach Size: " + Float.toString(reachRectangle.getWidth()) + ", "
+        //         + Float.toString(reachRectangle.getHeight()));
+
         haveIMovedOneTile();
     }
 
     /**
-     * Check if the Dean has move on tile yet, and if so move on to the next step in its path.
+     * Check if the Dean has move on tile yet, and if so move on to the next step in
+     * its path.
      */
     private void haveIMovedOneTile() {
         if (nextTileDistance <= 0) {
@@ -56,7 +118,7 @@ public class Dean extends MovingEntity {
     }
 
     /**
-     * @return The direction the dean should move in next. 
+     * @return The direction the dean should move in next.
      */
     private Character getNextDirection() {
         if (moveNum >= path.length) {
@@ -67,38 +129,40 @@ public class Dean extends MovingEntity {
     }
 
     /**
-     * Update the dean's animation based on its current direction. 
+     * Update the dean's animation based on its current direction.
+     * 
      * @param direction - The direction the dean is moving.
      */
     private void updateAnimation(Character direction) {
         switch (direction) {
-                case 'U':
-                    changeAnimation(1);
-                    break;
-                case 'L':
-                    changeAnimation(3);
-                    break;
-                case 'D':
-                    changeAnimation(0);
-                    break;
-                case 'R':
-                    changeAnimation(2);
-                    break;
-            }
+            case 'U':
+                changeAnimation(1);
+                break;
+            case 'L':
+                changeAnimation(3);
+                break;
+            case 'D':
+                changeAnimation(0);
+                break;
+            case 'R':
+                changeAnimation(2);
+                break;
+        }
     }
 
     /**
-     * Check if a player is within the dean's reach. 
-     * Will be false if the given player is invisible. 
+     * Check if a player is within the dean's reach.
+     * Will be false if the given player is invisible.
+     * 
      * @param player - The player to check against.
      * @return True if the player is in the deans reach zone.
      */
     public boolean canReach(Player player) {
-        return player.isColliding(reachRectangle) && player.isVisible();
+        return player.isColliding(reachRectangle) && player.isVisible() && isActive();
     }
 
     /**
-     * Make the dean go back to the start of its path (first instruction). 
+     * Make the dean go back to the start of its path (first instruction).
      */
     public void restartPath() {
         moveNum = 0;
@@ -106,11 +170,10 @@ public class Dean extends MovingEntity {
     }
 
     /**
-     * @return The dean's reach rectangle. 
+     * @return The dean's reach rectangle.
      */
     public Rectangle getReachRectangle() {
         return reachRectangle;
     }
-
 
 }
