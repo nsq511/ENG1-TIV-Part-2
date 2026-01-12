@@ -18,9 +18,10 @@ public class TimerSystem {
         TIMESTARTVALUE = timeLimit;
     }
 
-    public void add(float amount) {
-        elapsedTime += amount;
-    }
+    // NOT USED
+//    public void add(float amount) {
+//        elapsedTime += amount;
+//    }
 
     /**
      * Restarts the timer
