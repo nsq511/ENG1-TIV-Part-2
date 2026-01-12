@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AchievementSystem.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">core</a> &gt; <a href="index.source.html" class="el_package">io.github.eng1group9.systems</a> &gt; <span class="el_source">AchievementSystem.java</span></div><h1>AchievementSystem.java</h1><pre class="source lang-java linenums">package io.github.eng1group9.systems;
+
+import java.util.HashMap;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
+
+import io.github.eng1group9.Main;
+
+<span class="nc" id="L14">public class AchievementSystem {</span>
+    public static final float logoSize = 32f;
+<span class="nc" id="L16">    public static float rowHeight = logoSize + 10f; // The height of rows for rendering</span>
+<span class="nc" id="L17">    public static float colWidth = 300f; // The width of columns for rendering</span>
+
+<span class="nc" id="L19">    private static String missingTex = &quot;missingTexture.png&quot;;</span>
+
+<span class="nc" id="L21">    private static HashMap&lt;String, Achievement&gt; achievements = new HashMap&lt;&gt;();</span>
+
+    public static void init() {
+        // Achievement initialisation
+<span class="nc" id="L25">        AchievementSystem.addAchievement(</span>
+                Main.ACH_LONGBOI,
+                &quot;You found Longboi!&quot;,
+                1,
+                Main.LONGBOIBONUSAMOUNT,
+                &quot;ach_longboi.png&quot;);
+
+<span class="nc" id="L32">        AchievementSystem.addAchievement(</span>
+                Main.ACH_DEAN_CAPTURES,
+                &quot;Get caught by the dean 3 times...&quot;,
+                3,
+                Main.ACH_DEAN_CAPTURE_POINT_PUNISHMENT,
+                &quot;ach_dean_capture.png&quot;);
+
+<span class="nc" id="L39">        AchievementSystem.addAchievement(</span>
+                Main.ACH_INVIS,
+                &quot;Become invisible&quot;,
+                1,
+                &quot;ach_invis.png&quot;);
+
+<span class="nc" id="L45">        AchievementSystem.addAchievement(</span>
+                Main.ACH_LOST,
+                &quot;Take over 4 minutes to escape&quot;,
+                1,
+                &quot;ach_lost.png&quot;);
+
+<span class="nc" id="L51">        AchievementSystem.addAchievement(</span>
+                Main.ACH_QUICK,
+                &quot;Escape in under a minute&quot;,
+                1,
+                50,
+                &quot;ach_quick.png&quot;);
+
+<span class="nc" id="L58">        AchievementSystem.addAchievement(</span>
+                Main.ACH_BOOK,
+                &quot;Steal librarian's book&quot;,
+                1,
+                50,
+                &quot;ach_book.png&quot;);
+
+<span class="nc" id="L65">        AchievementSystem.addAchievement(</span>
+                Main.ACH_POTION,
+                &quot;Use all 3 potions&quot;,
+                1,
+                50,
+                &quot;ach_potion.png&quot;);
+
+<span class="nc" id="L72">        AchievementSystem.addAchievement(</span>
+                Main.ACH_ARSONIST,
+                &quot;Burn the library to the ground&quot;,
+                1,
+                100,
+                &quot;ach_arsonist.png&quot;
+        );
+
+<span class="nc" id="L80">        AchievementSystem.addAchievement(</span>
+            Main.ACH_WORLD_ENDER,
+            &quot;WHAT HAVE YOU DONE?!&quot;,
+            1
+            -100000,
+            &quot;ach_world_ender.png&quot;
+        );
+
+<span class="nc" id="L88">        AchievementSystem.addAchievement(</span>
+            Main.ACH_COWARD,
+            &quot;Escape without completing any of your missions&quot;,
+            1,
+            -50,
+            &quot;ach_coward.png&quot;
+        );
+
+<span class="nc" id="L96">        AchievementSystem.addAchievement(</span>
+            Main.ACH_ERUDITE,
+            &quot;Learn the basics of evil pacifist magic&quot;,
+            1,
+            50,
+            &quot;ach_erudite.png&quot;
+        );
+
+<span class="nc" id="L104">        AchievementSystem.addAchievement(</span>
+            Main.ACH_PAPAL_AUTHORITY,
+            &quot;Personally free the Pope from his cell&quot;,
+            1,
+            50,
+            &quot;ach_papal_authority.png&quot;
+        );
+
+<span class="nc" id="L112">        AchievementSystem.addAchievement(</span>
+            Main.ACH_PROSELYTISER,
+            &quot;Convert the boss using evil pacifist magic&quot;,
+            1,
+            100,
+            &quot;ach_proselytiser.png&quot;
+        );
+
+<span class="nc" id="L120">        AchievementSystem.addAchievement(</span>
+            Main.ACH_SELF_SERVING,
+            &quot;Seize the staff and knowledge of evil pacifist magic for yourself&quot;,
+            100,
+            &quot;ach_self_serving.png&quot;
+        );
+
+<span class="nc" id="L127">        AchievementSystem.addAchievement(</span>
+            Main.ACH_TRUE_AND_PERFECT_KNIGHT,
+            &quot;Complete both of your missions&quot;,
+            100,
+            &quot;ach_true_and_perfect_knight.png&quot;
+        );
+<span class="nc" id="L133">    }</span>
+
+    /**
+     * Gets the specified achievement
+     *
+     * @param title The title of the achievement
+     * @return The achievement with the given title or null if it does not exist
+     */
+    public static Achievement getAchievement(String title) {
+<span class="nc" id="L142">        return achievements.get(title);</span>
+    }
+
+    /**
+     * Adds an achievement to the system
+     *
+     * @param title                    The name of the achievment
+     * @param description              What the achievement is for
+     * @param requiredConditionsAmount The number of conditions that must be met to
+     *                                 acquire this achievement
+     * @param scoreModifier            How to modify the score when this achievement
+     *                                 is acquired
+     * @param logo                     The name of the logo image texture stored in
+     *                                 the /Assets/Achievements directory
+     */
+    public static void addAchievement(String title, String description, int requiredConditionsAmount,
+            float scoreModifier, String logo) {
+<span class="nc bnc" id="L159" title="All 2 branches missed.">        if (!Gdx.files.internal(&quot;Achievements/&quot; + logo).exists()) {</span>
+<span class="nc" id="L160">            logo = missingTex;</span>
+        } else {
+<span class="nc" id="L162">            logo = &quot;Achievements/&quot; + logo;</span>
+        }
+<span class="nc" id="L164">        Achievement achievement = new Achievement(title, description, requiredConditionsAmount, scoreModifier,</span>
+                new Texture(logo));
+<span class="nc" id="L166">        achievements.put(title, achievement);</span>
+<span class="nc" id="L167">    }</span>
+
+    /**
+     * Adds an achievement to the system with defualt missing texture for the logo
+     *
+     * @param title                    The name of the achievment
+     * @param description              What the achievement is for
+     * @param requiredConditionsAmount The number of conditions that must be met to
+     *                                 acquire this achievement
+     * @param scoreModifier            How to modify the score when this achievement
+     *                                 is acquired
+     */
+    public static void addAchievement(String title, String description, int requiredConditionsAmount,
+            float scoreModifier) {
+<span class="nc" id="L181">        AchievementSystem.addAchievement(title, description, requiredConditionsAmount, scoreModifier, missingTex);</span>
+<span class="nc" id="L182">    }</span>
+
+    /**
+     * Adds an achievement to the system with defualt missing texture for the logo
+     * and no score modifier
+     *
+     * @param title                    The name of the achievment
+     * @param description              What the achievement is for
+     * @param requiredConditionsAmount The number of conditions that must be met to
+     *                                 acquire this achievement
+     */
+    public static void addAchievement(String title, String description, int requiredConditionsAmount) {
+<span class="nc" id="L194">        AchievementSystem.addAchievement(title, description, requiredConditionsAmount, 0, missingTex);</span>
+<span class="nc" id="L195">    }</span>
+
+    /**
+     * Adds an achievement to the system with no score modifier
+     *
+     * @param title                    The name of the achievment
+     * @param description              What the achievement is for
+     * @param requiredConditionsAmount The number of conditions that must be met to
+     *                                 acquire this achievement
+     * @param logo                     The name of the logo image texture stored in
+     *                                 the /Assets/Achievements directory
+     */
+    public static void addAchievement(String title, String description, int requiredConditionsAmount, String logo) {
+<span class="nc" id="L208">        AchievementSystem.addAchievement(title, description, requiredConditionsAmount, 0, logo);</span>
+<span class="nc" id="L209">    }</span>
+
+    /**
+     * Increments the number of conditions that have been completed for the given
+     * achievment
+     *
+     * @param achievementTitle The title of the achievement to increment
+     *
+     * @return Whether the achievment has met all conditions to be completed
+     */
+    public static boolean incAchievement(String achievementTitle) {
+<span class="nc" id="L220">        Achievement achievement = achievements.get(achievementTitle);</span>
+<span class="nc bnc" id="L221" title="All 2 branches missed.">        if (achievement == null)</span>
+<span class="nc" id="L222">            return false;</span>
+<span class="nc" id="L223">        return achievement.incConditions();</span>
+    }
+
+    /**
+     * Resets all achievments for a new game
+     */
+    public static void reset() {
+<span class="nc bnc" id="L230" title="All 2 branches missed.">        for (Achievement a : achievements.values()) {</span>
+<span class="nc" id="L231">            a.reset();</span>
+<span class="nc" id="L232">        }</span>
+<span class="nc" id="L233">    }</span>
+
+    public static float modifyScore(float score) {
+<span class="nc bnc" id="L236" title="All 2 branches missed.">        for (Achievement a : achievements.values()) {</span>
+<span class="nc" id="L237">            score = (int) a.modifyScore(score);</span>
+<span class="nc" id="L238">        }</span>
+<span class="nc" id="L239">        return score;</span>
+    }
+
+    /**
+     * Draws the given achievements in a grid if they have been achieved
+     * Must be called within a batch begin/end
+     *
+     * @param pos   The position to draw the grid at. Anchored at the top left
+     * @param cols  The number of columns in the grid. The rows will be determined
+     *              based on the size of achievements
+     * @param batch The batch to use for drawing achievement logos
+     * @param font  The font to use for drawing text
+     */
+    public static void draw(Vector2 pos, int cols, SpriteBatch batch, BitmapFont font) {
+<span class="nc" id="L253">        Achievement[] achievementsArray = achievements.values().toArray(new Achievement[0]);</span>
+<span class="nc" id="L254">        final float buffer = 10f;</span>
+
+<span class="nc" id="L256">        int i = 0;</span>
+<span class="nc bnc" id="L257" title="All 2 branches missed.">        for (Achievement achievement : achievementsArray) {</span>
+<span class="nc bnc" id="L258" title="All 2 branches missed.">            if (!achievement.isAchieved())</span>
+<span class="nc" id="L259">                continue;</span>
+
+<span class="nc" id="L261">            int col = i % cols;</span>
+<span class="nc" id="L262">            int row = i / cols;</span>
+
+            // Place cursor in the bottom left of the cell
+<span class="nc" id="L265">            float curX = pos.x + (col * (colWidth + buffer));</span>
+<span class="nc" id="L266">            float curY = (pos.y - rowHeight) - (row * rowHeight);</span>
+
+<span class="nc" id="L268">            achievement.render(new Vector2(curX, curY), batch, font);</span>
+<span class="nc" id="L269">            i++;</span>
+        }
+<span class="nc" id="L271">    }</span>
+}
+
+/**
+ * Class for achievemnts in the game
+ */
+class Achievement {
+    private Sprite logo; // Achievement logo for displaying to user
+    private String name; // Title of achievement
+    private String description; // What the achievement is for
+    private boolean achieved;
+    private float scoreModifier; // How to modify the score when the achievement is acquired
+
+    private final int numReqConditions; // The number of conditions that must be met to acquire this achievement
+    private int reqConditionCount; // The number of conditions the user has completed. This
+
+    /**
+     * Creates an achievement
+     *
+     * @param title                    The name of the achievment
+     * @param description              What the achievement is for
+     * @param requiredConditionsAmount The number of conditions that must be met to
+     *                                 acquire this achievement
+     * @param scoreModifier            How to modify the score when this achievement
+     *                                 is acquired
+     * @param logo                     The logo to use for this achievement
+     */
+    public Achievement(String title, String description, int requiredConditionsAmount, float scoreModifier,
+<span class="nc" id="L299">            Texture logo) {</span>
+<span class="nc" id="L300">        numReqConditions = requiredConditionsAmount;</span>
+<span class="nc" id="L301">        reqConditionCount = 0;</span>
+
+<span class="nc" id="L303">        name = title;</span>
+<span class="nc" id="L304">        this.description = description;</span>
+<span class="nc" id="L305">        this.scoreModifier = scoreModifier;</span>
+<span class="nc" id="L306">        achieved = false;</span>
+<span class="nc" id="L307">        this.logo = new Sprite(logo);</span>
+<span class="nc" id="L308">        this.logo.setSize(AchievementSystem.logoSize, AchievementSystem.logoSize);</span>
+<span class="nc" id="L309">    }</span>
+
+    /**
+     * Creates an achievement with no score modifier
+     *
+     * @param title                    The name of the achievment
+     * @param description              What the achievement is for
+     * @param requiredConditionsAmount The number of conditions that must be met to
+     *                                 acquire this achievement
+     * @param logo                     The logo to use for this achievement
+     */
+<span class="nc" id="L320">    public Achievement(String title, String description, int requiredConditionsAmount, Texture logo) {</span>
+<span class="nc" id="L321">        numReqConditions = requiredConditionsAmount;</span>
+<span class="nc" id="L322">        reqConditionCount = 0;</span>
+
+<span class="nc" id="L324">        name = title;</span>
+<span class="nc" id="L325">        this.description = description;</span>
+<span class="nc" id="L326">        this.scoreModifier = 0;</span>
+<span class="nc" id="L327">        achieved = false;</span>
+<span class="nc" id="L328">        this.logo = new Sprite(logo);</span>
+<span class="nc" id="L329">        this.logo.setSize(AchievementSystem.logoSize, AchievementSystem.logoSize);</span>
+<span class="nc" id="L330">    }</span>
+
+    /**
+     * Creates an achievement with no texture
+     *
+     * @param title                    The name of the achievment
+     * @param description              What the achievement is for
+     * @param requiredConditionsAmount The number of conditions that must be met to
+     *                                 acquire this achievement
+     * @param scoreModifier            How to modify the score when this achievement
+     *                                 is acquired
+     */
+<span class="nc" id="L342">    public Achievement(String title, String description, int requiredConditionsAmount, float scoreModifier) {</span>
+<span class="nc" id="L343">        numReqConditions = requiredConditionsAmount;</span>
+<span class="nc" id="L344">        reqConditionCount = 0;</span>
+
+<span class="nc" id="L346">        name = title;</span>
+<span class="nc" id="L347">        this.description = description;</span>
+<span class="nc" id="L348">        this.scoreModifier = scoreModifier;</span>
+<span class="nc" id="L349">        achieved = false;</span>
+<span class="nc" id="L350">        logo = new Sprite();</span>
+<span class="nc" id="L351">        this.logo.setSize(AchievementSystem.logoSize, AchievementSystem.logoSize);</span>
+<span class="nc" id="L352">    }</span>
+
+    /**
+     * Creates an achievement with no texture and no score modifier
+     *
+     * @param title                    The name of the achievment
+     * @param description              What the achievement is for
+     * @param requiredConditionsAmount The number of conditions that must be met to
+     *                                 acquire this achievement
+     */
+<span class="nc" id="L362">    public Achievement(String title, String description, int requiredConditionsAmount) {</span>
+<span class="nc" id="L363">        numReqConditions = requiredConditionsAmount;</span>
+<span class="nc" id="L364">        reqConditionCount = 0;</span>
+
+<span class="nc" id="L366">        name = title;</span>
+<span class="nc" id="L367">        this.description = description;</span>
+<span class="nc" id="L368">        this.scoreModifier = 0;</span>
+<span class="nc" id="L369">        achieved = false;</span>
+<span class="nc" id="L370">        logo = new Sprite();</span>
+<span class="nc" id="L371">        this.logo.setSize(AchievementSystem.logoSize, AchievementSystem.logoSize);</span>
+<span class="nc" id="L372">    }</span>
+
+    public String getName() {
+<span class="nc" id="L375">        return name;</span>
+    }
+
+    public String getDescription() {
+<span class="nc" id="L379">        return description;</span>
+    }
+
+    /**
+     * Increments the number of conditions that have been completed
+     *
+     * @return Whether the achievment has been achieved on this increment call
+     */
+    public boolean incConditions() {
+<span class="nc bnc" id="L388" title="All 2 branches missed.">        if (reqConditionCount &lt; numReqConditions)</span>
+<span class="nc" id="L389">            reqConditionCount++;</span>
+
+<span class="nc bnc" id="L391" title="All 2 branches missed.">        if (reqConditionCount == numReqConditions) {</span>
+<span class="nc" id="L392">            achieved = true;</span>
+<span class="nc" id="L393">            return true;</span>
+        }
+
+<span class="nc" id="L396">        return false;</span>
+    }
+
+    /**
+     * Whether the achievement has been completed
+     *
+     * @return Whether the achievement has been completed
+     */
+    public boolean isAchieved() {
+<span class="nc" id="L405">        return achieved;</span>
+    }
+
+    /**
+     * Resets the achievement for a new game
+     */
+    public void reset() {
+<span class="nc" id="L412">        achieved = false;</span>
+<span class="nc" id="L413">        reqConditionCount = 0;</span>
+<span class="nc" id="L414">    }</span>
+
+    /**
+     * Modifies the score
+     *
+     * @param score The score to modify
+     * @return The modified score
+     */
+    public float modifyScore(float score) {
+<span class="nc" id="L423">        return score + scoreModifier;</span>
+    }
+
+    /**
+     * Draws the logo with its title and desctiption.
+     * Must be called within a batch begin/end
+     *
+     * @param pos   The position to draw the achievement. Anchored at the bottom
+     *              left
+     * @param batch The sprite batch to use to draw the logo
+     * @param font  The font to use to write text
+     */
+    public void render(Vector2 pos, SpriteBatch batch, BitmapFont font) {
+<span class="nc" id="L436">        final float buffer = 10f;</span>
+
+        // Draw logo
+<span class="nc" id="L439">        logo.setPosition(pos.x, pos.y);</span>
+<span class="nc" id="L440">        logo.draw(batch);</span>
+
+<span class="nc" id="L442">        float scale = font.getScaleX();</span>
+        // Draw text
+<span class="nc" id="L444">        pos.x += logo.getWidth() + buffer;</span>
+<span class="nc" id="L445">        pos.y += logo.getHeight();</span>
+<span class="nc" id="L446">        font.getData().setScale(1.5f * scale);</span>
+<span class="nc" id="L447">        font.draw(batch, name, pos.x, pos.y);</span>
+<span class="nc" id="L448">        pos.y -= logo.getHeight() * 0.6f;</span>
+<span class="nc" id="L449">        font.getData().setScale(scale);</span>
+<span class="nc" id="L450">        font.draw(batch, description, pos.x, pos.y);</span>
+<span class="nc" id="L451">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

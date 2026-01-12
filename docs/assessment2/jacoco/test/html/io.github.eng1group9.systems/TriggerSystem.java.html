@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TriggerSystem.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">core</a> &gt; <a href="index.source.html" class="el_package">io.github.eng1group9.systems</a> &gt; <span class="el_source">TriggerSystem.java</span></div><h1>TriggerSystem.java</h1><pre class="source lang-java linenums">package io.github.eng1group9.systems;
+
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+
+//import com.badlogic.gdx.math.Vector2;
+import io.github.eng1group9.Main;
+import io.github.eng1group9.entities.Player;
+
+/**
+ * The system used to make things happen if a player enters a given area.
+ * The Triggers layer on the TileMap contains Rectangles used to denote these
+ * areas.
+ * The name of the Rectangle is in the form &quot;ID,triggerType&quot;
+ * which is used to determine what happens when it is triggered, and how.
+ * &lt;p&gt;
+ * &lt;/p&gt;
+ * triggerType must be in the form T or I
+ * for Touch or Interact
+ */
+<span class="nc" id="L30">public class TriggerSystem {</span>
+
+    /**
+     * A Trigger with a zone and a player it relates too.
+     */
+    static class Trigger {
+        private int ID;
+        private Rectangle zone;
+<span class="nc" id="L38">        private boolean activateOnTouch = false;</span>
+        // private Vector2 roomCoordinates;
+
+<span class="nc" id="L41">        public Trigger(int ID, boolean activateOnTouch, Rectangle zone) {</span>
+<span class="nc" id="L42">            this.ID = ID;</span>
+<span class="nc" id="L43">            this.activateOnTouch = activateOnTouch;</span>
+<span class="nc" id="L44">            this.zone = zone;</span>
+<span class="nc" id="L45">        }</span>
+
+        public int getID() {
+<span class="nc" id="L48">            return ID;</span>
+        }
+
+        public boolean isActivateOnTouch() {
+<span class="nc" id="L52">            return activateOnTouch;</span>
+        }
+
+        public boolean isActivateOnInteract() {
+<span class="nc bnc" id="L56" title="All 2 branches missed.">            return !activateOnTouch;</span>
+        }
+
+        public Rectangle getZone() {
+<span class="nc" id="L60">            return zone;</span>
+        }
+
+        public boolean playerInZone(Player player) {
+<span class="nc" id="L64">            return player.isColliding(zone);</span>
+        }
+
+        public void moveZone(int x, int y) {
+<span class="nc" id="L68">            this.zone.setPosition(zone.getX() + x, zone.getY() + y);</span>
+<span class="nc" id="L69">        }</span>
+    }
+
+<span class="nc" id="L72">    private static List&lt;Trigger&gt; touchTriggers = new LinkedList&lt;&gt;();</span>
+<span class="nc" id="L73">    private static List&lt;Trigger&gt; interactTriggers = new LinkedList&lt;&gt;();</span>
+
+    public static void init(String tmxPath, int viewportWidth, int viewportHeight) {
+<span class="nc" id="L76">        List&lt;Trigger&gt; triggers = getTriggers(tmxPath, viewportWidth, viewportHeight);</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">        for (Trigger t : triggers) {</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">            if (t.isActivateOnTouch()) {</span>
+<span class="nc" id="L79">                touchTriggers.add(t);</span>
+            } else {
+<span class="nc" id="L81">                interactTriggers.add(t);</span>
+            }
+<span class="nc" id="L83">        }</span>
+<span class="nc" id="L84">    }</span>
+
+    /**
+     * Return a list of all triggers in a tileset.
+     * This should only be used when first loading the tileset.
+     *
+     * @param tmxPath - The path to the tileset (.tmx file).
+     * @return A list of all Triggers.
+     */
+    public static List&lt;Trigger&gt; getTriggers(String tmxPath, int viewportWidth, int viewportHeight) {
+<span class="nc" id="L94">        TiledMap map = new TmxMapLoader().load(tmxPath);</span>
+<span class="nc" id="L95">        MapLayer triggerLayer = map.getLayers().get(&quot;Triggers&quot;);</span>
+<span class="nc" id="L96">        MapObjects triggerObjects = triggerLayer.getObjects();</span>
+<span class="nc" id="L97">        List&lt;Trigger&gt; triggers = new LinkedList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L99" title="All 2 branches missed.">        for (MapObject mapObject : triggerObjects) {</span>
+<span class="nc" id="L100">            RectangleMapObject recMapObj = (RectangleMapObject) mapObject;</span>
+<span class="nc" id="L101">            int ID = Integer.parseInt(recMapObj.getName().split(&quot;,&quot;)[0]);</span>
+
+<span class="nc" id="L103">            Rectangle zone = recMapObj.getRectangle();</span>
+<span class="nc" id="L104">            zone.set(zone.x * 2, zone.y * 2, zone.width * 2, zone.height * 2);</span>
+
+<span class="nc" id="L106">            String triggerType = recMapObj.getName().split(&quot;,&quot;)[1];</span>
+<span class="nc" id="L107">            Trigger t = new Trigger(ID, triggerType.equals(&quot;T&quot;), zone);</span>
+<span class="nc" id="L108">            triggers.add(t);</span>
+<span class="nc" id="L109">            System.out.println(&quot;Loaded Trigger &quot; + t.getID() + &quot; X:&quot; + zone.getX() + &quot; Y:&quot; + zone.getY());</span>
+<span class="nc" id="L110">        }</span>
+<span class="nc" id="L111">        return triggers;</span>
+    }
+
+    /**
+     * @return A list of all touch triggers in the system (Name = ID,T).
+     */
+    public static List&lt;Trigger&gt; getTouchTriggers() {
+<span class="nc" id="L118">        return touchTriggers;</span>
+    }
+
+    /**
+     * @return A list of all touch triggers in the system (Name = ID,I).
+     */
+    public static List&lt;Trigger&gt; getInteractTriggers() {
+<span class="nc" id="L125">        return interactTriggers;</span>
+    }
+
+    /**
+     * Remove a trigger from the system.
+     *
+     * @param ID - The ID of the trigger which should be removed.
+     * @return True if it was successful.
+     */
+    public static boolean remove(int ID) {
+<span class="nc bnc" id="L135" title="All 2 branches missed.">        for (Iterator&lt;Trigger&gt; it = touchTriggers.iterator(); it.hasNext();) {</span>
+<span class="nc" id="L136">            Trigger t = it.next();</span>
+<span class="nc bnc" id="L137" title="All 2 branches missed.">            if (t.getID() == ID) {</span>
+<span class="nc" id="L138">                it.remove();</span>
+<span class="nc" id="L139">                return true;</span>
+            }
+<span class="nc" id="L141">        }</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">        for (Iterator&lt;Trigger&gt; it = interactTriggers.iterator(); it.hasNext();) {</span>
+<span class="nc" id="L143">            Trigger t = it.next();</span>
+<span class="nc bnc" id="L144" title="All 2 branches missed.">            if (t.getID() == ID) {</span>
+<span class="nc" id="L145">                it.remove();</span>
+<span class="nc" id="L146">                return true;</span>
+            }
+<span class="nc" id="L148">        }</span>
+<span class="nc" id="L149">        return false;</span>
+    }
+
+    /**
+     * @return A list of all triggers in the system (both types).
+     */
+    public static List&lt;Trigger&gt; getTriggers() {
+<span class="nc" id="L156">        List&lt;Trigger&gt; triggers = new LinkedList&lt;&gt;();</span>
+<span class="nc" id="L157">        triggers.addAll(touchTriggers);</span>
+<span class="nc" id="L158">        triggers.addAll(interactTriggers);</span>
+<span class="nc" id="L159">        return triggers;</span>
+    }
+
+    /**
+     * Will check if the given player is staninding in any triggers, and trigger
+     * them if so.
+     *
+     * @param player The player which is being checked.
+     *               This is run each time the player presses E.
+     */
+    public static void checkInteractTriggers(Player player) {
+<span class="nc bnc" id="L170" title="All 2 branches missed.">        for (Trigger t : interactTriggers) {</span>
+<span class="nc bnc" id="L171" title="All 2 branches missed.">            if (t.playerInZone(player)) {</span>
+<span class="nc" id="L172">                System.out.println(&quot;Triggered &quot; + t.getID() + &quot;!&quot;);</span>
+<span class="nc" id="L173">                trigger(t.getID(), player);</span>
+            }
+<span class="nc" id="L175">        }</span>
+<span class="nc" id="L176">    }</span>
+
+    /**
+     * Will check if the given player is staninding in any triggers, and trigger
+     * them if so.
+     *
+     * @param player The player which is being checked.
+     *               This is run each frame.
+     */
+    public static void checkTouchTriggers(Player player) {
+<span class="nc bnc" id="L186" title="All 2 branches missed.">        for (Iterator&lt;Trigger&gt; it = touchTriggers.iterator(); it.hasNext();) {</span>
+<span class="nc" id="L187">            Trigger t = it.next();</span>
+
+<span class="nc bnc" id="L189" title="All 2 branches missed.">            if (t.playerInZone(player)) {</span>
+<span class="nc" id="L190">                trigger(t.getID(), player);</span>
+<span class="nc" id="L191">                it.remove();</span>
+            }
+<span class="nc" id="L193">        }</span>
+<span class="nc" id="L194">    }</span>
+
+    /**
+     * &lt;P&gt;
+     * Adjusts the trigger zones to the current room.
+     * &lt;/P&gt;
+     * &lt;P&gt;
+     * This should only be called from the loadRoom method in Main
+     * &lt;/P&gt;
+     *
+     * @param x              - The x coordinate of the room.
+     * @param y              - The y coordinate of the room.
+     * @param viewportWidth  - The viewport width.
+     * @param viewportHeight - The viewport height.
+     */
+    public static void loadRoom(int offsetX, int offsetY) {
+<span class="nc" id="L210">        int x = -offsetX;</span>
+<span class="nc" id="L211">        int y = -offsetY;</span>
+<span class="nc bnc" id="L212" title="All 2 branches missed.">        for (Trigger trigger : getTriggers()) {</span>
+<span class="nc" id="L213">            trigger.moveZone(x, y);</span>
+<span class="nc" id="L214">        }</span>
+<span class="nc" id="L215">    }</span>
+
+    /**
+     * Will act based on which trigger has been activated
+     *
+     * @param ID the trigger that has been activated
+     */
+    public static void trigger(int ID, Player player) {
+<span class="nc bnc" id="L223" title="All 34 branches missed.">        switch (ID) {</span>
+            case 0: // open the main door
+<span class="nc" id="L225">                Main.winGame();</span>
+<span class="nc" id="L226">                break;</span>
+            case 1: // Get the chest room key
+<span class="nc" id="L228">                player.giveChestRoomKey();</span>
+<span class="nc" id="L229">                break;</span>
+            case 2: // Get the scroll
+<span class="nc" id="L231">                Main.getcloak();</span>
+<span class="nc" id="L232">                break;</span>
+            case 3: // Standing by the switch
+<span class="nc" id="L234">                Main.dropSpikes();</span>
+<span class="nc" id="L235">                break;</span>
+            case 4: // Standing by the mouse hole
+<span class="nc" id="L237">                Main.checkForLongboi();</span>
+<span class="nc" id="L238">                break;</span>
+            case 5: // Standing by the chest
+<span class="nc" id="L240">                player.giveJanitorKey();</span>
+<span class="nc" id="L241">                break;</span>
+            case 6: // Standing by the chest room door
+<span class="nc" id="L243">                Main.openChestRoomDoor();</span>
+<span class="nc" id="L244">                break;</span>
+            case 7: // Standing by the chest room door
+<span class="nc" id="L246">                Main.openExit();</span>
+<span class="nc" id="L247">                break;</span>
+            case 8: // Pickup red potion.
+<span class="nc" id="L249">                player.giveRedPotion();</span>
+<span class="nc" id="L250">                break;</span>
+            case 9:
+<span class="nc" id="L252">                player.giveExitKey();</span>
+<span class="nc" id="L253">                break;</span>
+            case 10:
+<span class="nc" id="L255">                player.giveStaff();</span>
+<span class="nc" id="L256">                break;</span>
+            case 11:
+<span class="nc" id="L258">                player.giveFirestarter();</span>
+<span class="nc" id="L259">                break;</span>
+            case 12:
+<span class="nc" id="L261">                player.giveLockpick();</span>
+<span class="nc" id="L262">                break;</span>
+            case 13:
+<span class="nc" id="L264">                Main.releasePope();</span>
+<span class="nc" id="L265">                break;</span>
+            case 14:
+<span class="nc" id="L267">                Main.releaseBob();</span>
+<span class="nc" id="L268">                break;</span>
+            case 15:
+<span class="nc" id="L270">                Main.convertBoss();</span>
+<span class="nc" id="L271">                break;</span>
+            case 16:
+<span class="nc" id="L273">                Main.openPNQDoor();</span>
+<span class="nc" id="L274">                break;</span>
+            case 17:
+<span class="nc" id="L276">                Main.openDungeonDoor();</span>
+<span class="nc" id="L277">                break;</span>
+            case 18:
+<span class="nc" id="L279">                Main.openLockpickRoomDoor();</span>
+<span class="nc" id="L280">                break;</span>
+            case 19:
+<span class="nc" id="L282">                player.giveMoney();</span>
+<span class="nc" id="L283">                break;</span>
+            case 26:
+<span class="nc" id="L285">                player.readBook(1);</span>
+<span class="nc" id="L286">                break;</span>
+            case 21:
+<span class="nc" id="L288">                player.readBook(2);</span>
+<span class="nc" id="L289">                break;</span>
+            case 22:
+<span class="nc" id="L291">                player.readBook(3);</span>
+<span class="nc" id="L292">                break;</span>
+            case 23:
+<span class="nc" id="L294">                player.readBook(4);</span>
+<span class="nc" id="L295">                break;</span>
+            case 24:
+<span class="nc" id="L297">                player.readBook(5);</span>
+<span class="nc" id="L298">                break;</span>
+            case 25:
+<span class="nc" id="L300">                player.readBook(6);</span>
+<span class="nc" id="L301">                break;</span>
+            case 20:
+<span class="nc" id="L303">                player.readBook(7);</span>
+<span class="nc" id="L304">                break;</span>
+            case 27:
+<span class="nc" id="L306">                Main.loadRoom(0, 1, new Vector2(30, 30), new Vector2(50, 50), new Character[] { 'U', 'D' });</span>
+<span class="nc" id="L307">                break;</span>
+            case 29:
+<span class="nc" id="L309">                Main.openOutsideRoomDoor();</span>
+<span class="nc" id="L310">                break;</span>
+            case 30:
+<span class="nc" id="L312">                Main.getBook();</span>
+<span class="nc" id="L313">                break;</span>
+            case 31:
+<span class="nc" id="L315">                RenderingSystem.hideLayer(&quot;Potion1&quot;);</span>
+<span class="nc bnc" id="L316" title="All 2 branches missed.">                if (player.getPotionDelay() == 0) {</span>
+<span class="nc" id="L317">                    player.potionTriggered();</span>
+<span class="nc" id="L318">                    Main.getPotion();</span>
+                }
+                break;
+            case 32:
+<span class="nc" id="L322">                RenderingSystem.hideLayer(&quot;Potion2&quot;);</span>
+<span class="nc bnc" id="L323" title="All 2 branches missed.">                if (player.getPotionDelay() &lt; 1) {</span>
+<span class="nc" id="L324">                    player.potionTriggered();</span>
+<span class="nc" id="L325">                    Main.getPotion();</span>
+                }
+                break;
+            case 33:
+<span class="nc" id="L329">                RenderingSystem.hideLayer(&quot;Potion3&quot;);</span>
+<span class="nc bnc" id="L330" title="All 2 branches missed.">                if (player.getPotionDelay() &lt; 1) {</span>
+<span class="nc" id="L331">                    player.potionTriggered();</span>
+<span class="nc" id="L332">                    Main.getPotion();</span>
+                }
+                break;
+            default:
+                break;
+        }
+<span class="nc" id="L338">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
