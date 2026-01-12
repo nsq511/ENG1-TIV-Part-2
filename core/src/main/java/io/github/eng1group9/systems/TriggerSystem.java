@@ -18,12 +18,19 @@ import io.github.eng1group9.entities.Player;
 
 /**
  * The system used to make things happen if a player enters a given area.
+<<<<<<< Updated upstream
  * The Triggers layer on the TileMap contains Rectangles used to denote these
  * areas.
  * The name of the Rectangle is in the form "ID,triggerType"
  * which is used to determine what happens when it is triggered, and how.
  * <p>
  * </p>
+=======
+ * The Triggers layer on the TileMap contains Rectangles used to denote these areas.
+ * The name of the Rectangle is in the form "ID,triggerType"
+ * which is used to determine what happens when it is triggered, and how.
+ *
+>>>>>>> Stashed changes
  * triggerType must be in the form T or I
  * for Touch or Interact
  */
@@ -86,7 +93,10 @@ public class TriggerSystem {
     /**
      * Return a list of all triggers in a tileset.
      * This should only be used when first loading the tileset.
+<<<<<<< Updated upstream
      *
+=======
+>>>>>>> Stashed changes
      * @param tmxPath - The path to the tileset (.tmx file).
      * @return A list of all Triggers.
      */
@@ -127,7 +137,10 @@ public class TriggerSystem {
 
     /**
      * Remove a trigger from the system.
+<<<<<<< Updated upstream
      *
+=======
+>>>>>>> Stashed changes
      * @param ID - The ID of the trigger which should be removed.
      * @return True if it was successful.
      */
