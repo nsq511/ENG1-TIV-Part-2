@@ -18,7 +18,7 @@ public class LeaderBoard {
 
     /**
      * Creates a leaderboard from a map of Usernames and Scores, with the specified max length
-     * 
+     *
      * @param leaderboard Pairings of unique usernames to scores
      * @param maxLength The maximum number of entries that can exist on the leaderboard
      */
@@ -33,21 +33,22 @@ public class LeaderBoard {
         this(new HashMap<>(), 5);
     }
 
-    public int getLength(){
-        return length;
-    }
+    // NOT USED
+//    public int getLength(){
+//        return length;
+//    }
 
     /**
      * Adds an entry to the leaderboard if there is space
      * If there is not sufficient space then behaviour will depend on whether the score ranks above the lowest value already in the leaderboard
      * If the score is less than or equal to the lowest value in the leaderboard, it will not be added
      * If the score is higher than the lowest value, it will be added and the lowest value will be removed
-     * 
+     *
      * @param name The name of the user who achieved the score. If name already exists it will overwrite
      * @param score The score that the user achieved
      */
     public void addEntry(String name, int score){
-        if(length == maxLen && get(maxLen) < score){
+        if(length == maxLen){
             popLowest();
         }
         else{
@@ -62,7 +63,7 @@ public class LeaderBoard {
 
     /**
      * Gets the score corresponding to the given name
-     * 
+     *
      * @param name The name of the user who's score to get
      * @return The score of the user
      */
@@ -71,7 +72,7 @@ public class LeaderBoard {
     }
     /**
      * Gets the score corresponding to the user of the specified rank when ordered by score
-     * 
+     *
      * @param rank The rank of the user who's score to get
      * @return The score of the corresponding user
      * @throws IndexOutOfBoundsException If rank is out of range
@@ -82,36 +83,38 @@ public class LeaderBoard {
 
     /**
      * Removes an entry by the rank when ordered by score
-     * 
+     *
      * @param rank The rank to remove
      * @throws IndexOutOfBoundsException If rank is out of range
      */
-    public void removeEntry(int rank) throws IndexOutOfBoundsException{
-        if( rank < 0 | rank > length){
-            throw new IndexOutOfBoundsException();
-        }
-        
-        Integer removed = entries.remove(getEntry(rank).getKey());
-        if(removed != null){
-            length--;
-        }
-    }
+    // NEVER USED
+//    public void removeEntry(int rank) throws IndexOutOfBoundsException{
+//        if( rank < 0 | rank > length){
+//            throw new IndexOutOfBoundsException();
+//        }
+//
+//        Integer removed = entries.remove(getEntry(rank).getKey());
+//        if(removed != null){
+//            length--;
+//        }
+//    }
     /**
      * Removes an entry by the name of the user
-     * 
+     *
      * @param name The name of the user to remove
      */
-    public void removeEntry(String name){
-        length--;
-        Integer removed = entries.remove(name);
-        if(removed != null){
-            length--;
-        }
-    }
+    // NEVER USED
+//    public void removeEntry(String name){
+//        length--;
+//        Integer removed = entries.remove(name);
+//        if(removed != null){
+//            length--;
+//        }
+//    }
 
     /**
      * Gets a list of entries ordered by ascending score
-     * 
+     *
      * @return The list of ordered entries
      */
     public ArrayList<Map.Entry<String, Integer>> getSortedList(){
@@ -122,7 +125,7 @@ public class LeaderBoard {
 
     /**
      * Removes the lowest entry
-     * 
+     *
      * @return The lowest entry
      */
     public Map.Entry<String, Integer> popLowest(){
@@ -167,7 +170,7 @@ public class LeaderBoard {
 
     /**
      * Creates a LeaderBoard object from a JSON
-     * 
+     *
      * @param json The JSON specifying the username and score entries
      * @param maxLength The maximum number of entries
      * @return The corresponding LeaderBoard
@@ -196,7 +199,7 @@ public class LeaderBoard {
     /**
      * Saves the leaderboard entry data to the specified file in JSON format
      * Does not save if the file cannot be written to
-     * 
+     *
      * @param filepath The file to save the data to
      */
     public void saveToFile(String filepath){
@@ -210,13 +213,15 @@ public class LeaderBoard {
 
     /**
      * Loads a leaderboard from the specified file
-     * 
+     *
      * @param filepath The file containing the entry data in JSON format
      * @param maxLength The maximum number of entries
      * @return The corresponding leaderboard. Or an empty leaderboard if the file is not readable
      */
     public static LeaderBoard loadFromFile(String filepath, int maxLength){
         Path path = Paths.get(filepath);
+        //DEBUG
+        System.out.println(path);
         try {
             String content = Files.lines(path).collect(Collectors.joining("\n"));
             return fromJson(content, maxLength);

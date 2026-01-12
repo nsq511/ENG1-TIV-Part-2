@@ -1,9 +1,10 @@
 import io.github.eng1group9.Main;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class MainTest {
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class MainTests {
     Main main;
 
     @BeforeEach
@@ -12,7 +13,7 @@ public class MainTest {
     }
 
     @Test
-    void testTest() {
-        assertFalse(false);
+    void testNoFail() {
+        assertTrue(true);
     }
 }
